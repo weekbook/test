@@ -1,0 +1,5901 @@
+
+
+8월 26일 기록
+
+@Resource(name = "")
+    Java에서 지원하는 어노테이션
+    name 으로 DI(의존성주입)를 가능케한다.
+    프레임워크에 종속적이지 않아 많이 사용하고, 추천하는 방식
+    Bean을 생성해주며 싱글톤 패턴이 자동으로 적용이 된다.
+
+@Autowired
+    Spring Framework에서 지원 하는 어노테이션이며, 종속적이다.
+    type으로 DI를 가능케한다.
+    Bean을 생성해주며 싱글톤 패턴이 자동으로 적용이 된다.
+    강제 연결 할 경우에는 @Qualifier를 사용한다.
+
+
+HashMap / LinkedHashMap 차이
+    HashMap은 데이터나 객체를 넣을때 key의 순서가 지켜지지 않는다는 것이다.
+    때문에, 입력된 Key의 순서가 보장되어야 한다면 LinkedHashMap을 사용하면 된다.
+    LinkedHashMap은 put을 통해 입력된 순서대로 Key가 보장되므로 해당 문제를 해결할 수 있다.
+
+
+ModelAndView
+    dispatcherservlet에 의해 처리될 뷰를 직접 지정할 수 있고 Model(entity) 부분에 있는 데이터를 전달 할 수 있도록 함
+
+
+@RequestParam
+    /getDriver?name="name에 담긴 value"
+    url이 전달될 때 name 파라미터 (name에 담긴 value)를 받아오게 된다.
+    즉, @RequestParam("실제 값") String 설정할 변수 이름
+    url뒤에 붙는 파라미터의 값을 가져올 때 사용한다.
+    단, RequestParam에 key값이 존재하지 않을 경우 "BadRequest"로 error가 발생
+    이를 방지하고자 default 값을 설정해준다.
+    ex) @RequestParam("name",required=false,defaultValue="") String name
+    Case 1) http://xxx.x.x?index=1&page=2
+    
+@PathVariable
+    url에서 각 구분자에 들어오는 값을 처리해야 할 때 사용한다.
+    Case 2) http://xxxx.x.x/index/1
+
+PstStngVO pstStngVO = (PstStngVO) mav.getModelMap().get("resultVO_stng");
+_init에서 설정해둔 값을 Key값을 이용하여 value값을 가져옴
+("resultVO_stng", pstStngVO) 같은 Map형태니깐 getModelMap().get()으로 pstStangVO값을 가져오는것)
+
+
+DataBase LIMIT
+    LIMIT 1;
+    데이터를 한 개만 뽑아오겠다는 말이다.
+    쿼리 결과가 여러개라면 LIMIT의 숫자를 조정해서 원하는 데이터를 뽑아올 수 있다.
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+  8월 29일 기록
+
+slf4j을 사용하는 이유?
+    기존 사용하던 log4j는 지원이 중단되었다. 보안이나 유지쪽에서도 좋지않다는 얘기다.
+    때문에 사용을 한다면 log4j2나 logback으로 교체하는 편이 더 좋고 퍼모먼스 측면에서도 우월하다.
+    하지만, log4j를 logback으로 교체하는 업무가 주어졌다고 가정을 하면,
+    우리는 우선 maven이나 gradle에서 log4j의 dependency를 exclude하고 다시 logback을 추가를 합니다.
+    이러한 과정에 수많은 오류 및 에러가 발생하게됩니다. replace기능을 사용해도 결국 conflict가 발생하고 하나하나 파일을 손봐야합니다.
+
+    때문에 이러한 일이 발생하지 않기 위해서 slf4j를 사용합니다. SLF4J는 java의 로깅 모듈들의 추상체라고 보면 된다.
+    이는 우리가 왜 interface를 써야하는가와 이유가 동일하다. 실제 코드상 interface코드를 사용하고 실제 로깅을 하는
+    구현체는 추가로 참조한 라이브러리에서 구현된다.
+    기존에 쓰던 log4j의 dependency를 제거한다 하더라도 수백개의 파일을 고치거나 내가 잘 모르는 영역을 건드려야 된다거나 하는일이
+    발생하지 않는다. log4j의 패키지나 class가 소스상에서 모두 사라졌기 때문이다.
+    내가 다른 로깅 라이브러리를 쓴다고 하면 그냥 기존의 참조를 지우고 새로운 로깅 모듈을 붙이기만 하면 된다.
+    그리고 왠만한 java의 logging 모듈들은 slf4j의 브릿지를 이미 제공해주고 있다. 그 이야기는 slf4j와 logback을 연결하기 위해서
+    추가로 무언가를 구현 할 필요가 없다는 얘기이다. 이미 만들어진 브릿지를 mavenrepository에서 찾아서 넣기만 하면 된다.
+    logback을 쓰고 싶으면 slf4j-api를 log4j2를 쓰고 싶다면 log4j-slf4j-impl과 log4j-api를 추가하면 된다.
+
+    결론적으로 개발자는 어떤 상황에든 대처하고 확장될 수 있는 느슨하고 유연한 코드를 만들어야 한다.
+    따라서 하나의 라이브러리에 너무 종속적이 되버리는 코드는 가급적 작성하지 않는쪽이 좋다. 그렇기에 slf4j를 써야하는 이유가 된다.
+
+Spring tiles란?
+    뷰페이지의 jsp들을 상단, 사, 하단을 설정 상태로 include 처리 해주는 구조의 템플릿을 말한다.
+    페이지들을 일관관리 할 수 있고, 공통사용하는 부분들을 배번 등록을 따로 해주지 않아도 되기 때문에 편리하다.
+
+이상화과장님 과제
+    CMS 사이트 추가해보고 포털관리 이용해서 콘텐츠, 게시판 메뉴 추가해보고 사용자 화면에서 잘 나오는지, 오류가 없는지 테스트해보기
+    -> 사이트별 관리할려면 사이트 추가시 자동으로 추가되는것이아니라 우리가 직접 작업을 추가해야한다고 하심 (보류)
+   
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+이드, 메인
+    8월 30일 기록
+
+이상화과장님 과제
+    29일에 못했던 작업을 한 번 스프링 공부할겸 추가해보라고 하심
+    즉, 사이트 관리에서 만들었던 사이트들을 직접 만들어서 포털관리에서 추가하여 사용자화면까지 띄울 수 있도록..
+    오전 : 보류
+    오후 : 파파고 Api 사용해서 추가해보기 (끝날때까지 404에러 떠서 망함)
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    8월 31일 기록
+    펜타코드 데이 / 월급날
+    오전 : 파파고 API 진행
+    갑자기 Tomcat에서 illegalstateexception 오류가 발생한다면, server.xml에서 reloadable을
+    false로 바꿔준다면 정상적으로 작동한다.
+
+    파파고번역 : ajax비동기 처리가 아닌 modelandview 방식으로 지정해서하면 중국어번역 동작하는것을 확인
+    Ajax 비동기 처리해서 Controller에서 Service 데이터 가공 후 나오는것까지는 잘 나오는데 view단에 나오질 못함
+    -> 비동기로 한국어 입력받은 값을 중국어 / 영어 버튼을 통해서 번역하는것까지 성공
+
+    이상화 과장님 : 파파고API ID랑 Secret을 Global.dev.properties 파일에 입력해두기(어차피 임시임)
+    파파고API 모듈을 ifez-cms-core/src/main/java/com/pentachord/util에 넣어야함
+    util폴더는 공통적으로 사용하는 기능들 모음 / service, serviceImpl, dao 만들 필요 없음
+    -> 이건 9월 1일에 하자?
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 01일 기록 (지각함)
+
+- 이상화 과장님 -
+공통모듈 쓰기때문에
+
+1. cms에 활용함.
+
+2. util.func 는 공통 활용위한 패키지 
+ex) api로 통해 변역연동, sns, feed, 등등.. 메일, sms발송, 등등. 날짜함수까지 등등.
+
+컨트롤러,  service, serviceimpl, dao는 디비관련 연동위해서 사용하는데
+컨트롤러는 화면 보여주기나  ajax이나 등등 활용 기능.
+
+FuncNaver 란
+
+네이버 개발자 에서 사용하는 공통모듈
+ ex)  파파고, 메일클라우드, 로그인 등등 기능을 다 활용위해 저기에 모여있는거.
+
+ 예제를 참고하면 여러개 있는데 
+
+ enum 활용해서 관리하던지, 아니면 공통코드 활용해도되는데 
+
+ enum 관리하는게 낫겟다.
+
+ 기훈씨가 만든거 잘만들었어 
+ 1차적으로 만든건 나도 그랬을거고
+
+ 2차 기능 보강 및 작업위해서라면
+
+ 파라미터 추가해서 원본언어, 목적언어 파라미터값 받을수있게 기능 추가활용하면 좋을거같아.
+
+ 만약 관리자에서 변역기능 필요하다 하면 관리자에서 컨트롤러 추가
+
+ 사용자에도 번역기능 필요하다면 사용자에서 컨트롤러 추가 
+
+공통모듈 api등등은 Func패키지안에 활용하면댕~'
+
+지도, 페이, 푸시 등등 여러가지 많잖아..
+
+
+거기에서 FuncKakao
+안에 메소들 있잖아.
+
+메소드명을 pushAlert
+
+해봤어? ㅇㅋ 옛날에 많이했거든 난 근데 다까먹어서..
+
+이렇게 구현하면 좋을거같아. 
+
+쉽게말해셔 그냥  inputVal 해두되고 (입력한 값)
+
+인용이가 고정이런거는 안좋아해 
+
+이거는 푸시하지말고 그냥 테스트용으로 놔두면되고 깃에서 안올라가게끔. 
+1. 그래서 원본언어, 목적언어 파라미터 추가해서 활용해야 함. 
+2. 처음에 받은파라미터 (원본, 목적)이 없으면 오류뱉어도되고
+아니면 if 체크해서 null일시 원본이 한국어, 목적이 영어 디폴트로 해두되고...
+내생각에는 그냥 오류뱉는게 좋을거같애
+왜냐면, 계정당 5천자까지 제한있고, 하루에 1만자까지 제한있을거같은데 맞지?
+그거때문에 오류뱉어야하는게 맞을거같애 .... 무제한이라면 상관없겠지만. 
+이것만 수정하면 오케이일듯. 
+junit 활용법 안해봣지?  안보이네.. 일단 어쩔수없으니까 화면구현까지는 잘했어 .
+
+//나중에 네이버 로그인 추가하게되면
+//	public static ~~~~ login()~~~
+//	네이버개발 문서참고해서 갖다 쓰면되 . 나머지는 1차 개발완료후 2차 기능보완  
+//	내가말했던거처럼 원본언어, 목적언어 파라미터 추가 등등.
+
+
+말씀해주신것처럼 앞으로는 고정값 하지말고 유동적으로 이용할 수 있는 함수 만들자
+해야하는거 원본언어 -> 목적언어로 파라미터 추가해서 사용자 입력대로 변경할 수 있도록
+
+
+!!  No mapping for POST 오류 발생 (파파고)
+각 처리방식이 이미 정해두심 (내가 맘대로 만들면 안됨..)
+process.json.do
+process.html.do
+process.ajax.do 등등. 통일성 나는 자동빌드 잘안해 수동이 안전 ㅋㅋ
+지금은 내 맘대로 translate.json.do 이렇게 지었지만,
+다음에는 위에 process.~~.do 처럼 미리 통일된 규칙으로 만들어진거 사용해야함
+
+메뉴 관리, 그룹 권한, 개인 권한 까지 주었는데 권한을 확인할 수 없다고함 -> 과장님이 낼 다시 보시기로
+
+컨트롤러에서 @RequestParam이 많아지면 보기도 안좋고 성능도 떨어지니,
+HttpServeltRequest request 파라미터로 받아오고,
+String input = request.getParameter("input") 이런 방식으로 하는게 더 좋다
+
+ajax에서 
+async: false,
+contentType: false,
+processData: false,
+이거 3개 안넣었더니 오류나던데 없어도 될 때도있던데 모르겠다.
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 2일
+    어제 오류나던 권한은 마지막에 사용여부에서 사용으로 바꾸지 않아서 생긴 오류 바꾸고나서 잘 됨
+    기존에 쓰던 translate.ajax.do와 같이 규칙없이 만든거 삭제하고 규칙에 맞춰서 만든것을 사용하자
+    기존에 있던 /process.json.do에 param=TP 부분만 바꿔서하면 될줄알았는데 안되더라
+    상세 메뉴에 /process.ajax.do로 추가해서 해야할듯하다. 왜안되지
+
+    -이상화과장님-
+    이제 trnaslate.json.do 빼고
+    process.ajax.do 꼭 쓰면될거야
+    TP="translate"
+    샘플컨트롤러 참고해서 규칙 맞춰야대~
+
+    요즘  ajax 안에서는 html, json 활용하기떄문에 json 로 하는게 맞을거같애. 요즘보니까.  
+    process.json.do  d요렇게 참고해서 작업하면 좋을거같애. 옛날에는 process.ajax.do 햇엇는데 인용이가 
+    바꾼거 보니까 , 요즘은 process.json.do (화면 뜨우지않고 결과 리턴해주는거, 실패시 실패값과 실패내용 / 
+    성공시 성공값이랑 성공메세지 (별도 필요시 데이터 추가)) / process.html.do (이거는 무슨개념인지 모르지?) 정답.
+
+    제이쿼리 $() 셀렉트를 이용할때 id나 class를 이용하기보다는 name속성을 이용해서 값을 찾거나 변경하도록 하자
+    폼데이터에 name속성은 필수!
+    <select name="select_original" id="select_original">
+    let original = $("select[name=select_original]").val();
+
+    내가 Controller에 코딩한 코드는 반환값이 String인 메소드를 코딩했는데, 코드 규칙에 맞춰서 하자. 
+    해당 코드는 다른 메모장에 -> 파파고기록.txt에서
+
+    반홭타입을 String에서 -> ObjResultVO타입으로 반환하도록 변경했으니 ajax결과값 뽑는 부분도 변경해야한다.
+    기존 String 반환타입일때는
+    var complete_translate = result.message.result.translatedText;
+    $("#complete").text(complete_translate);
+
+    이렇게 사용했지만, 변경 후 에는 json타입으로 parse해야한다.
+
+    //json 값을 받게되면 json 파싱 해주는거야.
+    const json = result.data;
+    const obj = JSON.parse(json);
+
+    alert("##message>>" + obj.message);
+    alert("##message.result>>" + obj.message.result);
+    alert("##message.result.translatedText>>" + obj.message.result.translatedText);
+    $("#complete").text(obj.message.result.translatedText);
+    위 과정을 통해 값이 제대로 들어오는지 확인.
+    resultVO.setStatus(Status.OK); //필수 - 성공실패여부
+    resultVO.setMessage("번역완료"); //요거 해두되는데 굳이 안해두된다면 안해두됨 - 메시지
+    resultVO.setData(transText); // 보낼 결과값
+    
+    테스트 결과 -> 결과값은 잘나오는데 입력값이 없거나, 원본 및 목적언어 설정안할때 오류가 안뜸
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 5일
+
+    var, let, const
+    var는 함수 레벨 스코프를 따른다. (중복 선언이 가능함 -> 디버깅에 좋지 않음)
+    함수 레벨 스코프 : 함수 내에서 선언된 변수는 함수 내에서만 유효하며 함수 외부에서는 참조할 수 없다.
+    즉, 함수 내부에서 선언한 변수는 지역 변수이며 함수 외부에서 선언한 변수는 모두 전역 변수이다.
+
+    let은 블록 레벨 스코프를 따른다. (블록을 벗어나면 오류, 중복 선언시 오류)
+    블록 레벨 스코프 : 모든 코드 블록(함수,if문,for문,while문,try/catch문 등) 내에서 선언된 변수는 
+    코드블록 내에서만 유효하며 코드 블록 외부에서는 참조할 수 없다. 즉, 코드 블록 내부에서 선언한 변수는 지역변수이다.
+
+    const 또한 블록 레벨 스코프를 따른다.
+    let과 const의 차이는 let은 재할당이 가능하고, const는 재할당이 불가능한 변수이다.
+    const로 객체나 배열을 할당 시에도 객체와 배열 내부의 값은 바꿀 수 있어, 재할당하는 경우는 사실 흔하지 않다.
+    또한 const는 의도치 않은 재할당을 방지해주기 때문에 var과 let보다 안전하다.
+    
+    재할당이 필요한 변수에 한정해 let을 사용하는 것이 적합하며, (ex. 반복문, 수학계산 등)
+    거의 대부분의 경우에 const를 사용하는 것이 적합하다.
+
+
+    FormData 객체란?
+    window.FormData에 위치하며, html에 form태그가 있으면 제이쿼리나 자바스크립트로 가져온다.
+    // html태그에 form태그가 존재할시 
+    const formData1 = new formData($("#form");
+    // html태그에 form태그가 없을경우
+    const formData = new FormData();
+    formData.append('item','hi');
+    formData.append('input',변수명);
+
+    위에 처럼 append메소드에 key와 value 값을 차례로 추가해주면, 곧 input태그에 값을 입력하는 것과 같은 효과를 가진다.
+    참고로 값은 무조건 "문자열"로 자동 변환 된다. 객체나 배열 같은 복잡한 데이터는 넣을 수 없다.
+
+    formData = new FormData(formList.get(0));
+    get() 함수를 사용하면 해당 인덱스의 값이나 key, value값을 return 할 수 있다.
+
+    formdata key와 value 확인하는방법
+    for (let key of formData.keys()) {
+	console.log(key, ":", formData.get(key));
+    }
+
+    HashMap과 Map의 차이점
+    HashMap<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<String, Object>();
+    두 번째 코드가 HashMap이 구현하는 인터페이스의 개념으로 이해하면 된다.
+    때문에 두 코드 모두 정상적으로 HashMap을 선언하여 사용할 수 있고 그 기능상에서 차이를 보이지 않는다.
+    하지만 유지보수성을 고려했을 때 그 차이를 보인다.
+    두 번째 코드를 사용하면 나중에 HashMap이 아닌 다른 종류의 Map을 사용해야하는 상황이 발생하더라도
+    많은 코드 수정이 필요없이 손쉽게 이를 반영할 수 있다.
+    첫 번째 코드를 사용하게되면 오직 HashMap에 대한 Object를 담을 수 있기 때문에 앞에서 살펴본 
+    두 번째 Code에 비해서 다소 코드의 수정이 더 할일이 많아지고 불편해지며, 유지보수성이 떨어진다.
+
+    Junit Test 오류
+    Test할려는데 자꾸 Class Not Found 라고 오류남 2가지 방법 하다가 갑지가 되었는데,
+    1. Java Build Path -> Order and Export에서 Maven Dependencies, JRE순서 변경
+    2. Maven Update 
+
+    - 이상화 과장님 -
+    FuncHttp클래스에 있는 initHttpUrlConnection함수를 이용해서 
+    FuncNaver의 파파고 모듈을 수정해봐라 (파라미터 변경해서 해보기)
+    이상화 처음에 initHttpUrlConnection 이렇게 활용해보고
+    테스트정상되면 getHttpUrlConnection 이메소드로 바꿔서 활용해봐요
+    funcHttp는 restapi 통신하는 기능 구현되어잇기때문에 네이버에 제공한 자바소스랑 비슷해여
+    그래서 우리회사에서 만들어놓은 함수,메소드가 있는데 그거 맞춰서 활용하는 연습해보는게 좋아요
+    파라미터만 잘맞춰넣으면 될듯
+
+    -> initHttpUrlConnection은 테스트 성공하여 결과값이 잘 나옴
+    -> getHttpUrlConnection은 이것또한 성공 근데 짜맞추다 어쩌다 된것같음
+
+    BufferedReader / BufferWriter
+    버퍼를 사용하면 입출력 효율이 매우 좋아진다.
+    버퍼를 사용하지 않으면 키보드 입력 누르는 즉시 바로 전달되고,
+    버퍼를 사용하면 중간에 메모리 버퍼를 둬서 데이터를 한데 묶어서 이동시킨다.
+    예를 들면, 흙을 한 번 파고 가서 일일이 버리는것보다, 수레에 한 번에 채워서 나르는 것과 동일하다.
+
+    StringBuilder
+    기존 String을 사용하여 문자열을 더할 때는 새로운 객체를 생성하는 방식으로 하지만,
+    StringBuilder는 기존의 데이터에 더하는 방식을 사용하기 때문에 속도도 빠르며 상대적으로 부하가 적다.
+
+
+    Junit Test방법
+	@Test
+	public void execute2() {	
+		
+		try {
+				
+			ObjResultVO transText = FuncNaver.papago("한국", "ko", "en");
+				
+			System.out.println("##getData>>" + transText.getData());
+			System.out.println("##getStatus>>" + transText.getStatus());
+		} catch (Exception e) {
+			System.out.println("[ERROR] >>" + e.toString());
+		}
+	}
+    테스트도 try~catch를 사용하면 더 좋음
+
+    서버쪽(네이버, 구글, 페북, 등등)에서도 오류가 날 수 있기때문에
+    rest api 테스트는 postman과 같은 툴에서 테스트해보면 좋다
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    
+    9월 6일
+    
+    private static final Logger logger = LoggerFactory.getLogger(this.getClass());
+    1) static으로 선언한 이유
+    static을 선언하면 클래스 변수로 객체 생성이 될 때마다 해당 객체를 매번 생성하지 않고 초기 클래스로 로딩 시 한 번만 생성해서 사용하게 됨
+    -> Perm영역의 공간 소비 X / 직렬화 피함 
+    2) final으로 선언한 이유
+    로그를 찍는 경우 Logger는 초기 생성된 이후 변경될 필요가 없다. 따라서 final로 선언하여 유지보수와 가독성을 높이기 위함
+    3) 기능
+    Console 창에 해당 로그가 찍힌다. 따라서 프로그램이 오류 발생 시 어디서 어떤 이유로 오류가 발생하는지 알 수 있어 이슈 처리가 용이
+    결론 
+    private : 다른 클래스에서 가로채 사용하지 못하도록
+    static : 인스턴스당 하나만 필요하므로, 또한 직렬화를 피하기 위해
+    final : 변경될 일이 없으므로
+
+    오늘 할일
+    1. 페이스북 feed 가져오기 파악 및 토큰 발급법 등 파악
+    2. 페이브북 feed 가져오기 api 처리
+    3. DB에 데이터 중복 존재시 update / 데이터 중복 미존재시 insert
+    db 설계는 내가 해줄태니까 우선 1.2번만 하고있으면될듯.
+    테스트는 자기페이스북계정으로 테스트해두됨 나도 시간나면 파악해볼태니 참고하면될거같아
+
+    Accesss Token Info
+
+
+    spring-facebook 연결방법
+    https://wan-blog.tistory.com/11
+    https://docs.spring.io/spring-social-facebook/docs.old/1.0.0.RC1/reference/html/apis.html
+
+    Facebook Graph API
+    문의 ->  https://developers.facebook.com/support/bugs/1570204453396865/?join_id=f642be7f007334
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 7일
+    페이스북 API진행
+    오늘도 앱생성 안되서 결국 페이스북 계정 새로파서 만듬
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 8일
+    페이스북 API진행
+    구글링해서 찾은 내용을 이용하여 테스트 할려던 차,
+    Facebook SDK를 사용해야하는데, Content Security Policy에 걸려서 진행못하는중
+    -> PageIntercepter에 CSP에 대한 설정이 코딩되어있으나, 건드려보는중
+
+    String.join()
+    join("추가할 문자", "대상 list(혹은 Array)"
+    String[] color = new String[] {"빨강", "노랑", "초록", "파랑"};
+    System.out.println(String.join("+ ", color));
+    -> 빨강+노랑+초록+파랑 
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 13일
+    네이버 API 데이터랩 -> log에 기록이 찍히도록 만듬. 하지만 ratio 비율 데이터를 추출해야함
+    
+    자바스크립트
+    객체 key값 추출 -> Object.keys(객체);
+    객체 value값 추출 -> Object.values(객체);
+    JavaScript 값이나 객체를 JSON문자열로 변환 -> JSON.stringify(값 or 객체);
+    JSON문자열을 분석하여 JavaScript값이나 객체를 생성 -> JSON.parse(JSON문자열);
+
+    마이바티스 resultMap
+    자동 매핑으로 해결이 어려운 경우를 위해 구조를 설계할 수 있도록 만들어진 도구
+    필드명이 자주 바뀐다거나, 매칭되는 타입이 다른 경우 매핑 할 수 없는데, 이 때 사용하게 되는 것이 ResultMap이다.
+    데이터베이스의 레코드명과 VO클래스의 변수명이 같으면
+    <resultMap type="com.pentachord.model.cms.vo.CmsSiteVO" id="resultMap" />
+    이렇게만 선언해도 가능한가봄.
+
+    자바 Stream().filter()
+    기존 자바 컬렉션이나 배열의 원소를 가공할때, for문, foreach 등으로 원소 하나씩 골라내여 가공을 하였다면,
+    Stream을 이용하여 람다함수형식으로 간결하고 깔끔하게 요소들의 처리가 가능하다.
+    배열 원소 가공 메소드
+    map : 요소들을 특정조건에 해당하는 값으로 변환해준다.
+    filter : 요소들을 조건에 따라 걸러내는 작업을 해준다.
+    sorted : 요소들을 정렬해주는 작업을 해준다.
+    요소들의 가공이 끝났다면 리턴해줄 결과를 collet를 통해 만들어준다.
+
+    cmsSiteVO = cmsSiteList.stream().filter(a->FuncString.isEqual(a.getCms_site_sn(), 
+    cms_site_sn)).collect(Collectors.toList()).get(0);
+    FuncString.isEqual메소드로 site_sn이 같다면 collect메소드로 list를 만들어 return해준다.
+
+    Comparator / Comaparable 인터페이스
+    Comparable : 객체를 비교 할 수 있도록 만들기 위한 인터페이스
+    compareTo() 메소드 하나가 선언되어 있는 인터페이스로, 자기 자신과 매개변수로 들어오는 객체를 비교한다.
+
+    Comparator : 객체를 비교 할 수 있도록 만들기 위한 인터페이스
+    compare() 메소드 하나가 선언되어 있는 인터페이스, 자기 자신이 아닌 매개변수로 들어오는 객체 2개를 비교한다.
+
+    더블콜론과 람다
+    더블콜론(::)은 람다의 간결한 버전중 하나이다.
+    list.forEach(item -> System.out.println(item));
+    list.forEach(System.out::println);
+    
+    DashboardController랑 main.jsp 비교하면서 작동방식 봄
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+   9월 14일
+   fn:escapeXml()
+   xml 마크업으로 해석될 수 있는 문자를 이스케이프 한다.
+   <c:set var="str2" value="<a>This is XML String</a>"/>
+   <p>str2 : ${fn:escapeXml(str2)}</p>
+   결과 -> value="This is XML String"
+
+   자바 ... 파라미터 = 가변인자
+   public void test(String ... parameter)
+   위 예제처럼 ... 파라미터는 가변인자로 여러 개의 매개변수를 받을 수 있다는 말이다.
+
+프로퍼티에서 가져오게끔
+url
+https://graph.facebook.com/v14.0/103406285850273/feed?
+
+토큰도 프로퍼티에서 가져오게끔 
+파라미터
+access_token=EAAlZC3xTvzicBAHyqFvSfPrywnhSFccAoHob3OZChXcAExvgL24pPsaRyKsyWXpr6NEVBw0xxr4Pd0lrZCXN2nGMdgRMG12ZAOs1qZBMnxdN3GOTFnrU9kOZCyaa7miq6uslYRF81ZBVrBuZBQZA1SIHZAI09iOpSIujL3hHbp4MFtnQNrxYZA5BCl5AcQGubGYhcjhrmjd4HgryAwrZAHWNSAKO
+&fields=attachments,message,picture,link,name,caption,description,source
+
+
+페이스북 그래프 API 
+PageInterceptord에 3가지 추가해서 content security policy 막히는거 뚫음
+-> 게시물, 사진 feed 뜨는것까지 확인
+
+타계정 feed도 뜨게할려면?
+-> 해당 계정 앱ID, Access Token을 이용하여 뜨게 할 수 있음 (액세스 토큰은 1시간 유효이므로 3개월 혹은 영구로 바꿔야할듯)
+
+앞으로 해야할것
+자바스크립트로 구현한것을 서버단 즉, 자바로 해야함 
+앱id와 access Token을 global.properties에서 받아서 입력하고,
+cURL을 이용해서 나온 url을 gethttpsurl~ 메소드를 이용해서  
+썸네일이미지, 글내용, 링크, 게시일자 등이 DB에 넘어갈 수 있도록 해야함.
+링크가 있어야 썸네일 클릭시 해당 링크로 이동하게끔 만들 수 있기 때문에
+DB에 저장 -> DB조회할때 뿌려줌
+
+(ifez 메인 홈페이지 구석부분에 페이스북 feed가 나오도록 만드는듯하다?)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 15일
+    globals.dev.properties에 Naver Api Key 만들어논게 있었다.. 좀 보고 할껄
+    
+    페이스북 서버단에서 돌아가도록 작업중
+    6시간동안 GET방식을 POST방식으로 해놔서 안되는걸로 개고생하고있었네 아오
+    암튼 데이터 뿌려주는것까지는 완료함
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 16일
+    드디어 중첩객체에서 값 추출하는거 알아냄
+    const json = result.data;
+    const obj = JSON.parse(json);
+    
+    여기서 문제가 console.log("##obj.data>>"+obj.data);
+    방식으로 확인하려고 앞에 문자열을 붙인것이... 라고했는데 또 되네??
+    console.log("##obj.data[0].message>>>"+obj.data[0].message); 이런 방식으로하니 잘나옴
+
+    ajax dataType과 ContentType의 차이??
+    contentType은 보내는 데이터의 타입이다.
+    contentType: 'application/json; charset=utf-8' 방식이 흔히 쓰이며,
+    디폴트는 application/x-www-form-urlencoded; charset=utf-8 이다.
+    dataType은 서버에서 어떤 타입을 받을 것인지를 의미한다.
+    json, html, text 등등... jQuery가 이것을 이용해 success나 done 함수의 파라미터로 받아 처리한다.
+    
+    ajax async / processData
+    async옵션의 기본값은 true로 async옵션을 표기해주지 않으면, 비동기 통신을 하게된다.
+    동기식으로 처리를 하고 싶을때는 async옵션에 false를 주면 된다.
+    false를 주게되면, 동기식 처리를 하게되므로, ajax통신의 결과를 받고나서 다음 스크립트 코드로 차례대로 실행하게 된다.
+
+    processData
+    data 지정한 개체를 쿼리 문자열로 변환할지 여부를 설정한다. 기본값은 true로,
+    자동으로 "application/x-www-form-urlencoded" 형식으로 변환한다.
+    DOMDocument 자체 등의 다른 형식으로 데이터를 보내기 위하여 자동 변환하고 싶지 않을 경우에는 false를 지정searchvo vo차이
+
+
+    -이상화과장님-
+    썸네일, 링크, 내용, 등록일시 4개 추출하는 거까지만 해주면될거같아.
+    나중에 바로 스크립트로 뿌리는게 아니라 (왜냐면 시간딜레이 있어서)
+    스케쥴러로 활용해서 DB에 저장활용예정이기때문에
+    나중에 화면에서 뿌릴떄 DB통해서 바로 뿌리게끔 구현할 예정이라서 (요렇게 하면 api 안하고 바로 바로 뿌리기때문에 시간단축이 빨라짐)
+    그래서 그렇게 사용할거라 내생각이거든 그래서 DB저장하기위해 자바단에서 필요한 필드만 뿌려주게 구현해주면될거같아.
+    //그거까지만 해주면 될거같아. 나중에 DB내가 설계완료되면 그떄 DB 넣어주는걸로 그거 우선 설계감리때문에
+    다음주월요일쯤 설계 DB공유해줄께 그떄 디비넣는거까지만 해주면될거같아 . 
+    insert, update, select, selectList 등등. delete포함
+    이것들은 어차피 샘플에 있는거 다 똑같이 복붙하고 활용하면대.
+
+    받아온 데이터를 어떻게 게시물마다 분리시켜서 DB에 저장하지?
+    JSONObject, JSONArray 등등 해봐도 안됨 
+    toString 으로 변환한다음에 String 메소드를 이용해서 분리해야하나?? 
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 19일
+    facebook feed 나오는 항목에 updated_time도 나오게 하도록 추가
+    테이블 만드는건 이상화 과장님이 진행하시고, 나는 마이바티스 쿼리 짜서 데이터가 들어가도록 할듯
+    게시물 id값이 존재하면 자동으로 update해주고, 존재하지 않으면 insert를 해주는 merge into문 사용해서
+    처리하기 기존 if태그 사용해서 만드는거 아님
+    
+    Z:\펜타코드\202207_IFEZ 웹사이트 전면 개편 사업\99.기타 에 있는 테이블 설계_v1.5 엑셀파일을 참고해서
+    create table 문을 만듬 7~8개 만든듯 
+    module-seting.sql 파일에 작성하였는데 이클립스에 못찾아서 찾았더니 ifez 프로젝트 폴더 안에 있더라.
+    (cubrid) TINYINT는 (3) 처럼 크기 지정하지 않아도 됨
+    ` ' 이거 두개 햇갈리지 않도록 유의하기
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 20일
+    cms에 페이스북 피드 적용시키기 위해 코딩중..
+    JSONParser을 이용해서 각 key에 따른 value를 뽑아내는것까지는 성공했지만,
+    이것들을 DB에 어떻게 저장하지??????????? -> 일일이 setter 사용해서 insert되는것은 확인
+    Gson 라이브러리 사용하면 JSON을 VO랑 매핑해서 사용할 수 있는데 key값이 달라서 사용못하고있음 (sns_url_~~ <-> link)
+    
+    SearchVO 일반VO 나눈 이유?
+
+    페이스북 피드 기능을 어떻게 cms에 적용하는지 잘 모르겠다. 
+    cms에서 페이스북에 게시물을 올리거나 삭제하는것까지해야하는가?
+    
+    1. CmsFacebookMapper.java / .xml
+    2. CmsFacebookService / Impl
+    3. CmsFacebookSearchVO / CmsFacebookVO
+    4. FacebookController
+    5. ConstVO 클래스에 TB_SNS_FD 테이블 추가
+
+    cms 피드관리 페이지에 db데이터 나오는것까진 확인.. 매우 지저분
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 21일
+    먼저 리스트를 띄어놓고 수집 가져오기 해서 갱신?
+    아니면 빈 화면에서 수집버튼을 눌러야 갱신되면서 리스트가 띄어지는 방식? 
+
+    
+    insert랑 update if문?? / merge into ans 오류
+    파일명은 항상 DB테이블 이름에 맞춰서 (CmsFacebookController X -> SnsFdController)
+
+    갱신 = 페이스북 수집하기 (최근 10개까지만 가져오기)
+    나중에 영어버젼도 가져올수도있고, 
+    등등.. 인스타그램 등등..
+    나중에 페이스북 class 안에
+    메소드가 각역할 더 추가할수도있어.
+    피드가져오기, 로그인하기, 토큰가져오기 등등 그렇기때문에
+    메소드명을 이렇게 하면되.
+    일련번호 자동넣는거 이거때문에 그냥 merge 없애는걸로. 
+    그냥 컨트롤러에서 값이 존재하면 그냥 update 던져주고
+    값이 미존재시 insert하는걸로   
+    카운트로 조회해서 1이상ㅇ일경우 update
+    0일경우 insert 일련번호 못가져오기때문에 오류날거같애. 
+    그래서 그냥 merge 사용안하는걸루
+    Date 객체라서 일단 한번 연구해서 오류안나게 해보는걸로
+    mapper안에 id값이 동일한개 2개이상이면 에러나.
+
+    -- 과장님이 도와주셔서 db에 id값 있으면 update, 없으면 insert 기능 구현함
+    String snsUrlAddr = String.valueOf(FuncString.isEmpty(fdObject.get("link"), ""));
+    snsFdVO.setSns_url_addr(snsUrlAddr);
+    방식으로 해서 값이 있으면 넣고 없으면 ""로 db에 저장됨
+
+    피드 게시일자랑 수정일자 String 타입이라 Date로 바꿔서 저장했는데 코드가 좀 그렇다
+    sns_fd_se(구분)은 vo파일에 enum따로 만들어서 FACEBOOK / FACEBOOKENG로 변경함
+
+    SearchVO는 검색할때 활용하면된다.
+    if(!"".equals(snsFdId)) {
+     	//검색할때 searchVO활용
+     	SnsFdSearchVO snsFdSearchVO = new SnsFdSearchVO();ajax void return
+	// Id를 이용하여 객체를 찾음?
+     	snsFdSearchVO.setSns_fd_id(snsFdId);
+     	snsFdSearchVO.setDel_yn("N");
+	// SearchVO가아닌 그냥 VO를 매개변수로 줘야하므로 아래처럼 만들어서 이용해야함
+     	SnsFdVO snsFdInfo = snsFdService.selectObject(snsFdSearchVO);
+     	
+     	if(snsFdInfo != null) {
+     		//데이터 존재 update
+     		snsFdVO.setSns_fd_sn(snsFdInfo.getSns_fd_sn());
+     		snsFdService.update(snsFdVO);
+     	} else {
+     		//데이터 미존재 insert
+     		snsFdService.insert(snsFdVO);
+     	}
+     	
+     } else {
+     	//미존재로 그냥 넘어감.
+     }
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 22일
+    sns_fd_se컬럼 모두 소문자로 변경 (FACEBOOK -> facebook)
+    어제까지 Test로 한거 Controller에 적용해보기
+    피드관리 게시판 검색기능 작동하도록 수정하기
+    코드 리팩토링
+    
+    노출여부 = 사용자에서 노출할지 안할지 결정하는기능 처음에는 페북에서 가져오기때문에 (관리자는 다보임) 
+    - 기본 N으로해놧다가 관리자가 보고 맘에든다 노출해야한다 판단되면 Y로 변경해서 사용자에 노출하는기능.
+    사용여부 = 사용자에서 노출같은기능이네? 좀더생각해볼께 (관리자는 다보임) 그냥 이거는 무조건 Y로 해놓고 뭐.. 유지.
+    삭제여부 = 삭제시 관리자도 안보여지고, 사용자도 안보여짐.
+
+    나중에 hidden 으로 바꾸면되니까 저쪽에서 요청오기전까지
+    만약 관리자가 수집된 페북을 사용자에 노출하고싶지않다 이야기 나오면
+    그때는 수정화면 들어가서 노출여부나 사용여부를 N으로 변경후 저장하면
+    사용자에서 노출하지않는거고, 나중에 노출다시하고싶을때 수정화면 다시가서 사용여부를 Y로 변경후 저장하고 활용하는거지
+    내용들은 그냥 수정해도 수정되지만 , 어차피 수집하면 또 덮어씌우니까
+    나도 알고있는데 그냥 일단 그렇게 미리 구현해놓으면대~
+
+
+    노출여부 / 사용여부
+    이거 하나로 취합할수도 있어서 참고하고
+    내가 한번더 기존꺼 확인해보고
+    필요없다고 판단되면 노출여부 삭제할예정
+    사용여부가 사용일경우 사용자에서 보여지고, 
+    아닐경우 안보여지게 같은의미때문에 하나로 줄어야할듯
+    그럼 사용여부만 변경하는걸로 만들면되나요?
+    일단 두개로 해놓고 나중에 삭제하믄될거같아 금방하기때문에
+    
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 23일
+
+    1. 페이스북 수집 갯수 제한하기 (field에 &limit=10 붙여서 해결)
+    -> String apiURL = "https://graph.facebook.com/v14.0/" + appId + "/" + 
+				"feed?fields=message%2Clink%2Ccreated_time%2Cupdated_time%2Cpicture%2Cid%2Cname%2Ccaption%2Cdescription%2Cpermalink_url%2Csource&limit=10&access_token=" + accessToken;
+    2. field 속성에 link 더 있는지 문서 찾아보고 적용시키기 (문서에는 더 없는것같음)
+    3. 영구 액세스 토큰 -> 해결
+    4. 영구 Data Access Expires -> ?? 이건 영구가 안되는듯한데
+    5. fields 속성에 type추가해보기 (단순히 게시물 종류만 나옴, 일단 필드에 추가해놓고 보류)
+    6. 회원 관리의 수정버튼 처럼 list페이지에 버튼 만들기 - 완료
+    7. 피드 게시물 수정 할 수 있도록 만들기  - 형식상 화면이랑 수정기능 동작하게만 만듬
+
+    페이스북 계정 정보(내꺼)
+    앱ID = 2673870896090663
+    app.key = 103406285850273
+    (앱기준)token.key = EAAlZC3xTvzicBAKnKRFEhkzIcABg6mEzwOxianq6HdiOoLOY3FAxPnr0U9dro5gMVHXn9ZBajPGfjxntEu1oP4smtxOHNawfhQbK60tR0KJ0ZCAgxVrOnZB52HRZAsXUTAAOWUwwpWW0pT6vlEzvwJoyTYVjsLfJZARBi0nxsflXnuN9jB06ch
+    (페이지기준)token.key = EAAlZC3xTvzicBAK5jpZAAxLn7CMVutSNS6otuhSCz8c8JRBDG7S7BeddZAGYZCW9dJOKNTapdtHS8lM1LpPsbSyB0Wh7VygESJ8VY1qdZC21vIzIJerL2t9PeQAGSqPy0pHA3FpugI4qFIaEjCQC0YZCXZBC02K1eno7t7E0C2Ec9rbmMNnNx2Id12jbkvtvQ4ZD
+    --> 페이지 삭제해서 페이지 기준 키 토큰은 X
+
+    fields에 attachment 추가했음 permalink_url도 추가함 (apiURL에 추가만한거임 DB작업 X)
+
+    데이터 엑세스 만료 이거 어떻게 해결하냐
+    담주에 과장님이 수정화면 봐주시기로함
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 26일
+    tb_sns_fd 테이블에서 use_yn 컬럼 삭제하기로함 -> DB 및 쿼리에서 모두 삭제함
+    
+    황과장님
+    - 게시판 코드 알아내기?-
+    - xml파일에 암호화 복호화 코드 sample보고 수정하기
+
+    게시물코드 명확하게 / 줄이기 / 구분갈 수 있게
+
+    암호화 / 복호화
+    암호화는 컬럼명이 이상해도 상관없다. 왜?
+    어차피 vo에 매핑할것이 아니라 값만 나와서 db에 들어갈것이기 때문
+
+    하지만 복호화는 다르다 
+    vo에 매핑해서 값을 넣기위해서는 컬럼명이 일치해야한다.
+    때문에 AS 를 사용해서 컬럼명을 임의로 변경해줘야한다.
+
+    ,	dec_str(#{damo_user}, #{damo_key}, #{mbr_nm_encpt})
+    위 커리는 select문에서 쓰던 쿼리다 뭐가문제일까?
+    1. #{mbr_nm_encpt} 가 아니라 mbt_nm_encpt로 변경해야한다. 
+    #{mbr_nm_encpt}처럼 #과 중괄호가 붙은건 vo에서 값을 가져와서 db에 이용한다는 얘기이다.
+    근데 select는 db에서 값을 가져오는행위이므로 잘못되었다.
+    searchVO파일에는 해당 컬럼이 없기때문에 애초에 오류가 발생
+
+    하지만 insert와 update는 다르다. 사용자가 입력한 값을 vo에 저장하여 db에 보내는 행위이므로 #{mbr_nm_encpt}가 맞다. 
+    
+    2. select절에는 AS로 컬럼명을 vo와 똑같이 매핑해줘야 값이 들어온다.
+
+    내일할일 4개 xml파일 고친거 테스트하기 (11시전까지) / 엑셀파일정리
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 27일
+
+    파라미터 오류나는 이유 (마이바티스 ? , ? )
+    1. DB에 특정 암호화 컬럼이 암호화되지 않은 상태로 저장되어 있어서 오류가 발생 (그냥 한글같은걸로 저장되어있었음)
+    2. 타입일치? 
+
+
+    관리자나, 사용자 화면에서 검색입력란에 "이상화" 치고 검색하자나.
+    wrd_telno_encpt 파라미터가 이상화 나오는게 맞아.
+	DB에서는 wrd_telno_encpt가 암호화 되어 들어간상태자나
+			
+	and dec_str(wrd_telno_encpt) = wrd_telno_encpt파라미터 
+	ex) dec_str('dslfkjsdlfjsdlf') 암호화에서 복호화처리  = 이상화
+
+	AND wrd_telno_encpt = dec_str(#{damo_user}, #{damo_key}, wrd_telno_encpt)
+	AND dec_str(#{damo_user}, #{damo_key}, wrd_telno_encpt) = #{wrd_telno_encpt}
+	db에서 가져오는거 / 저거는 파라미터
+
+    암호화 / 복호화 부분 마저 수정함
+    Ifez 구글시트 참고하면서 메뉴 추가 
+
+    내일 과장님오시면 board의 확인 부분은  pst/process.do 인지 여쭈어보기 (투자이벤트 -> 문의사항 -> 확인)
+    -> 확인 부분은 나중에 해당 페이지 개발자가 따로 하기로
+    -> 게시판 작성에 있어서 목록만 메뉴 만들어야함 목록은 고유값없이 리스트를 보여줄 수 있으므로,
+    -> 그러므로 상세, 작성 같은것들은 고유값이 있어야 하므로 메뉴생성하면 안됨
+
+    투자종합상담 -> 투자종합상담 안내 -> PM정보에서 contentType LP가 무엇인지 여쭤보기
+    (LP -> Layer Pop) 일단 안하고 보류
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 28일
+
+    http://e.pentachord.com:49087/  -> ifez 본격 작업하는 사이트(view)
+
+    행정정보 -> 재정정보 -> 결산정보 -> 목록  항목의 게시판 코드는 새로추가되서 그런지 아직 미정 (보류)
+    -> info07 로 만들어서 해결함
+
+    2:31 메뉴 다 만들고 다시 페이스북 데이터 접근 만료 해결하기
+    찾아보니 액세스 토큰과는 다르게 영구적으로는 못하고 로그인? 뭐 하면 권한...해서 갱신된다던데
+
+    1. graph api를 호출하면 비활성화 되지않는다? -> 데이터 액세스 만료일은 똑같음..
+    2. 앱에 로그인을 해야 갱신된다? (앱 권한) -> 방법을....
+    3. webhooks??
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 29일
+
+    - 구글링하다 본것 - 
+    endpoint를 통해서 토큰을 갱신하고
+    facebook developer의 도구인 액세스 토큰 디버거를 이용해서 확인해보면
+    만료일은 그대로고 데이터 액세스 만료만 갱신처리가 되더라구요.
+
+    새로 앱을 만들어서 generate token을 하면 데이터 액세스 만료가 다시 3개월로 갱신된다.
+    토큰을 새로만들면 갱신이되는건데 새로 만들면 결국 또 원점아닌가?
+    -> 그러면 새 토큰 발급받는걸 자동으로하면 데이터 엑세스 만료도 자동으로?
+    -> 하지만 새로 발급받으면 만료시간이 2시간 뿐이라서, 장기 or 영구로 바꿔주는 작업필요
+    -> 영구로 바꾸면 graph api에서 generate access token을 눌러도 오류가 뜨고 새로 발급이 안되던데
+
+    대안1 : 토큰이 더 이상 작동하지 않을 때 메시지를 받을 수 있도록 적절한 오류 처리를 구현
+
+
+    // 앱 토큰을 받을 수 있는 apiURL client id와 client secret을 입력하여 얻을 수 있음 (단 활성 액세스 토큰이 아니라서 무용지물임)
+    String apiURL = "https://graph.facebook.com/oauth/access_token?client_id=646354447067894&
+    client_secret=442a862977984a31be59027714814c51&grant_type=client_credentials";
+
+
+    // 액세스 토큰 디버거 화면과 유사하게 결과를 출력하는 apiURL, data_access_expires_at이란 속성으로 만료일을 알려줌
+    String apiURL = "https://graph.facebook.com/debug_token?"
+		+ "input_token=" + accessToken + "&"
+		+ "access_token=" + accessToken;
+
+    개인계정이 아닌 ifez 페이스북 페이지의 게시물들을 띄우는 작업 아닌지??
+
+    얻은 장기토큰을 다시 장기실행api에 넣으면?
+EAAJL2x83avYBADCmQQ4NcaC8ttqaFQ7ltkwZBW2sWgaSYRbTnJSFG20m9SBO7fOPYV7wQrSqSil9mDMNRayfaURvlqJ2ACFVWcIPXXw8y0QVkIityjaIPPpcCiyoG91sThtETMwZBD6YngNywiz81XKA4APWgHGe77ZBFLOVwZDZD
+-> 기존 토큰과 다른 토큰이 나오지만 발급일, 만료일, 데이터 액세스 만료 모두 같으므로 같은 토큰이라 봐도 무관할듯
+
+페이지 테스트
+
+(2시간 토큰)
+EAAHL3zmcXPwBAFUIXsBCgAVjsf4Y6jBi5ZCVKBNmRtENQ0y8YWJcaJrZBcYDHo1qvYjMX4j0V5JFqo2xLLUjTtGefngGYwRJxVbCUpdcZCWlNatIhuTjrdYlgsrSG34a8egMSHi1lup2oesyMy9vgWXzLNfMOULDdw4cv5DWMv4dXVhGP81JumBpuBejloo1bvxfjF8HA39IjRiKMDs
+
+2개월 토큰
+EAAHL3zmcXPwBABsbA524FrkeY64iOe3XbHLZBgGOeWyxGQotaqFH79vTkO6BZBrcA63YKtZCRkJ4P7ta3Nw2MthPCpFpL1VGJ81big1ILNbisfMZAVL5RrgEL032AH33YRDSnpBnxJ5oZBmhauEpwK7rzECFZCBKsiNKhfmWUIFfDem3Y1ZADGtDuexY8n5NoUZD
+
+영구토큰
+EAAHL3zmcXPwBAGAWE9KRJKXZCN00eMSYkQSrCCATLTynvwzoyxLMgkbVD3IZB1CKtjRiUSr1ji6kvmOtlDx4aP71oqQOEacGwRgYAtNpBr0FG79XPZCdip9XDTZCLZBUVWgJlQzy3UfQ6VEokS0fgKFI7kSfkK4NIZCiDgIq9wEiJlgkshtF3oAjwMI7rd88oZD
+데이터만료 : 2022 / 12 / 28 수 오후 5:46
+
+
+--> Graph Api -> 사용자 또는 페이지 -> 페이지 액세스 토큰 받기 를 하면 새로 데이터 액세스 만료 기간이 갱신되어있음
+
+-> 그러면 페이지 액세스 토큰을 새로 받는 작업을 하면 영구 토큰의 데이터 액세스 만료도 자연스럽게 갱신되지 않을까?
+
+내일 할꺼 -> 자바 백단에서 위에처럼 페이지 엑세스 토큰 받는거 알아보기 이것만하면 뚝딱일듯
+
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    9월 30일
+
+    장기토큰 만료일
+    2022 / 12 / 28 수 오후 6:19
+    
+    페이지 액세스 토큰 받기 후
+    2022 / 12 / 29 목 오전 9:14
+
+    스케줄러로 페이지 액세스 토큰 받는것만 실행 하는거고 토큰은 기존 영구토큰을 사용
+    page id?
+
+https://www.facebook.com/v15.0/dialog/oauth?response_type=token&display=popup&client_id=505634581404924&redirect_uri=https%3A%2F%2Fdevelopers.facebook.com%2Ftools%2Fexplorer%2Fcallback%3Fmethod%3DGET%26path%3D102641205959302%252Ffeed%26version%3Dv15.0&scope=pages_read_engagement
+위 주소로 apiURL에 넣으면 앱을 연결하겠냐는 화면이 나오는데 거기서 계속을 누르면 토큰이 발급되면서 만료가 갱신됨
+하지만 화면을 통해 해야해서 백단에서 스케줄러로 못하지않을까
+
+-> 페이스북 피드 게시판에 토큰 갱신 버튼을 만들어서 사용하도록하면 어떨까
+-> 하지만 페이스북에 로그인이 되어있지 않은 상태라면 로그인을 해야 해당 토큰 갱신 화면을 볼 수 있음
+
+하지만 끝까지 해결방법을 찾지 못하고 다음 일로 넘어가는듯..
+
+1. 로그인법 (캡처 + url 정보)
+2. 토큰발급 법 (캡처+ 유의사항 등등 url정보)
+3. 페북 게시글 피드 api (url 정보, 캡처)
+4. 토큰갱신 연장법 (캡처 + url 정보)
+
+
+    그래프 API로 토큰 발급 받는법 한글로 정리해서 과장님께 드림
+
+    황과장님이 site_id 변경하셨는데 내가 만든 메뉴들 링크들도 다 수정해야하나??? (다음주에 여쭤보기)
+
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 4일
+
+    https://e.pentachord.com:58102/ifezsm/main.do cms
+
+    디버그가 필요할때 System.out 쓰지말고 super.logger.debug 사용하기
+
+    Site_id 통합 결정안 (퍼블 <-> 개발)
+    1. 대표 - main
+    2. 글로벌 - global
+    3. 투자   -  investment
+    4. 열린청장실 - commissioner
+    5. 홍보센터 - promote 
+    6. 다국어  -  world
+
+    Const VO 페북테이블 정보 임시로 지움(pull 받아야해서)
+
+    부가기능 -> 설문관리 테스트
+    1. 검색기능
+     1.1 전체검색 o 
+     1.2 이름검색 o
+     1.3 설명검색 o
+     1.4 설문 공개여부 -> 예 o
+     1.5 설문 공개여부 -> 아니요 o
+
+    2. 설문관리 등록
+     1.1 설문관리의 모든 항목들 쿼리에 오류없이 잘 등록됨
+     1.2 위와 마찬가지로 항목들 수정 테스트 잘 동작
+     1.3 문항추가??
+
+    3. 문항추가
+     1.1 문항추가가 안됨
+     -> surveyController에서 mav.setViewName("/cms/survey/write.qstn.layer"); 코드가 잘못됨
+     .layer 라는 맞는 템플릿이 없어서 그런거라 하심 
+     web.xml에서 <survlet-mapping> 으로 추가해서 하는게 아니더라
+
+     <해결방법>
+     스프링 tiles에 .layer 부분이 만들어있지 않았음
+     스프링 타일즈란 : 뷰페이지의 jsp들을 상단, 사이드, 메인, 하단을 설정 상태로 include 처리 해주는 구조의 템플릿을 말한다.
+     페이지들을 일괄관리 할 수 있고, 공통사용하는 부분들을 매번 등록을 따로 해주지 않아도 되기 때문에 편리하다.
+     -> 반복되는 부분들을 한 곳 에서 관리할 수 있게 도와주는 템플릿 프레임워크
+
+     tiles 디렉토리의 definition.xml 파일을 생성해 준 다음 
+     상단, 사이드, 바닥, 메인으로 사용할 템플릿 등을 설정한다.
+     해당 프로젝트에는 header와 footer가 있으므로 web-inf/view/include 디렉토리에 layer 폴더를
+     만든다음 각각 header, footer 폴더를 생성 후 각 폴더 안에 header와 footer jsp파일을 만들어준다.
+     
+     그다음 xml파일에서 put-attribute 로 해당 파일들과 일치하게 name 속성에 파일이름을 적어주고,
+     value에는 해당 jsp파일의 위치를 기입해준다.
+
+     추가로 아래 extends 부분은 위에서 선언한 jsp를 선언받아 실제로 사용하는 페이지에 이식하고 body 영역은
+     실제 페이지를 사용하기 위해 설정하는 부분으로 메인 body로 쓸 jsp영역을 설정할 수 있으며, {1}/{2}.jsp을
+     통해 board/board.jsp로 갈때 자연스럽게 이식되어 사용할 수 있게 한다.
+    
+    구글시트 테이블
+    https://docs.google.com/spreadsheets/d/1gAw_VeFzR-uATwmkN8g0P9XNCkt3FrkH/edit#gid=369068960
+
+    행정정보 -> 재정정보 list / view / modify 모두 만들어야함 
+    내일오전에 패키지명 부터 다시 알려주시기로함
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 5일
+
+2019 17:16 이상화 5. 대표홈페이지 행정정보 > 재정정보 > 세입세출예산서 - tb_bgt_doc(예산 문서 - 테이블 확정) 이기훈
+2022-10-04 17:17 이상화 관리자단, 사용자단 만들어야하니까
+2022-10-04 17:17 이상화 관리자부터 만들면될듯.
+2022-10-04 17:20 이상화 연도, 예산분류코드, 회계분류코드, 예산상세분류코드, 예산문서종류코드
+2022-10-04 17:20 이상화 5개는 select box으로 (view화면)
+
+패키지명 만들때 과장님께 검토받기
+jsp랑 controller 는 그대로 따라가되(과장님이 수정한버전), 나머지service, vo, mapper 등은 테이블 명에 따라서 만들기
+
+경로명 보여드릴때 사진으로 하지말고 Alt + Enter 로 파일 경로명으로 보내드리자 (사진으로 하면 보기 힘들어하심)
+
+사용법 alt + enter
+
+/ifez-cms-core/src/main/java/com/pentachord/model/bgt_doc/mapper/BgtDocMapper.java
+/ifez-cms-core/src/main/java/com/pentachord/model/bgt_doc/mapper/cubrid.BgtDocMapper.xml
+
+cms/cms는 공통관리자모듈이라 
+ cms/main/~~~
+cms/사이트별/~~~
+
+vo -> mapper -> service -> test -> controller -> view
+
+세입세출예산서 관리자 
+
+/ifezsm/main/admns/finance/budget/list.do
+/ifezsm/main/admns/finance/budget/write.do
+/ifezsm/main/admns/finance/budget/modify.do
+
+/WEB-INF/view/controller/cms(무조건)/main(사이트별)/admns/finance/budget/
+- list.jsp	
+- wirte.jsp
+
+
+com.pentachord.ctrl.admin.main(사이트별).admns.FinanceController
+
+cms의 공통코드에 등록되어 있는 코드들을 이용하여 리스트를 불러올 수 있다.
+mav.addObject("mainBgtClsfList", super.getCmmnCdList(CmmnCdEnum.MAIN_BGT_CLSF_KEY));
+
+Controller의 다른 메서드들도 공통적으로 사용한다면 _init함수에 정의하는게 좋고,
+개별적으로 하나의 메소드만 사용한다하면 해당 메서드에만 추가해주는것이 좋다.
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 06일
+
+    관리자 CMS에서 메뉴 추가함
+
+    사용자 메뉴 위치 및 순서 지정
+
+    세입세출예산서
+    - 분류 코드에는 
+    DB에있는 테이블중 필드명이 ~~~~_cd  일경우는
+    tc_cmmn_cd(공통코드)테이블의 cmmn_cd 값을 넣어야함.
+
+    등록수정화면에  select e되어있을경우 검색에도 동일하게 select
+    (즉, 연도 / 예산분류 / 회계분류 / 예산 상세 분류 / 예산 문서 종류 5개가 select이므로 검색도 5개를 만들어야함)
+    text input은 똑같이 검색도 text input 으로 
+    
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 07일
+
+    1. 검색기능 xml파일에 추가하기 (어느정도 완성 / 첨부파일 Y,N은?)
+
+    2. 수정 화면 select db데이터가져와서 채우기 (완료)
+
+    3. 첨부파일 어카지?
+    -> 업로드하고 예 눌렀는데 업로드해버려도 괜찮아 무시해도되.
+	어차피 사용자쪽에서 사용여부 구분에따라 뿌려지는거라. 크게 신경안써도되.
+
+    4. 첨부파일이 pstcontroller 보고 따라했는데 안된다
+    2022-10-07 14:00 이상화 아까 수정화면에서 첨부파일 소스를 insert문만 처리해서 오류난줄알았는데
+2022-10-07 14:00 이상화 update문이였네
+2022-10-07 14:00 이상화 ㅋㅋ
+2022-10-07 14:00 이상화 ㅇㅇ 우선 컨트롤러만 보지말고 소스따라가면서 한번 확인해보는것도 좋을거야
+
+    -> 계속 나는 controller 만 보고있었는데 controller에 save_atchFile을 하는것이 아니라
+    serviceImpl에서 save_atchFile (insert)를 하는것이였다.
+
+	@Override
+	public void update(BgtDocVO bgtDocVO) {
+		bgtDocVO = super.getUpdtValue(bgtDocVO);
+		
+		this.mapper.update(bgtDocVO);
+		this.save_atchFile(bgtDocVO.getBgt_doc_sn(), bgtDocVO.getAtchFileList());
+	}
+
+	private void save_atchFile(Long bgt_doc_sq, List<AtchFileVO> atchFileList) {
+		//등록 처리
+		if (atchFileList==null) {
+			return ;
+		}
+		
+		for (AtchFileVO atchFileVO : atchFileList) {
+			atchFileVO.setTbl_nm(tblNmEnum);
+			atchFileVO.setTbl_id(bgt_doc_sq.toString());
+			this.atchFileService.insert(atchFileVO);
+		}
+	}
+
+위에처럼 serviceImpl에 save_atchFile 메서드를 만든다음 이용하면 쉽게 되는것을..
+
+
+---- 사용자 화면에서는 목록 / 상세는 추가할 필요가 없음
+왜냐하면 예를들어 결산정보 탭에들어가면 제목으로 결산정보가 떠야하는데 목록이라는 제목이 떠버려서 
+4depth에 목록이 위치한다면 그것을 없애고 3depth의 결산정보 탭에서 url을 추가해줘야 제대로 제목이 뜬다
+
+
+관리자 ㅡ 사용자 화면
+
+퍼블아직안나왔으니까. 임시로 퍼블없다고생각하고 대충 만들면되 .
+
+1. 년도 
+2. 예산 분류 
+3. 회계 분류 (년도, 예산분류 검색조건맞게 조회)
+- 일반회계안에 데이터가 있으면 뿌리고 없으면 안뿌림.
+4. 예산 상세 분류
+5. 예산 문서 종류 (첨부파일안 내용명)
+
+
+-사용자-
+1. 처음에 년도 디폴트 2022 선택 
+2. 2022년도 등록된 데이터중에 예산분류가 있는것 (만약에 1차 추경예산, 3차추경예산 ) 있을경우 1차 추경예산 디폴트 선택
+3. 2022년도와 1차추경예산 디폴트 선택된 조건으로 다가져와서 뿌리기 .
+
+//디폴트 올해년도 선택하고, 예산분류 디폴트 첫번쨰로 선택하고 뿌려줘  
+
+//proess.html.do (년도선택시) 아래에 호출 TP는 파라미터종류 (년도선택한경우, 예산분류 선택한경ㅇ) 2가지 호출 기능
+//년도선택했을경우 바꿔서 뿌러야하고
+//예산분류 선택한경우 바꿔서 뿌리기 용도 
+
+사용자 mav.setviewname 의 list.??? 점 뒤는 각 사이트마다 정해진 코드에 따라 달라짐
+ex) main, investment, comissionary.... 등
+
+프로젝트 진행하면서 참고해야하는거
+Z:\펜타코드\202207_IFEZ 웹사이트 전면 개편 사업\00.사업관리\설계감리\산출물_설계감리준비\구축산출물\07_프로그램목록 명세서
+Z:\펜타코드\202207_IFEZ 웹사이트 전면 개편 사업\02.설계\관리자
+IFEZ-CMS-LO-화면설계서(대표홈페이지 관리)02_Ver0.22_감리확인요청 반영.pptx
+Z:\펜타코드\202207_IFEZ 웹사이트 전면 개편 사업\02.설계\대표홈페이지_서브
+IFEZ-UINF-LO-화면설계서(다국어_메인)06_Ver0.21_감리 확인요청 반영.pptx
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 11일
+
+    관리자페이지 화면설계에 근접하게 수정 완료
+
+    너자리에서는 파일존재하니까.
+     파일없자나. 깃이 안올라가있기떄문에 못받아서 
+    http://192.168.1.53:8080/main/admns/finance/budget/view.do  (저번에는 그냥된것같았는데..)
+
+    
+    program? 게시판 만들때 
+    설계서에서는 컨텐츠(내용) 기입란이 없다면 게시판 아이디를 비교해서 없애면됨
+    <c:if resultVO.stng.머시기 eq pst_id=inv02>
+	$(#pst_id).hide();
+    </c:if>
+
+
+    if로 년도 체크한다음에 
+    데이터 유무 체크
+    없으면 빈칸으로하고,
+    있다면 해당 년도에 있는 예산 분류 코드 대로 나오게하고
+
+    해당 예산 분류 클릭하면
+
+    해당 예산 분류의 회계 분류가 나오게하고 (일반회계, 특수회계, 공기업특별회계)
+
+    각 회계 안에서 세입과 세출, 기타로 나누어서 
+    각 항목들 안에 예산 문서 종류 정한대로 파일항목들 이름을 준다
+
+    1. 처음에 화면 진입하자마자, 디폴트 올해년도 선택해서 검색후 데이터가 존재하면 진행 (만약 데이터가 없을경우 최근년도로 )
+2. 1번와 같이 데이터 조회 후, ajax로 만들어서 (process.html.do) 로 구현 
+3. process.html.do 구현쪽에서 년도와, 예산구분 둘다 존재할경우 조회해서 뿌려주는 식으로 
+
+퍼블적용법
+그냥 퍼블나온거(html) 코드 복붙해서 쓰셈
+
+
+[JSTL] fn:contains 포함되는 문자열 찾기 - Round Figure
+
+1. 년도 넣을때 저렇게 불러서 넣어야대 .
+SELECT bgt_yr, bgt_clsf_cd FROM tb_bgt_doc GROUP BY bgt_yr, bgt_clsf_cd
+ORDER BY bgt_yr DESC,
+bgt_clsf_cd ASC
+;
+
+DESC tb_bgt_doc;
+
+년도랑 비교해서 일치한것만 뿌리면될듯. \
+\
+
+SELECT * FROM tb_bgt_doc LEFT OUTER JOIN tc_atch_file + 
+WHERE bgt_yr = '2019';
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 12일
+    세입세출 사용자 진행중
+    각 항목당 세부분류 뜨는것 완료
+    첨부파일 부분은  /ifez-web-user/src/main/java/com/pentachord/ctrl/other/AttachController.java
+    파일에서 80~90번째 코드랑 뭔가 안맞아서 io에러 코드가 발생 (일단은 주석처리하고 과장님이 따로 본다고 하심 / 일단 원상복구시킴)
+    결국 수정해주심 (for문 답이없)
+
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 13일
+    분야별정보 > 스마트시티 > 국제심포지엄
+    (테이블 이름은 국제학술토론회로 되어있음)
+
+    Controller
+    Service 완
+    Mapper 완
+    VO - 완
+    View
+
+    혹시 작업할때 view화면에서 전화번호 관련 작업할경우
+    value="${pf:telNumber(resultVO.pic_telno) }"  이런식으로 값을 넣어야함 (input태그니 뿌릴때?)
+
+    세입세출예산서 관리자화면 년도검색부분 화면설계랑 동일하게
+    등록된 년도만 나오도록 controller와 view화면 수정함.
+    마찬가지로 관리자 수정화면 설계에 맞춰서 올해년도 + 1까지 드롭다운 할 수 있도록 수정
+
+    에디터 이용기능에서 사진올리기나 그런것들은 ImagePath.jsp에 경로만들어서 사용하먄됨
+    imagePhysicalPath = "C:\\devel\\ifez_upfiles\\editor";
+    
+    경로폴더위치 : C:\devel\ifez_upfiles
+    인터넷 주소 : http://e.pentachord.com:8080/ifezsm/dashboard/main.do
+
+
+    제기랄 패치 먼저 안하고 커밋 푸쉬할려해서 겹쳐서 한거 날라감
+
+    푸시하기전에 먼저 패치해서 풀있는지없는지 확인하고 풀받고 푸시 충돌나서 그래 
+충돌예방하려면 먼저 패치풀 체크하고 푸시 
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 14일
+    심포지엄 관리자 보완 - 게시물 작성 or 수정하는데 이미 작성한 년도가 있으면 작성불가하다고 알럿띄우기?
+    2022-10-13 09:35 이상화 년도를 중복 등록못하게
+2022-10-13 09:35 이상화 만약 기존 데이터에 2022년도 등록된게 있으면
+2022-10-13 09:35 이상화 이미 등록된 년도가 있다고 알럿띄우고 막아
+-> controller 단에 처리부분에 추가해서 연도중복 막기 완료
+-> 등록은 잘 적용되었지만, 수정을하면 연도중복떠서 다시 고침
+-> count변수를줘서 modify일때 count가 2보다 크거나 같으면 알럿띄우도록 변경
+
+내용이 editor일 경우 (view)
+<div class="cm_title2 mt-50">
+	<span>진행 프로그램</span>
+	<div class="editor_content">
+		<c:set var="txt_cont" value="${result2.sympsm_evnt_cn }" />
+		${txt_cont } 
+	</div>
+</div>
+
+
+필필필필-> 중복체크할때는 selectcount이용하자 
+(ex. 연도중복체크)
+
+중복체크에서 수정할때 중복검사하는 값이 변함없는상태로 수정하면 중복처리가 되는데
+SELECT * FROM tb_intrn_sympsm
+WHERE sympsm_yr = '2023'
+AND intrn_sympsm_sn != 1 -- 수정일련번호; 
+-> 일련번호를 줘서 처리하면 됨
+내가 수정한 연도가 있는 vo의 sn을 따와서 where절로 != 처리를하면 
+자기자신을 제외한 selectCount의 중복된 값이 나오므로 괜히 switch문의 write와 modify에 일일히 적을필요없이
+간단한 몇줄로 끝난다. 
+
+vo에 sn_not 컬럼 추가 -> xml쿼리의 sqllist 부분에 AND intrn_sympsm_sn != #{sn_not} 추가 
+그다음 controller에서 selectcount에 들어갈 searchVO에 setsn_not(내가수정한값있는vo.sn);
+그러면 쿼리에서 알아서 위에 쿼리문처럼 해서 중복된값의 count만 출력됨
+
+관리자 화면에서는 
+searchVO = super.defaultPagingValue(searchVO, "del_yn=N", "pageRows=5", "pageBlock=5");
+위에 코드처럼 del_yn이 되어있음 (use_yn은 관리자화면에서 보여야하기떄문에 필요없음)
+
+하지만 사용자에서 (페이징을안쓰면)
+searchVO = super.restoreSearchCondition(mav, searchVO);
+searchVO.setUse_yn("Y");
+searchVO.setDel_yn("N");
+위 코드처럼 해줘야함 (view단에서 jstl로 y,n 체크하지말고)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 14일
+    할것
+    사용자
+    대표사이트 -> 분야별정보 -> 중대재해 -> 안전보건 목표
+            -> 분야별정보 -> 중대재해 -> 경영방침
+
+    관리자
+    대표사이트 -> 문화관광 -> 축제/행사 -> 목록,등록,수정
+            -> 중대재해 -> 안전보건 목표
+	    -> 중대재해 -> 경영방침
+    
+    저거처럼 ajax활용해서 해도되. 
+다만 새로추가한 컨트롤러에서 추가하는게 좋을듯.
+
+
+---> 안전보건 목표
+공통코드 테이블을 활용하는데 어차피 사용자화면에서 한 페이지에서 진행하는거니깐
+관리자에서 수정을 진행하면 cd_nm만 update하면 바뀌지않을까??
+(때문에 vo,service,mapper 이런거는 기존의 cdmn 이용해서 하면되고?)
+
+vision -> cmmn가져와서 쓰기
+목표 -> 위와 동일
+
+추진전략 가져오고
+그 하위 5depth항목들 주요추진과제에 뿌려주고 
+삭제누르면 없어지고, 항목추가하면 생기고
+추가하면 빈칸이 생기고 그안에 사용자가 입력한 후 저장하면 cmmd테이블에 입력됨?
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 17일
+
+    이런거 굳이 안만들어도 되 어차피 감리쪽에 걸려서
+    왠만큼 필요한거만 뿌리고 나머지는 간단하게 jsp와 ajax 활용하는게 더빨라.
+
+
+    삭제처리 마저하기
+    1. 먼저 삭제할요소 처리
+    2. 마지막 insert/update (공통코드값없을경우 새로 추가/존재할경우 update)
+
+    insert는 cmmdservice 에있는 insert 가져다 쓰면될듯?
+    upadate는 기존 그거대로
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    10월 18일
+    예비군
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 19일
+    중대재해 - 안전보건 목표
+    관리자 - 삭제랑 변경하고있으나 뒤죽박죽임
+    일단 사용자부터 하는중
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 20일
+    중대재해 - 안전보건 목표
+    사용자
+    사용자화면에서도 process.json.do나 등등 ajax 처리 가능함
+
+    공통코드 삭제 후 cmmn_cd 겹치는 부분때문에 insert가 오류나서 
+    과장님이 따로 조치하심
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 21일
+    
+    중대재해 - 경영방침
+    안전보건목표와 똑같이 공통코드 테이블에 입력해서 하자
+    frst_val, secd_val 에 각각 날짜, 청장명 입력해서 진행하면 될듯
+    
+    경영방침에 항목이 2개뿐이라서 안전보건 목표 페이지랑 합치기로함 (관리자만)
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 24일
+    대표-> 이용안내-> 찾아오시는길
+     -> 인천경제자유구역청
+     -> 영종관리과
+     -> 청라관리과 
+    하는중. 근데 지도가안뜸 (kakao sdk를 못 불러옴)
+
+    cubrid.ctrtsubctrtMapper.xml (황인용과장님) 이 하신것에 where절 rls_yn 여부 묻는게 없어서 추가함
+    (커밋할때 말씀드리고 올리기) 이거말고도 user화면 검색에 필요한거 다 추가
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 25일
+     하도급계약현황
+    1. 사용자화면 datepicker 부분 날짜 고정이 안됨
+    2. 엑셀다운로드 기능 - 어찌저찌 따라해서 구현함(엑셀스타일은 패스)
+    3. 프린트는 쉬울듯? - window.print();
+    4. 검색초기화도 뭐 할만할듯 - href = 'list.do'줘서 초기화시킴
+
+    
+    지도 안뜬 이유
+    플랫폼에 http://192.168.1.53:8080 앞에 아이피까지 모두 등록안해놔서 (나는 http://localhost:8080 이렇게만 해놈)
+    지도 퍼블 적용시 작동안해서 임의로 내가 크기 정함 (나중에 퍼블이 고칠예정 (퍼블나온건 적용안되있으므로))
+
+    페이징 안된 이유
+    검색<form>부분에 <input type="hidden" name="page" value="1"> 이거 안넣었다고 안되더라
+
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 26일
+    CMS 저널관리 해야함
+    저널등록 -> 목록 / 등록:수정 / 기사등록
+    기사등록 -> 목록
+
+    저널등록 -> pst 게시판 이용
+    기사등록 -> tb_jrnl_pst 이용
+
+    저널 국문등록 기준 (default)
+    -> 기사등록할때 추가필드없이 화면설계서 그대로
+    저널 영문등록 기준
+    -> 기사등록할때 추가필드 (관련국문기사 selectbox로?)
+
+    상태구분 컬럼이 사용여부임 (wait는 무시)
+
+    상단 게시물 순서 컬럼이 홍보센터 메인 순서임 
+
+    노출순서 3 > 2 > 1 (3이 가장 중요한 대문, 2, 1..) 해당 컬럼 default는 0임
+
+    기사등록의 연도와 호수는 저널에 입력한값을 가져와서 수정불가능이니깐 그냥 Text형식으로 하면 됨
+
+    &84/~~.jsp 파일을 매핑? 찾을 수 없습니다.
+    (viewname 이나 매핑 주소를 잘못 준거임 다시 확인)
+
+    할꺼 - 게시물관리에서 화면설계서대로 없는항목 지우고 추가나 바꿔야할거 수정하기
+    /pst/write.jsp 에서 게시판 코드대로 <c:if>줘서 수정하는것같다
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 27일
+
+    저널등록 / 기사등록
+    저널등록 목록화면은 화면설계서대로 같진않은데 일단 기사등록만 추가하고 보류
+    
+    기사등록
+    jrnl테이블에 작성자 컬럼이 없는데 저장은 어떻게하고 수정할때 값을 불러오지?
+
+    jrnl_sumry_cn(저널 개요 내용)은 화면설계서에 칸이없는데도 not null인데 어카지?
+
+    조회수는 관리자화면 제외하고 사용자화면의 controller에서 view_count 쿼리 처리하는것
+
+    ??? 저널 제목이랑 호수랑은 다른 컬럼인데 테이블에 호수컬럼없다 
+    뭐 어케 해야하나 pst
+
+    -> JOIN 써서 해보자
+    jnrlvo 에 pst에서 필요한내용들 가져와서 vo에 저장한후
+    검색에 쓰던 출력에 쓰던 사용하자
+
+    사용자/관리자 화면설계서
+    Z:\펜타코드\202207_IFEZ 웹사이트 전면 개편 사업\00.사업관리\설계감리\산출물_설계감리준비\구축산출물\06_화면설계서
+
+    내일할일
+    selectListJoin 만든거 mapper, service, controller 에 모두 추가해줘야함
+    그다음 기사등록 화면 다시 만들어보기
+    그다음 기사 등록시 이미지 db에 입력안된거 해결해야함
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 28일
+
+    저널등록 / 기사등록
+
+    점심먹고할꺼 이미지 경로가 pst테이블로되어있으니 저널테이블로 변경해야함 (해결)
+
+    이제 join한 결과를 목록에 적용시켜야함 완
+
+    문제1. joinlist 불어온건 좋은데 페이징처리가 아예안되고 번호가 이상하게 나옴
+    -- 이건 select_paging 메소드가 작동을안하므로 selectcount 메소드도 작동을안해서 갯수를 못세 페이징이 아예안됨
+       그러므로 기존 sqllist부분을 내가만든 joinlist로 바꿔서  selectcount 나 object에 joinlist를 넣어서 할 수 있도록
+    문제2. 기사등록의 작성자 이름을 저장할 db컬럼이 없음. (임시로 pst게시물 작성자이름 나오게함)
+    사용자에 작성자 필요없으므로 걍 넘기자
+    문제3. 검색구현을 못하고있음
+    내가 join 만든거를 이용해서 검색에서 tc.pst_cn 이렇게 테이블명.컬럼 = #{} 검색 이렇게하자
+    
+    pdf보기는 저널등록에서 쓴 글이 보이는 board 형식
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    10월 31일
+    언어 국문 영어 정하는부분 공통코드빼고 그냥 하는게 TEXT로 하는게 더편하지않나? -> 팀장님
+    -> 해당공통코드 지우고 국문/영문으로 option 2개해서 바꿈
+
+    기사등록 부분에서 수정하면 이미지가 사라짐
+
+    1. sqllist 부분에 join select 변경
+    2. 검색기능 완료
+
+    열린청장실 쪽은 아직 사용자쪽 퍼블이 안되어 있고,
+    관리자쪽은 그냥 게시판 이용하는것같은데 나중에 물어보기
+
+    통합검색창이 너무 내려와있다. 그리고 어떻게 구현하나?
+    이번호보기 -> 목록보기 
+    연도랑 호별은 일단 얼렁뚱땅했는데 (있는 호수만 하고싶긴한데 못하는중)
+    상세보기 하다 집감 (퍼블적용이 이상하게됨)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 01일
+
+    호수별 나오는건 데이터 중복 없애야할듯 (cubrid.pstmapper에 추가해서 없애긴햇는데)
+    첨부파일 관련 참고할려면 bgtdoc (세출계산서 참고하면될듯 아님그냥 pst)
+
+    문1. 카테고리별 기사를 Headline -> Project -> Activity 순으로 해야하는데 글작성 순으로 나옴
+    문2. 키워드 검색시 항목 하나로 검색이 안됨 (jstl 리스트로 쪼개서 하면 안됨)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    
+    11월 02일
+
+    0.바뀐컬럼명 처럼 검색 name도 변경 (완)
+    1.관련국문기사 출력하기 (완)
+    2.목록보기 누르면 가장 최신 연도 및 최신 호로 자동으로 넘어가게 
+    3.연도바꾸면 페이지 새로고침이 아니라 ajax로 호 셀렉트박스만 변경되게 해서
+      연도랑 셀렉트박스까지 모두 바꿔야 검색이 되도록 변경해야함
+
+    
+    문1. 바로 현재연도, 최신호가 보여야함 (아래 조건문으로 해결)
+     -> if(FuncString.isEmpty(searchVO.getPst_scnd_val())) {
+			//없을경우
+			searchVO.setPst_scnd_val(year);
+		} else {
+			//선택해서 넘어왔음
+			//안넣어도됨.
+		}
+    문2. pdf보기의 내용부분은 td_jrnl 테이블이랑 조인해서 가져와야하는데 cubtid.pstMapper에 추가해서 진행?
+     -> pstVO에 테이블 컬럼들 대량으로 넣지말고 xml파일의 resultMap에 다 넣어서 해보자? (지저분해지는데 괜찬나)
+    문3. pdf에 영문 저널도 같이나오므로 국문저널만 나오게 조건 줘야함 (문2 해결되면 가능할듯)
+
+    해야함
+    ajax로 연도 선택시 호별 바뀌게
+    pdf보기 조인한 내용들 추가해주기 + 6개만뜨고 페이징 + list바꾸고나서 다운로드 먹통
+    호수 안의 기사들 해줄려면 또 쿼리 만들어야할듯
+
+    영문페이지...
+    모아보기
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 03일
+
+    완
+    1. pdf파일 호수 별 카테고리 항목 나오도록 함
+    2. 순서 정렬(varchar타입이라 100에서 99로 갈때 정렬이 원하는대로 안되서, 큐브리드 TO_NUMBER() 함수 이용함
+    3. pdf파일 국문만 나오도록 searchVO에 조건 추가
+    4. pdf파일 페이징 처리 (게시판 관리에서 설정하는것)
+    저널>기사등록에서 값을 넣어버리는 사태발생 
+    (영문등록시 리스트만 나오게 할려고 하다 이런사태가)
+
+    해
+    1. 목록보기 기사 키워드 검색 (이건 걍 나중에 하라는 뜻이)
+    2. 목록보기 년도 지정시 ajax로 호수 출력 (저널이 존재해도 기사가 없으면 뜨지않음) 어중간한데 우선 넘긴다
+    3. 영어페이지 (나중에 모아보기 먼저)
+    4. 모아보기
+
+    
+    풀 받고 모듈 없어서 오류뜰때
+    (대개는 user 작업프로젝트에) -> Java Buld Path -> Libraries -> Add External JaRs에서 모듈
+    추가해주면된다.
+
+    sysout말고 쿼리볼수있는 함수 만들어놓았던데 뭐엿지?
+    
+
+    키워드 검색방법
+    홍보센터 -> 사진자료 -> 대표사진에 있는 키워드 검색 따라서 구현하면될듯
+    제안 : 위치지정 1,2,3말고 나머지들을 아래 슬라이더에 넣는거 어떠한가 (새 라디오버튼 4 추가해서 하는것)
+
+
+    내일 -> 스와이프 동작시키기 
+    임시로 떼운곳들 수정하기
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 04일
+    개못만든 메인화면 시간없어서 일단 푸쉬함 (목록, pdf도 모두)
+
+    잠시쉬는겸
+    투자개발 > 자료모음 > 새소식/자주하는 질문 하고있기
+    
+    새소식
+    write -> 공개여부 추가 (사용자에는 pst_frst_val = 'Y'로 searchVO에 넣어주면 될듯)
+    list -> 공지글은 번호란에 공지라고 출력 그리고 최상단에 위치하도록 (이것도 되있네?)
+
+    다음주
+    1. 열린청장실 끝내기
+    2. 저널소식지 못한거 끝내기
+    3. 피드관리
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 07일
+    IFEZ QA
+    1. 이용안내 > 찾아오시는길 > (인천경제자유구역청, 영종관리과, 청라관리과) 카카오맵 API 적용필요
+    -> 카카오 디벨롭에서 개발서버 주소 플랫폼에 추가해었더니 잘 작동됨
+
+    열린청장실 작업중
+    1. 영상갤러리도 같은 스킨을 쓰므로 if문으로 따로 처리해줘야할듯하다. 완
+    2. 슬라이더라서 첨부한 사진이 여러개나와야하는데 어떻게하면 될까 완
+    -> <img src="/other/attach/process.file.do?TP=img&amp;sn=${row.atch_file_sn}&amp;key=${pf:getFileDownloadKey(row.inpt_dt) }" class="img"> 
+     위 형식으로 첨부파일 다운 url 이용해서 똑같이 사용하면 된다.
+    3. 첨부파일 용량 출력 
+
+    외 할일 순위
+    0. 페이스북 피드 받아오기 및 토큰 갱신 ( 토큰 만료되었을때 수집버튼 누르면 자동으로 페북로그인나와서 로그인 성공하면 토큰이 갱신되는)
+    1. 사이트 처리방침
+    2. API 관리
+    3. 세입세출예산서 오류 수정
+    4. 저널
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 08일
+    피드관리
+    1. 링크 없는 게시물은 사용자화면에서 클릭시 경제청 페이지 메인으로 이동하도록 
+    2. 3개의 페이지에 들어감(열린총장실/대표메인/글로벌?) 때문에 3개의 페북계정에서 데이터를 수집해야함
+    3. ( 토큰 만료되었을때 수집버튼 누르면 자동으로 페북로그인나와서 로그인 성공하면 토큰이 갱신되는)
+    4. 
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 09일
+    일단 만료일 없는 토큰은 사용한다는 전제로
+    데이터 액세스 만료만 갱신되도록 만들어야함
+
+    데이터 액세스 만료는 해당 기간동안 사용이 없다면 만료되는데,
+    앱API를 이용하면 자동적으로 갱신이 된다고하던데 
+
+    오 먼가될듯말듯
+    그냥앱은 로컬에서 안되니깐 테스트앱 만들어서 해바야겟다
+    -> 테스트앱 만들어서 url추가해줘도 안됨
+
+    만료 판단해서 권한 창뜨게 해야함
+
+    1. 시용자 계정 피드
+    2. 아이페즈 국문 계정 페이지 피드
+    3. 아이페즈 영문 계정 페이지 피드
+
+    일단 페이지로 바꾸고 링크는 attachment안에 있는데 못꺼내고있음 (임시로 permament_link)
+    리스트 정렬순서는 페북 게시글 등록일 기준으로 정렬함
+    
+    이제는 우선 만료되었으면 권한인증창 뜨도록 변경해야할듯
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 10일
+
+    국문페이지 영구토큰
+    EAAMdRvd3RZCIBAJ0hyI3BoxVehodlFJPAEBN3kZC37t3bOgsSMHFdzXIUdBo8Q50o3zngmTvhZBtGKiPXoDPXbD2mpxKKQQ6c6Iuap5MvZCLcmxM00kAiozlt15vVdaZCz9KzD956kKWNVf1UB6N9scBD2nrwSYkarCyK2SbPVRWxTHzrTuexBwIYvOkvMOwZD
+
+    영문페이지 영구토큰
+    EAAMdRvd3RZCIBAIGnuOUY3ZCIYfO3r9uJqaGPxvgSrFOGg8fNZAQBCe7ZC8ICZBiJu5A3205qfYO2WaZBHNM7WBhm0HYUXxXd7XWsvSXaTpIlhjCpdRXxyYyAuJ5ZCu8GnZC3zV4j3kC2il2p3wvRAZAO07mWBVPbbUB3UJkrZBTq0UBGRbWT8PspB8WGFAtlIlgcZD
+
+    ->만료되지 않는 권한 <-
+    https://developers.facebook.com/docs/facebook-login/auth-vs-data?locale=ko_KR
+    pages_show_list, pages_read_engagement와 같은 권한은 만료되지 않는다.
+
+    4시에 만료된 토큰가지고 돌려보고 js에서 에러처리나오면 거기다 권한 넣어서해보기
+
+    반영된 개발서버에서 해본결과 데이터 엑세스 만료가 잘 갱신된것을 확인
+    버튼형식으로 된 것은 로그인 후 바로 잘 꺼지는데, FB script로 추가한것은 로그인 후 자동으로 꺼지지가 않음
+    
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 11일
+    페북
+    1. 페이스북 로그인 후 창 꺼지게하기 (보류)
+    1-1. org.json.simple 라이브러리 삭제하고 org.json으로 활용한 코드로 수정하기(완)
+    1-2. permanent_link말고 다른화면나오는 링크로 변경하기 (json parser필요)
+    열린청장실
+    2. 열린청장실 메인페이지 푸터부분 나오게하기(완, sns부분 제외 메인 완료)
+    저널
+    3. 저널소식지 메인 출력할때 임시로 하드코딩해논거 수정해야함
+    3.1 다른 페이지 불러오는것도 변경했음(공지사항, 이벤트, 영상소식)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 14일
+    1. 저널출력 수정하기
+    2. 피드관리 스케쥴러로 갱신?
+
+    문제
+    1. 이미지가 링크형식이라 출력이안됨 (pageintercepter에 링크 추가로 해결)
+    2. 내용으로하자니 글이 너무길어서 쿼리로하던 자바로하던 내용의 앞부분을 제목으로 db에 추가해서 출력시켜야할듯
+    -> 그냥 jstl로 글자수 자른다음 ... 으로 하게 만듬
+
+    내일 할일 
+    디지털 원패스
+    Z:\펜타코드\202207_IFEZ 웹사이트 전면 개편 사업\99.기타\연동모듈\디지털원패스\디지털원패스 연계모듈 및 가이드(인천경제자유구역청 홈페이지)
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 15일
+    2022-11-15 09:27 이상화 //회원 처리
+    ObjResultVO resultVO = ctrl_member_process_result(request, MbrCertSeEnum.ipin, sDupInfo);
+    이상화 MbrCertSeEnum.디지털원패스
+    이상화 이것만 바꾸면될듯.
+    이상화 MbrCertSeEnum.onepass
+    이상화 저거는 인증 테이블에 저장하고, 로그인까지 처리해줌
+    이기훈 아 enum부분을 변경하면 된다는 말씀이시죠
+    이상화 ㅇㅇ 디지털원패스 인증처리과정에서
+    이상화 성공할때만
+    이상화 저 소스를 갖다 쓰면되
+    이상화 enum만 디지털원패스로 변경해서
+    이기훈 넵 해보겠습니다
+    이상화 연동부분만 처리해주면되.
+    이상화 디지털원패스 다른거바빠서 작업하다 말았어
+
+    1. 눌럿을때 팝업창
+    2. 아이디입력하고 확인누르면 연동되서 돌아감
+    -> OnepassRequestHandler 오류때문에 막힘 (과장님도 같은 오류 발생하셨고 연락해보신다고 하심)
+
+    
+    페북피드
+    -> globalCenter 앱에서 개발자 권한은 받았지만 해당 계정으로 로그인을 해야 토큰이랑 권한을 설정할 수 있다.
+
+    글로벌까지하면 앱ID가 두개인데 list.jsp 스크립트의 appid는 어떻게 처리하지?
+    일단 global.properties에 변수 추가함
+    SnsFdSeEnum에 facebookglb 추가해놈 
+    feed/list.jsp에 영문버튼 함수 추가해놈
+
+    남은거 -> 글로벌계정 받아오면 토큰 받아서 영구토큰 만든 뒤, 바로 피드 수집 기능 적용시켜서 db에 저장해보기
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 16일
+    slf4j
+    logger.error -> 의도하지 않은 오류를 명시적으로 표현할 때 사용
+    logger.info -> 시스템 동작을 표현
+
+    디지털원패스
+    1. 새 플젝 만들어서 임포트 한다음에 테스트해보기
+    2. 과장님이 먼저 해보셔서 테스트한 결과, 인증값을 받아왔지만 Dn? Di값을 못받아왔고,
+    해당 테스트 성공한 모듈을 IFEZ에 적용했더니 오류가발생
+    OnepassRequestHandler 클래스 문제로 원인을 찾고있으시지만 못찾았다고하심
+    -> 메일로 문의해서 알아내신다함
+    
+
+    글로벌계정 토큰까지 받았음
+    근데 공유글을 가져올 수는 있는데 메시지를 못가져오더라.어떻게해야가져오나?
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 17일
+    1.디지털원패스 NoDefClassFoundError Exception 오류 원인? 
+    2.그룹내 다른 유저 공유글 받아올 수 있는가?
+    3.할꺼없으면 저널페이지 수정
+
+    할꺼
+    페이스북 group 피드를 다른 구성원이 올린 글도 피드로 받을 수 있는지 찾아보고 있습니다.
+    끝나면 디지털원패스 원인을 더 찾아보거나, 저널페이지 제대로 안된부분 수정할려고합니다
+    
+    순서?
+    버튼 누르기 -> 컨트롤러 연결 -> getFeed 실행 -> 권한오류발생 -> reauthorize 발생을 하는데..
+    3가지 방법으로 시도했지만 순서가 맞ㅈ 않아서 오류가 발생
+
+    글로벌센터 다른 사용자 피드까지 가져올려면 앱권한 받고 비즈니스 인증받고 막 이래야해서 
+    그냥 일단 놨두기로 함
+
+    이제 1시간에 1번 자동으로 피드 수집하도록 배치프로그램 설정해야하는데 어떻게 할지 이상화 과장님께 물어보기
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 18일
+     피드해야할것
+    1. 일부로 key나 토큰중 틀리게해서 권한 요청 뜨게 만든다음, 이번에 받은 ifez계정 / 글로벌계정 둘다 로그인 후
+    액세스 만료시간 갱신되는지 테스트 해보기
+    -> 위에 1번 테스트 해볼려고 en.id 랑 global.id 는 일부로 틀린 id값으로 해놈 개발서버 반영 요청드리기
+
+    2. 1시간에 1번씩 자동으로 피드 수집되도록 배치프로그램 기능 구현하기 (완)
+    -> FeedScheduler 배치 완성시키기?
+    스케줄러 테스트 할필요 따로 없다.
+    -> 어차피 스케쥴러랑, junit 똑같아. 그래서 excute 안에 내용을  junit 테스트해서 
+    정상이면 그대로 스케쥴러도 정상동작될거야. 굳이 테스트하러고 하지마.
+
+
+    ※문제※
+    1. 운영서버에서 sns피드관리 페이지 들어가면 FeedController 에러발생 null 이 뜸  왜??
+
+    2. 국문/영문 페이지랑 글로벌센터 앱 ID를 따로 해야함 앱ID가 같으면 한쪽 앱 계정만 액세스 만료가 갱신됨
+
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 22일
+    아침 다시 피드테스트 해보니 unexpected 'SUBSTRING'이라는 쿼리 오류로 수집이 안됨.
+    -> 일단 삭제함 (잘되더니 갑자기 오류가 떠서)
+
+    unique key 중복 오류 발생
+    -> sns_fd_sn 중복되지 않고 다음번호로 insert하는것이 로그에 나왔지만, 계속 유니크 키 중복으로 오류발생
+    -> 오류명 : operation would have caused one or more unique constraint violations.
+    -> Replace into로 바꾼다음 동작시키고 다시 insert로 바꾸니 정상 작동 
+    -> 자세한 원인을 모르겠음
+
+    쿼리성능?
+    -> Replace into를 쓰면 로직단에서 if문으로 id가 중복일때 insert, update 나눌필요 없어보이는데 
+    -> repalce into랑 insert into 랑 둘 중 어떤방식이 나을까.
+
+    왜 운영서버에서만 피드 페이지가 뜨지 않을까? (controller -> null) 발생
+    -> selectList_Paging 메소드에서 생긴 null값인것 같은데 운영서버에서만 null이 뜨니 원인을 모르겠음
+    -> xml 쿼리부분에 selectCount와 selectList 부분에 parameterType이 빠져있어서 추가함
+
+    
+    내일 홍보센터 수정 끝난거 올라온다고함 (이번주 안에 끝내야하는데..)
+    끝낸다음엔 검색엔진 기능 만들어야함 (API로 화면5개... ??)
+
+
+    기사 좋아요 기능 추가는 PstController의 TP=itrst 만들어논 기능 사용하자
+    view화면은 photo_matl.jsp 참조
+
+    global.properties 수정하면 
+    global.real.properties에도 반영해줘야함
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 23일
+    좋아요기능 수정해야함 (컨트롤러에 좋아요 기능 수정해서 추가함)
+    상세화면 및 목록화면 좋아요 나오도록 함
+
+    상세화면 조회수 가장많은 기사 2개 노출
+    view.do 가는 컨트롤러에서 searchVO로 pst_count order by 해서 하나?
+    새 쿼리를 또 만들기는 좀 그렇다.
+    -> setSrchSort로 조회수 높은순으로 list 만들어서 해결함
+
+    화면설계? 저널 어떻게 해야하는지 문서 나왔는지 물어보기 (조성영 사원님)
+    비즈니스+ / 라이프+ 두개가 나뉘는데 jrnl_se 부분을 비즈니스/라이프 2개로 나눈다는소린가? (그런것같은데)
+    -> 그러면 Headline 이나 Interview같은 항목들은 오디에??
+
+    ->답 : jrnl_se 부분을 무조건 비즈니스랑 라이프만 선택할 수 있도록 변경 (지금은 text inpur으로 되어있지만
+    드롭다운방식으로 두 가지중 선택하도록 변경)
+
+    저널의 내용을 라이프 or 비즈니스 소식으로
+    비즈니스 들어가면 라이프소식이 나오고, 라이프 들어가면 비즈니스 소식이 나오도록
+
+    영상소식은 새로 추가된 메뉴임
+    첨부파일형식 동영상이아니라 유튜브 링크넣으면 작동하는 임베디드 방식으로 
+    형태참고 -> https://love.seoul.go.kr/asp/movieList.asp
+
+
+    1. 일단 저널을 비즈니스랑 라이프로 구분되게 만들자 O
+    2. 좋아요 기능 추가 O
+    3. 상세에서 조회수 가장 높은 2개 출력 (비즈니스에선 비즈니스 카테고리 중 가장 조회수가 높은것만) O
+
+    저널영문페이지는 누르면 메인으로감 
+    기사등록에 관련국문기사 탭은 필요없을듯
+
+    퍼블나오고 금요일까지 끝내고 다음주 검색엔진?
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 24일
+    열린청장실 header.jsp 투자개발에있는 header 코드 복붙해서 사이트맵 링크만 바꾼상태
+
+    비즈니스 / 라이프에서 우측항목의 라이프or비즈니스 소식에는 해당저널 최신기사 5개가 나오면 노출시키면됨
+
+    -열린청장실 문제
+    1. 모바일버전에서 접속한 메뉴의 버튼이 active로 바뀌지않는 문제
+    -> <c:set var="menuPathSnList" value="${fn:split(__menuVO.menu_path_sn, '>') }" /> 가 없어서 active가 클래스에 추가가 안됨
+    2. 모바일버전에서 링크를 누르면 해당 페이지로 가야하는데 밑에 depth가 또 생기는 문제
+    -> 해당 사이트에는 2depth가 최대인데 3depth까지 만들어져있어서 눌러도 depth만 생기고 링크가 안타진거임
+    -> 때문에 gnb_depth3 부분을 주석처리하거나 지우면 해결됨
+    3. 사이트맵 눌러도 안타짐
+    -> 그냥 없어서 그럼 나중에 생기면 관리자에서 메뉴추가해주고 링크타게 해주면 될 듯
+
+
+    내가작업한 페이지들 이미지에 모두 썸네일 작업해야함
+    2022-11-24 11:17 이상화 관리자 공통코드 > 사이트 공통 > 썸네일 사이즈 > 숫자 넣을것.
+모든 이미지 width 값  파라미터 꼭 부여할것,
+2022-11-24 11:17 이상화 (사진)
+2022-11-24 11:18 이상화 빠짐없이 꼭 해줘야함.
+2022-11-24 11:18 이상화 기훈이는 지금하고있는거 + 자기가작업한것 만 넣어주고
+2022-11-24 11:19 이상화 인호는 지금하고있는거 + 자기가작업한거 + 상화꺼, 인용꺼
+2022-11-24 11:19 이상화 온라인통합예약 메뉴 빼고 나머지 해주면ㄷ뇌.
+난 온라인예약 작업중에 이미 넣은것들이라
+2022-11-24 11:19 이상화 String s_width = FuncString.isEmpty(request.getParameter("width"), "0");
+			Integer i_width = Integer.valueOf(s_width);
+
+super.imagePrint(response, fileVO, i_width, null);
+2022-11-24 11:20 이상화 process.file.do 로 되어있는 이미지들 처리해주면된다.
+
+저널
+1. layout.jsp 부분 메인, 서브페이지 구분 수정함
+2. header.jsp 부분 일치하도록 수정함
+
+
+메인3개노출
+selectlist?  selectobject?
+
+저널노출
+1번이 여러개면 메인 가장 크게 노출되는 부분이 롤링되도록 (기사제목이랑 카테고리도 바뀜)
+
+2번은 두 번째로 작은 메인 노출부분
+
+3번은 위에 노출 제외 모두 
+
+관리자부분에 카테고리부분 그냥 놧두고
+홍보저널 메인 노출 부분을 메뉴로 변경해서 사용하기
+
+영상이랑 최신사진부분 관리자가 대표 설정한걸로 뭐 한다던데 어떻게??
+
+기사등록 이미지사 사라짐
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 25일
+
+    완
+    2. 기사등록 수정에서 이미지 안건들여도 사라짐
+    -> 쿼리랑 controller 부분에 img_updt_yn 추가해서 해결 (jrnlPstVO에도 변수추가)
+
+    3. 라이프 / 비즈니스 구분 변수변경 해야함
+    -> top_pst_seq변수 이용해서 구분하기로함 (1 -> 비지니스 / 2 -> 라이프)
+
+    4. 저널메인 더보기 구현
+    -> css로 어케해볼려고 하다 답이없다
+    -> 4개만 불러들이고 더보기눌렀을때 contoller 매핑추가해서
+    -> 동적쿼리로 추가하는게 나을까?
+
+    ->방법1. css와 제이쿼리만으로 처리
+    ->방법2. ajax로 selectlist_paging이용하여 4개씩 나오도록 페이징하는방식으로?
+
+    페이징으로 4개 불러오고 1페이지, 2페이지, 3페이지 나눌 수 있음
+    이제 ajax로 더보기 누를때마다 setpage의 숫자가 1씩 늘어나게 해야함
+    그런다음 더이상 불러올 데이터가 없다면, 더보기 버튼을 없애버리는게 좋을것같다.
+
+    사진이랑 링크, 갯수출력까지 정상작동하는것을 확인, 이제 데이터가없으면 더보기버튼을 없애거나 동작못하게해야함
+
+    5. 최신사진 대표 선택??
+    -> 최근사진 게시판에 pst_ffth 메인 노출여부 추가해서 처리함 (Y일때 저널메인노출)
+
+    7. 홍보메인
+     7-1. 팝업레이어부분 관리자가 수정하도록 만들어야하는데 기존기능이 있나? 만들어야하나?
+     -> 관리자cms 팝업이용해서 만들긴했는데 관리자 맘이면 버튼같은건 어떻게하나?
+     -> 해결: 해당 팝업레이어는 텍스트만 변경할 수 있도록 만들면 됨
+
+   6. 라이프 / 비즈니스 검색창 구현 및 연도, 호 매끄럽게 수정, 키워드 검색 추가
+    라이프/비즈니스 검색 오류 수정
+    문제1. 비즈니스, 라이프로 바꼇으니 비즈니스에서는 비즈니스 게시물이 존재하는 저널 호만 뜨게 해야함
+    -> ajax 데이터 전달할때 구분값도 같이줘서 쿼리돌릴때 비즈니스, 라이프를 구분해서 값을 가져옴
+    문제2. 검색을 했으면 searchVO에 값이전달되서 selectBox가 select되어야하는데 초기화됨
+    문제3. 연도를 선택한 후 호별이 바로 선택되지않고 전체~호수가 뜨도록 해야하는데 그렇게 안되고있음
+    문제4. 연도선택 후 호가 존재하지 않으면 selectBox를 초기화시켜야함
+    -> 비즈니스랑 라이프쪽 검색창은 다빼기로 결정
+
+    1. 운영서버 페이스북 피드 페이지 안들어가짐
+     -> 갑자기 또 된다? real.properties만 수정했는데 음...
+    페이스북변경
+    1.ajax 돌릴때 fnPrevent_check()  -> 처리완료 회색화면뜨는거 이벤트 추가해주기 (음 된건가)
+    2.수집버튼들 위로 올리기 -> 음 한줄에 나란히 뜨도록했는데 검색수 부분이 좀 올라간느낌
+    3.노출부분 예, 아니요로 변경하기 -> c:when 처리로 완료
+    4.검색에 구분 추가 -> 새로 select태그 만들어서 처리함
+
+    영문페이지
+    1. 영문저널 만든다음 기사등록하면 해당 영문저널의 기사로 등록되겠지?
+    2. 영문페이지는 따로 레이아웃을 추가해야하는것같은데 방법을 모르겠음
+    -> 과장님이 tiles 와 header, layout 틀 다 만들어주심
+    -> 메인부분 유튜브만 추가하면 될 듯 
+    -> 기존 만들어져있던 방식에 추가해서 만들었음
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 28일
+    미완
+    8. 저널 썸네일 등록되도록 코드 수정
+    -> 작업현황
+     저널소식지
+     1. 메인 완
+     2. 비즈니스, 라이프, 영상 퍼블 나오면 작업하자
+     3. 지난호보기 완
+
+     홍보센터
+     1. 메인 완
+     2. 홍보관 퍼블 나오면
+     3. 나머지는 인호님이 하심
+
+    9. 저널이랑 홍보 메인 header부분 english 아이콘이 변경안되었음
+
+    10. English Journal 만들기
+
+    11. 서브페이지 퍼블 및 기능구현되면 메인에 추가해주기(저널 -> 영상소식)
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 29일
+
+    공유버튼, 프린트버튼 동작되도록 수정하기
+    -> 저널이랑 홍보 console에 index 에러발생하는데 이거고치면 해결되지않을까?
+    -> 아마 스크립트 순서가 꼬여서 그런것 같음 빨리 확인해보자
+    (script.js에서 imageCash부분 try-catch 추가한 결과 오류는 사라짐)
+    (하지만 여전히 공유하기버튼 및 프린트 버튼 기능이 동작하지 않음)
+
+    저널, 홍보센터 검색버튼 동작방식??? (통합검색이랑은 다르게 해야함)
+    (홍보는 홍보안에서만 게시물들 검색하게 , 저널은 저널안에서만 검색하게 단, 영문페이지 빼고)
+    (검색결과하면이 나오면 하자 일단 검색엔진부터)
+    
+    지난호보기 부분에 jrnl_se 같은 카테고리 항목은 묶여서 출력되어야하는데 각자 출력됨
+    -> 설계서에 따로 적힌거없으니 나중에 하기
+
+    검색엔진
+    api에 검색할 정보 보내고 json형태 받아와서 
+    검색결과창에 데이터 뿌려주기
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    11월 30일
+    기사등록페이지 페이징처리 오류남 newcontroller 수정바람 -> 완
+    english journal 유튜브 -> 완
+    최신호 데이터 가져오는 쿼리 수정 -> stng_sn 비교처리해서 완
+    기사등록 -> 관련국문기사 jsp파일 및 newscontroller 주석처리 -> 완
+
+    열린청장실 수정사항
+    1. 메인부분 경제청장sns 삭제 -> 주석처리로 완
+    2. 포토, 현장속으로! 사진확대(좌우크기 전체적을 기존 대비 120~130% 정도로 )
+    -> .cm_board_view1 .board_slide_wrap { width: 100%; max-width: 1140px; margin: 0 auto; margin-top: 60px; } 
+    -> width를 950 -> 1140으로 20% 더 크게 변경
+
+
+    검색엔진
+    6개항목 url에 잘 넣어서 버무리면 어케 되지않을까?
+    결과형태는 json이고 잘 parser하면 될 것 같다.
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 01일
+    홍보센터 서브 페이지 퍼블 수정 완료됨(검색결과창 제외)
+    1.비즈니스,라이프 목록,상세 수정 (영문도 같음)
+    -> 비즈니스, 라이프 각 항목에 대해서만 이전글, 다음글 나오게 해야하냐?
+
+    국문 비즈니스 or 라이프부문은 수정완료
+    영문저널 국문이랑 똑같이하긴햇는데 한글부분이랑 영상소식은 어케?
+
+    홍보센터
+    홍보관
+    1. 홍보관 소개, 관람 및 시설안내 html (완)
+    2. 자주 묻는 질문 새로 만들어야할듯 (게시판코드 추가해서 만듬 완)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 02일
+    검색엔진
+    1.검색버튼 form부분에 검색결과창 새로 만들어서 연결해주기
+    2.Controller 매핑(검색값을 받아와야함)
+    3.FuncSearch 함수 이용해서 검색결과값 받아오기
+    4.받아온 데이터들을 화면에 뿌려주기
+
+    드디어 where 사용해서 검색해봄
+    String apiURL = "http://" + ipPort + "/search5?select=*&from=pst.pst&where=pst_id";
+    String encodeData = "";
+    try {
+	encodeData = URLEncoder.encode("='mayor_photo'","UTF-8");
+	System.out.println("URL인코딩 : " + encodeData)
+    } catch (Exception e) {
+	e.printStackTrace();
+    }
+    apiURL += encodeData;
+    apiURL += "+order+by+%24relevance+desc";
+
+    주택검색 -> Controller -> 검색값 FuncSearch에 전달 -> 
+    검색값 utf-8 encoding 해서 검색쿼리에 추가 -> 추가한 쿼리를 검색엔진에 돌려서 결과값 받아오기
+    -> 받아온 결과값을 다시 Controller -> 받아온 json데이터를 잘 쪼개서 화면에 뿌려주기
+
+    방법1. 검색어를 가지고 하나의 쿼리를 엄청 길게 써서 한번에 데이터 불어와서 json데이터 쪼개기(성능,시간 좋은데 개어려움)
+    방법2. 여러 url 쿼리를 만들어서 각각 검색대상에 따라서 여러번 검색엔진 돌리기 (성능, 시간 나쁨)
+
+    
+    더보기 눌렀을때 그 밑으로 리스트가 쭉나오게되며 페이징처리 해주기
+
+    나와야하는 데이터
+    
+    1.메뉴경로(누르면 해당 링크 이동되도록)
+    menu_path_nm 메뉴경로
+    menu_link_addr 메뉴상세url
+
+    2.담당업무 (a태그가 아닌거보니 링크이동은 아닌듯)
+    jbttl_nm 직책
+    dept_nm 부서명
+    emp_nm 이름
+    emp_telno 전화번호
+    tkcg_task_cn 담당업무
+
+    3.웹페이지 (누르면 해당 웹페이지로 이동)
+    menu_link_addr 상세페이지 url
+    퍼블에 해당 웹페지 설명있는데 그런 논리명은 없는데?
+    
+
+    4. 게시판 (누르면 해당게시물로 이동)
+    pst_nm 게시물 명
+    pst_cn 게시물 내용
+    inpt_dt 입력 일시
+    menu_link_addr 상세페이지 URL
+    menu_path_nm 메뉴경로명
+
+    5. 첨부파일(누르면 다운받어야하는듯? 미리보기도)
+    file_orgnl_nm 파일 원본 명
+    file_path 파일 경로
+    menu_path_nm 메뉴 경로 명
+
+    6. 멀티미디어 (이미지가 쫙 나와야함)
+    pst_nm 게시물 명
+    img_path 이미지 경로
+    menu_link_addr 상세페이지 URL
+
+
+    hilite-fields 변수를 이용해서 그 키워드에 <b></b>처리 할 수 있을지도
+
+    apiURL 그냥한번에 쭉 쓰고 url encoding  한번에 처리해서 진행하기
+
+    검색 후 5개까지는 노출시키기 (limit로 5개까지만)
+    그런 다음 더보기를 누르면 새페이지로 가면서 해당메뉴 쿼리만 동작시키게 만들어서 데이터 쭉 뽑아오기
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월05일
+    홍보센터 문제
+    독자사진?인가 먼가 사진이 안나옴
+    저널소식지의 영상이 완료되었으므로 메인 및 목록에 추가해야함
+
+    검색엔진 문제
+    menu_link_addr에 자동으로 <b>태그가 붙어버리는 문제 
+    menu_path_nm에 <b>태그가 붙엇지만, class=keyword가 없으므로 글자가 바뀌지않음.
+    위 2개문제 모두 replace로 <b> = "" 로 바꿔버리기?
+
+    limit=5가 먹히지 않음.
+    -> &limit=2 하니그냥됨. 미치겟네
+
+    테스트 라이센스를 해지할 방법을 모르겠음. 때문에 계속 WARNING이 붙어다님
+
+    웹페이지 html태그 지우기인데 <b>태그는 뺴고지워야함
+    FuncHttp에 html태그 지우는게 있지만 <b>태그까지 지워버림
+    때문에 황인용과장님께 태그제외하고 지울 수 있는지 여쭤보기
+    -->>>> 검색엔진회사쪽에서 html태그 빼고 내려주기로 했음 그래서 그냥 진행하면됨
+
+    postman 사용해서 하기
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월06일
+    limit를 추가하면 count도 limit숫자로 변경되더라,
+    때문에 스크립트에서 5개로 제한시키고 count를 그대로쓰는게 좋지않을까?
+    (어차피 디폴트로 10개만 나오기때문에 성능저하는 거의 없다고 보면될 것 같은데)
+
+
+    검색 후 결과 재검색 이거 어케하냐
+
+    더보기 및 탭 눌렀을때 category랑 키워드 controller에 전달하면서 새페이지 리로드?
+    그런다음 화면에 해당 카테고리에 해당하는 값만 쭉 뿌려주기 limit 없고 페이징?
+
+
+    페이스북 실험해볼거
+    오래동안 수집을 안햇더니 이미지url이 만료가되서 엑박으로 뜸
+    최근10개만 수집하므로 오래된건 업데이트도안됨, 때문에 최근 10개중에 업데이트 후 img url 변경되는지 확인해보기
+
+    더보기했을때 c:if처리해서 탭부분을 해당 더보기 클릭한 것같 만오게 하자
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월07일
+    그냥 다 뒤집고 다시해야함
+    검색어가 두 개일때나 띄어쓰기 있을경우?
+    자바에서 모두 처리 후 view에 뿌리기 (게시판처럼)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월08일
+    홍보센터
+    목록 pdf다운 atch 오류난거 수정, 홍보센터 메인 행사사진? pst_id 오류수정
+    저널메인 및 목록 영상소식 추가
+
+    vo만들어서 jstl로 화면에 뿌리는 걸로 교체함
+    검색쿼리 다 다시 만들어야함
+    더보기 만들어야함(하나의 jsp파일에 만들어야하나, 여러개 만들어서 해야하나)
+    검색 후 재결과 만들어야함
+    화면 수정해야함
+
+
+    인기검색어
+    custom필드의 keyword가 들어가야 로그가 쌓이고 
+    그걸 기반으로 인기검색어가 나올 수 있다.
+    필요한 custom필드 -> site, search_type, keyword, pre_keyword
+
+    통합검색 팝업창이 띄울때 검색엔진이 맛이가면 다른부분도 맛이가므로,
+    인기검색어 데이터를 불러올때는 스크립트 ready부분에서 ajax처리 이용해서 가져오도록하자
+    검색엔진이죽어도 error 부분에서 걸러질 수 있도록
+
+    최근검색어
+    이건 검색엔진에 따로 뭐 없고 (있어도 사용자별이라..)
+    그냥 쿠키 이용해서 구현하자
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 09일
+    로그분석기에 검색결과 나옴
+    api 호출해서 json형태로 받아올려면 24시간이 걸리는듯
+    
+    같은 정확도일시 날짜순 복합 정렬 : order by $relevance desc,dates desc  <----이거대로통일하자
+
+    일단 더보기 흘러가는대로 하긴했음
+
+    전체검색에서 쿼리 수정하고 bold처리 해줘야함
+
+    그리고 검색쿼리도 정확하게 나오도록 수정해야함
+
+    인기검색어, 최근검색어 해야함
+
+    통합검색창 레이아웃같은거 다 없애야함(임시로해놨기때문)
+
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 12일
+    통합검색 운영서버 오류
+    1. 전체에서 웹페이지 더보기 없음
+    2. 게시물 많을때 페이징 난리남(pageblock이 안되어있어서 그런듯 10으로해야함)
+    -> pageBlock변수를 menuCount로 줘서 생긴문제 -> controller에서 지정해서 던져주면될듯
+    3. 웹페이지부분 내용부분 태그 다 노출됨 (검색엔진회사에서 운영쪽은 태그제거 안해준듯)
+    4. 스크롤위로가기 버튼 누르면 게시물이 나옴? 왜
+    5. 탭이나 더보기눌렀을때 해당 페이지 말고는 탭을 없애던가 아니면 건수를 모두 보여주도록하기
+
+    홍보센터오류
+    사진이미지 경로가 안맞는듯 (개발서버에 올린거)
+    저널소식지의 비즈니스+, 라이프+ 들어가지지 않고 오류 발생  ---- 영문저널도 마찬가지
+    영어저널 다 텅텅 비었음 youtube만나오고 
+
+    열린청장실
+    목록 부분 사진이 안나옴(상세보기는 나옴)(아닌가? 그냥 사진없음으로 나오는데)
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 13일
+    최근검색어
+    쿠키저장후 최신순 5개 출력 (5개 넘어가면 삭제처리???)
+    쿠키 유효시간은 1주일 or 1일
+    x누르면 스크립트? 자바? ajax나 뭐 해서 쿠키없애기
+
+    5개가 넘어가면 0번자리 쿠키의 만료시간을 0으로 줘서 삭제?
+
+    홍보센터 검색구현
+    홍보센터안에서만 검색하는기능
+    영문저널도 해야함
+
+    영문저널 메인, 비즈니스, 라이프 모두 안나옴
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 14일
+    통합검색 이미지없으면 noimage나오도록 처리해주기
+    
+    홍보센터 검색 작업중
+
+    우선순위
+    1. 홍보센터 검색
+    2. 통합검색 - 검색결과 재검색, 멀티미디어 이미지 없을경우 noimage로
+    3. 중대재해 수정 및 기능 추가 -  중대재해 탭메뉴만들어서 중대재해 ㅡ 시민재해 나눠지도록 수정해야함(관리자도 수정해야할듯)
+    4. 저널메인 발간책자 세트로 화살표누르면 해당 카테고리 책자의 다음호가 나오도록 변경
+    
+
+    개요필드는 입력하여도 사용자화면에서 노출되지 않으므로 삭제 처리 요청
+    개요부분은 비즈니스,라이프 목록에서 
+    <a href="view.do?jrnl_pst_sn=${row.jrnl_pst_sn }" class="elm_text">${row.jrnl_sumry_cn }</a>
+    항목으로 사용자에게 노출됨
+
+
+    홍보센터검색 -> 좋아요 및 다운로드 횟수 출력되도
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    12월 15일
+    하다하다 안되서 걍 새로 xml 만들어서 함
+
+ ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 16일
+    split해서 나눠야하나..
+    검색키워드 강조되도록..
+
+    홍보, 저널 검색결과
+    1. 더보기에서 검색결과 수 출력
+    2. 게시글 및 홍보관 텍스쳐 길이따라서 나옴
+    3. 검색키워드 특수문자 제거 및 검색값 없으면 alert띄워서 못하게하기?
+    4. 내용노출부분에 에디터이면 이미지나 태그가 그냥 노출됨 -> 에디터나 태그 모두 삭제 ( 개요로 대체)
+    5. 검색키워드에 굵기 처리 하기
+
+    기사등록
+    1. 에디터 용량 개선 및 오류 해결(관리자) 
+    2. 사용자화면에서 에디터 사용했을때 태그만나옴
+    
+    저널등록에서 01호 02호 이렇게 등록하면 쿼리에서 검색을 못함
+    (db에 입력될땐 앞에 붙은 0 다 빼버리도록 처리하는게좋을듯)
+
+    영문저널 비즈니스/라이프
+    첨부파일이 없어서 오류뜨고 안들어가지는 문제
+    -> 저널등록부분 필수값으로함
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 17일
+
+    1. 통합검색 검색결과 재검색
+    2. 통합검색 더보기 타메뉴 count 추가
+    3. 중대재해 수정 및 기능 추가 -  중대재해 탭메뉴만들어서 중대재해
+    4. 저널메인 발간책자 세트로 화살표누르면 해당 카테고리 책자의 다음호가 나오도록 변경
+    5. 통합/홍보/저널 검색 : 검색 키워드 없을때 처리
+    6. 영문저널 비즈니스,라이프 오류수정
+    7. 대표 메인페이지 인기검색어 3개만 출력
+    8. 저널 키워드검색
+    9. 홍보센터qa
+
+    
+    검색설계서있네??
+    1.한줄 출력몇개 부분 수정 (완)
+    2.검색키워드에 따른 검색조건 추가
+    3.
+
+    영어저널 검색쿼리 수정
+
+    이전글 다음글 필요조건
+    현재 보고있는 게시물보다 이전글이라면 작아야하고, 다음글이리면 커야함.
+    즉, 이전글은 보다 작은상태에서 max인 게시물 번호값을 구해야하고,
+    다음글은 보다 큰 상태에서 min인 게시물 번호값을 구해야한다.
+    if문 -> 국문영문, 저널호수, 현재게시물번호, 
+
+
+    ■  ifez 서버 적용 절차 - 참고
+	1. 운영 tomcat shutdown
+	2. 개발에서 db export해서 운영에 import
+	3. 마이그레이션을 위한 쿼리 실행.
+	4. 소스올려서 tomcat  시작
+	5. 마이그레이션 URL 실행
+	6. 개발에서 첨부파일 압축해서 서버에 올리기
+	7. 기존서버 첨부파일 rsync 동기화
+	8. 검색엔진 재수집
+
+	pst_cn 에디터 부분 필수아니라면  
+	$("#jrnl_cn").val(CrossEditor.GetBodyValue()); 넣도록 해줘.
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 18일
+    개발서버 로그확인 정보
+    개발서버  192.168.1.4
+    penta_db / penta3377&*()
+
+    완료
+    1. 홍보검색 홍보관 더보기부분 count0으로 나옴
+       홍보/저널 검색  pst_cn -> jrnl_pst_cn 
+       -> searchVO에 pst_stng_sn_arr 값이 저장된 상태로 쿼리돌려서 제대로 동작안했던것
+    
+    cms관리자
+    2. 저널이 삭제되면 해당 저널의 기사들도 모두 del_yn 처리해야하나?
+       저널이 삭제된 기사를 수정할려고하면 오류가 발생함.
+       -> tc_pst의 del_yn 뿐만아니라 tc_jrnl_pst 테이블의 del_yn 까지 N인 데이터를 검색하게 쿼리 수정
+
+    3. select_maxIssue에 del_yn, pst_thrd_val where절에 쿼리 추가 들어가는 모든 파일에 추가해줘야할듯
+	-> select_maxIssue를 사용하는 파일들에 del_yn과 pst_thrd_val 여부 추가해줌
+
+    9. 홍보센터 관리 > 배너/팝업존 > 등록 - 비주얼이나 배너 둘 다 같은 위치에 출력되므로 버튼 하나는 삭제
+    -> 공통코드에서 사용여부 안함했는데도 나와서 banerController에 use_yn 추가함
+
+    13. 대표 메인페이지 인기검색어 3개만 출력
+    -> if문으로 index가 4이하일때 까지만 출력하도록 설정함
+
+    1. 통합검색 더보기화면 count 출력
+    -> searchController 구조조정함
+
+    3. 홍보/저널/영어저널 검색 검색쿼리 추가(현재는 pst_nm, jrnl_ttl 정도만 되어있음)
+    -> <trim prefixOverrides="AND|OR">
+	  OR tp.pst_nm LIKE CONCAT ('%' + #{kwd} + '%')
+	  OR tp.pst_cn LIKE CONCAT ('%' + #{kwd} + '%')
+	</trim>
+	사용해서 해결함
+
+    4. 홍보/저널/영어저널 검색 키워드에는 진한글씨로 나타나게
+    -> list 돌면서 키워드 replace 사용해서 진한글씨로 만드는 태그 추가해서 돌려보냄
+
+    6. 중대재해 > 안전보건목표 관리자 및 view 수정
+    -> 새 메뉴 만들어서 추가하는 방식으로 작업함
+
+    하도급계약현황 리스트 역순으로 (최근 자료가 위로 오도록)
+    -> 계약일 기준으로 정렬함
+
+    지난호보기 국문 저널만 나오도록 변경함
+
+    **8. 저널메인에서 가장최신호의 기사가 출력되는데, 최신호 사용안함 할 경우 메인에 아무것도 안뜨게됨
+    -> 이건 내가 쿼리에서 del_yn 쿼리 추가한것같은데 use_yn도 추가해서 되는지 해봐야할듯
+	1) 저널메인 / 영문저널 메인 수정
+	 저널에 기사가 아무것도 없으면 메인에서 아무것도 안뜸 -> 메인노출기준으로 다른 가장 최근 저널의 기사라도 뿌리도록 수정
+	 -> 그러면 latest넣어서 돌린 후에, resultList가 null이라면 국문,삭제,사용여부 판단해서 아무 최신기사 불러오도록만듬?
+
+    **5. 비즈니스/라이프에서 영상 3개가 안뜸
+      ->아니 값 다 잘넘어오는데 왜 안되는건가 (갑자기 안뜨는데 css문제인듯??)
+      .business_list .cm_list { width: calc(100% - 360px); } 이부분 없애면 나오긴하는데 레이아웃이 이상해짐
+      ->  .business_list > .cm_list { width: calc(100% - 360px); } 로 바꿔서 해결
+
+    애매함
+    10. 열린청장실 관리 > 배너/팝업존 마찬가지로 하나만 나와서 "배너" 버튼을 삭제 
+    -> 비쥬얼영역은 아예 구현이 안되어있는것같음 비쥬열영역 버튼을 삭제하면 안되겟냐고 물어보기
+
+    해야함
+    2. 통합검색 검색결과 재검색 구현
+
+    11. 저널메인 발간책자 세트로 화살표누르면 해당 카테고리 책자의 다음호가 나오도록 변경
+
+    12. 통합/홍보/저널 검색 : 검색 키워드 없을때 처리
+
+    14. 저널 키워드검색
+
+    15. 홍보센터 검색 사진자료부분 좋아요, 다운로드횟수 안나옴
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 21일
+    다국어에서 검색시 다국어에 있는 컨텐츠만 나올 수 있도록
+    로컬서버에서 검색하는거랑 운영서버에서 검색할때 db데이터가 다르다. (beaver db에서 보여지는건 운영서버기준인듯)
+    글자 강조부분이 이상한곳에 <b>태그가 붙어서 api결과를 받음
+
+    apiURL 가독성
+    String[] params = new String[] {
+			"select="	+urlEncode2("*")
+		,	"from="		+urlEncode2("menu.menu")
+		,	"where="	+urlEncode2("(menu_path_nm like '*"+kwd+"*')")
+		,	"custom="	+urlEncode2("IFEZ@ifez_search+user1$|첫검색|0|정확도^"+kwd+"")
+		};
+		
+//		String apiURL = "http://" + ipPort + "/search5?select=*&from=menu.menu&where=(menu_path_nm+like+%27*"+kwd+"*%27)+and+del_yn%3D%27N%27+order+by+$relevance&limit=-1&custom=IFEZ@ifez_search+user1$|첫검색|0|정확도^"+kwd+"";
+		//String apiURL = "http://" + ipPort + "/search5?select=*&from=menu.menu&where=(menu_path_nm+like+%27*"+kwd+"*%27)&custom=IFEZ@ifez_search+user1$|첫검색|0|정확도^"+kwd+"";
+		
+		// 효율적인 apiURL
+//		String apiURL = String.format("http://%s/search5?%s", ipPort, String.join("&", params));
+
+	
+    중대재해 수정....
+    최대한 기존코드 유지하면서 수정해보기
+    새안전보건목표 만들기
+    새목표만든다 -> 사용자화면에서 list를 돌면서 탭이 만들어진다.(중대시민재해탭, 중대장비재해탭...등)
+    안전보건 목표 추가하면 경영방침을 제외한 모든항목이 밑에 생김
+    항목들 추가하고 저장하면 뭐 아무튼 작업한게 저장되서 다음 수정떄도 두개의 안전보건 목표가 보임(3개라면 3개가 보임)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 22일
+    안전보건 목표
+    수정사항 : 기존양식을 이용해서 새로운 안전보건 목표를 만든다음, 사용자화면에서 탭버튼을 이용해 
+    각 안전보건 목표를 이동하게 만들어 달라.
+
+    기존기능은 하나의 목표에서 추진전략 및 주요추진과제만 삭제하거나 추가할 수 있다.
+    -> 공통코드 3depth에 새 목표를 만들어서 진행해야함.
+
+
+    어차피 기능똑같고, 양식도 똑같으니 새 매뉴를 만들어서 추가하는게 좋지 않을까?
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월 23일
+    push 겹쳐서 git 초기화하고 삽질함 
+    변경하거나 파일이 많다면 초기화하고 다시하는게 맞지만, 몇 줄 정도면 그냥 해당 브랜치로 초기화하는게 좋을듯
+
+    검색결과 재검색
+    재검색은 where문에 (이전 검색어 쿼리) AND (이후 검색어 쿼리)으로 작성해주시면
+
+    1. 결과 재검색 버튼 클릭
+    2. ~~flag변수 Y로 변경
+    3. controller에서 if문으로 flag y,n 여부 판단
+    4. y이면 funcsearch에서 재검색 쿼리 실행 후 결과 반환
+    5. 아니면 funcsearch에서 y,n 여부를 판단해서해야하나?
+    6. 
+
+
+    문서뷰어는 다 새창으로 띄우기 (search.jsp 모두 바꿔야할듯)
+    main/search/search.jsp 완
+    world/search/search.jsp 완
+    홍보/저널은 되어있음
+
+    인기검색어 쿠키 console.log 제거하기 완
+
+    열린청장실 main만 main header 클래스 붙이기 완
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월26일~27일(새벽)
+    1. 재검색 버튼 여부, 눌렀을때 controller에 ON 전달
+    2. 재검색 버튼을 누른상태에서 새 검색어를 입력하면 이전검색어에 누적됨 (input hidden태그
+    -> ex) 1 인천  2 인천|서구  3 인천|서구|송도  4 인천|서구|송도|청라...
+
+    3. 누적된 검색어를 controller 배열리스트에 저장시킨다음 getSearchResult 메소드의 매개변수로 전달
+    4. 해당 메소드에서 재검색 여부를 판단해서 첫검색인지, 재검색인지 분기
+    5. 재검색이라면 받아온 배열리스트의 수만큼 반복하면서 새 검색쿼리를 apiURL에 추가시키기
+    6. 검색엔진
+    7. 결과 화면에 반환
+
+    키워드 배열로 넘겨서 jsp에서 for문으로 생성
+
+    수정사항
+    1. 홍보센터 - 남았긴한데 중요도 하라서 검색엔진 부터
+    2. 세입세출예산서 데이터 존재하는 탭만 뜨도록, 기타,세입,세출 뜨는거 사용자에서 안보이게 처리 - 완
+    3. 중대재해 dev에선 안뜸 -> 아직 반영안되서그런듯 12/23일에 깃에 올렸으니
+
+    완
+    기훈님 영문 저널에서는 아래 영역 미노출 숨김 요청드립니다! -> 안보이게처리 (주석처리함)
+
+    열린청장실 헤더부분 홍보센터 빠짐 -> 서주임님이 수정함
+    저널 누리집되어있는거 다시 홍보센터로 변경
+
+
+    지난호보기 기사출력부분 에디터 다 지워버리기 -> 태그제거처리해도 이러네
+    -> 이상화 과장님이 보시기로 함
+
+    저널 키워드 검색 링크 추가 -> 누르면 홍보저널검색창에서 바로 검색되도록 변경
+
+    패밀리사이트 클릭 시 출력되는 레이어 영문으로 변경
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월27일 (2시퇴근)
+    국세심포지엄 수정 (db바꿔야하나?) 
+    -> 해당 수정건은 더 물어봐야해서 보류
+    
+    홍보 검색 조회수, 다운로드수 
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월28일
+    국제심포지엄 수정
+    감리전까진 해야하니 내일(29일)까지 끝내는게 베스트
+
+    constVO에 doc테이블 추가
+    controller랑 vo는 기존 만든파일 수정해서 해보고, 더 추가된건 파일 만들기
+    vo는 심포,월드 나눌필요 없이 하나의 vo만들어서 해도 될 듯  (sympsm_doc은 새로만들기)
+
+    cms에 기존 심포 이름 도시브랜딩으로 변경하고 하위에 심포,월드엑스포 추가해놈 (권한설정은 url추가해야나오는듯)
+
+    기업명은 atch_file 테이블의 dscrp_cn 항목에 저장
+
+    갑자기 tomcat 서버 자식컨테이너 생성못했다..뭐다 하면서 오류엄청나와서
+    tomcat server clean 돌렸더니 다행히도 원상복구됨
+    -> clean돌리면 서버 설정도 초기화되어서 주소매핑 다시해줘야함
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월29일
+    저널 국문,영문 로딩속도가 너무 느림
+    영문저널 하단 most view 튀어나옴
+    비즈니스,라이프 모든기사나와야함
+
+    홍보,저널에서 썸네일처리 못했던이유
+    jpeg 이미지가 rgb타입이 아닌 cmyk타입 이라서 생긴 오류
+    https://055055.tistory.com/77
+    -> 이미지 타입이 일반적으로 RGB와 CMYK 타입이 있는데, CMYK 타입인 경우는 ImageIO.read()를 이용하여 읽을 경우
+    에러가 발생한다. CMYK타입을 RGB로 잘못 변환하게 되면 이미지가 반전되거나 색이 이상하게 나타나는 경우가 많다고 함
+
+    소스 변경 없이 이미지 변환 ( cmyk를 rgb로 변환하는듯하다)
+    com.twelvemonkeys.imageio 라는 라이브러리를 추가하여 처리
+
+    Z:\펜타코드\202207_IFEZ 웹사이트 전면 개편 사업\00.사업관리\종료감리\#개발관련_산출물_작업\작업중
+    프로그램 정의 작업함
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    12월30일
+    사업개요 행사사진 - tc_atch_file - 
+    파트너사 로고이미지 - tc_atch_file - 구분:partner
+    심포하다가 다시 정의서로..
+
+    다음주와서 포토!현장속으로 에디터 적용여부 물어보기 (내부는 에디터 외부는 태그없어지게?)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월02일
+    
+    포토!현장속으로 에디터 수정(관리자, 사용자)
+    열린청장실 배너/팝업존 배너위치 여부 중 배너 삭제
+    포토, 현장속으로! > 상세 : 이미지 롤링 재생/멈춤 버튼 색 변경 필요
+
+    fn:escapeXml()
+    html, xml또는 xml마크업으로 처리될 수 있는 기타 태그를 이스케이프하는데 사용
+    pf:nl2br()
+    문자열 중 \n을 <br>로 변환한다.
+
+    상세화면은 html태그 출력 O 
+    메인화면에는 태그지우고 출력되어야함
+    위 2개의 함수가 안먹혀서 자바단에서 처리해줌
+    포토현장속으로의 목록과 상세화면 둘 다 pstg_ymd를 사용하여 메인에도 똑같이 적용해줌
+
+    세입세출예산서 디폴트년도 올해년도 맞추도록 코딩했는데
+    2023년 데이터가 없어서 예산서 페이지를 띄우면 아무것도 안뜨는 문제
+    검사해서 없으면 데이터가 있는 년도가 나오도록 변경해야하나?
+    -> select_groupByYear메서드로 데이터가 있는 연도만 뽑아온 뒤,
+    isNotEmpty로 데이터 유무 판단 후 가장 최신년도인 0번 인덱스를 searchVO 연도에 넣어줌
+    받아온 데이터가 없다면 임의로 설정해둔 match_year 년도가 들어감
+    2023년도 데이터가 들어간다면 자연스럽게 searchVO에도 2023년도가 들어갈 것
+    ------> QA에 올라와서 깃에 반영 후 엑셀에 업데이트함
+
+    홍보센터 > 사진자료 부분에 좋아요와 다운로드 수가 나오도록 할려면 tbl_id 가 필요한데
+    각각 다른 게시판 코드의 tbl_id를 쿼리에 넣을 수 있을까?
+
+    쿼리 selectCount 20초 selectList 22초
+    and tbl_id에 pst_sn을 넣으니 값은 나오지만, 쿼리시간이 엄청 길어짐
+    atchFileCnt 부분은 필요없으니 쿼리에서 주석처리함 (삭제 후 시간 절반으로 줄었음)
+    좋아요 부분 출력은 빠르게 잘나와서 문제없으나, 다운로드 수 출력에 시간이 오래 걸림
+    
+    (kwd 조건 빼면 47초 나옴)
+
+    글로벌센터 sns게시물 2개만나오도록 변경은 쉬운데 퍼블을 수정해야할듯
+    없어진 수 만큼 나머지 2개가 꽉채워서 이상해짐
+    .main_contents .main_sns .main_sns_area 부분 width 50%로하면 원래 크기처럼 돌아가는데, 가운데에 정렬필요함. 
+    display: flex 에서 justify-content: space-between 로 설정하면 가운데에 두 개만 https://www.ifez.go.kr/promote/pst/view.do?pst_id=event_photo&pst_sn=249539나오더라.
+    ----> 아 모바일에서만 2개 나오도록 하라는거였음.
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월03일
+    홍보,저널 메인 속도 느림 (쿼리개선필요)
+    -> cmsMenuMapper에서 selectObject_link 라는 메뉴찾는 메소드가 10번이상 반복되었음.
+    -> 해당 문제는 이미지를 불러오는 메서드과정에서 메뉴찾기가 반복되는것이였음.
+    -> WebUserIntercepter의 url체크 기준에서 사용자화면에서는 process.json.do나 process.file.do와 같은
+    url에는 메뉴관련 처리가 필요없기때문에 해당 url에는 검사하지 않도록 menuProcPass를 true로 변경하여 패스함
+
+    기존 pst_stng_sn을 찾는 과정에서 돌아가는 쿼리를 최대한 줄이기 위해 해당 게시판코드의 sn을 직접 넣어줘서 변경함
+    각 게시판코드의 selectObject를 돌릴필요가 업어져서 console log가 꽤 줄음
+
+    promote메인의 발간책자부분 resultList_pst_all_book = this.prmService.selectList_paging(pstSearchVO);
+    기존에 내가 짠 코드는 9개의 짐을 하나씩 들고 9번을 왕복하는 비요율적인 방법이였다면,
+    황과장님이 수정하신 방법은 9개의 짐을 한 번애 들고 움직이는 방법이다. stream을 이용하였는데 문법을 더 봐야할듯
+
+    
+    QA
+    오타 및 단어 수정 여러건
+
+    저널/홍보 메인 pst_id입력안되서 운영서버 터짐
+    -> 속도개선한다고 pstvo의 pst_id값도 다 지워버려서 저널/홍보 메인 난리남
+    -> PstVO 다 새로 만들어서 빨리 수정함
+
+    https://www.ifez.go.kr/main/pst/list.do?page=15&pst_id=noti01&pst_se=&srchKey=ABC&srchVal=
+    새소식 게시판에서 10페이지부터 처음으로 돌아가는 페이징 버튼이 생기지 않음(공통임으로 딴 곳도 안나오더라)
+
+    페이징 출력 개수를 5개로 해논곳은 10페이지가 넘어가도 처음으로 돌아가는 버튼이 나오지않음
+    -> 소수로 변환하니 정상 작동함
+    --> 그냥 문자열로 인식해서 못하는거였더라, <fmt:formatNumber>은 숫자를 문자열로 바꾸는거고
+    숫자로 바꿀려면 <fmt:parseNumber>로 해야함.. formatNumber사용하니 안되지
+
+    -저널,영어저널 키워드검색 빠져있음 (목록만해놨더라)
+
+
+    
+    내가 작성한 코딩 중에 감리 걸린것 (1월 3일 기준)
+    ->>>>>>Admin
+    SafeController (int타입 Overflow 문제, 정수형 오버플로우)
+    -> int를 Integer로 변경
+
+    >>>>>>Core
+    BgtDocVO (private배열에 public 데이터 할당)
+    -> private변수에 할당하여 private선언된 배열과 객체속성에 대한 의도하지 않게 수정되는 것을 방지해야한다.
+    -> 배열,리스트,Date와 같은 타입들은 모두 아래와 같읕 작업을 해야하는 것 같다.
+
+    -> file_dwnld_lmt_dt, AtchFileVO 부분을 지적당함
+    -> 해결 : 
+    ->  Date date = null;
+        if (file_dwnld_lmt_dt!=null) {
+            date = new Date(file_dwnld_lmt_dt.getTime());
+        }
+        return date;
+
+	List<AtchFileVO> tmpList = new ArrayList<AtchFileVO>();
+        if (atchFileList!=null) {
+            tmpList.addAll(atchFileList);
+        }
+        return tmpList;
+
+    SnsFdSearchVO (private배열에 public 데이터 할당)
+    SnsFdVO (private배열에 public 데이터 할당)
+    JrnlPstVO (private배열에 public 데이터 할당)
+    IntrnSympsmVO (private배열에 public 데이터 할당)
+
+    FeedScheduler (부적절한 예외처리)
+    -> 예외처리를 Exception 하나만 해놓아서 생긴 문제
+    -> 해결 : DataAccessException, NullPointerException와 같은 예외처리를 상황에 맞게 추가
+
+
+    >>>>>User
+    SearchController (정수형 오버플로우)
+    JrnlSearchController (정수형 오버플로우)
+    JrnlEngSearchController (정수형 오버플로우)
+    PromoSearchController (정수형 오버플로우)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월04일
+    홍보검색 사진자료 다운로드 횟수 쿼리시간 수정
+    -> 다운로드 횟수 가져오는 쿼리 소요 시간 : selectPaging(selectcount47초 + selectList47초) + 결과 수 selectCount 47초
+    -> 원인 : pst_sn을 가져올려면 쿼리결과값에서 가져와야하는데 계속 반복되면서 오래되는것으로 보임
+
+    기사 상세 키워드 / 영어저널 키워드 검색 (반영 대기)
+
+    내가 작성한 코딩 중에 감리 걸린것 (1월 4일 기준)
+    User
+    SearchController (정수형 오버플로우)
+    JrnlSearchController (정수형 오버플로우)
+    JrnlEngSearchController (정수형 오버플로우)
+    PromoSearchController (정수형 오버플로우) 
+    -> 4개 모두 int -> Integer로 고쳤는데 또 걸린거보면 다르게 바꿔야하나?
+    -> 올바른 예제 : 정수 연산 전에 안전한 범위 내의 값인지 검사한다
+    if(n1 < 0 || n1 > 100 || n2 < 0 || n2 > 100) {
+	throw new llegalArgumentException("out of bound");
+    }
+
+    Admin
+    SafeController (정수형 오버플로우)
+    -> 위에랑 마찬가지
+
+    속도개선
+    홍보/저널/영어저널 메인
+    홍보 : 사용안하는 쿼리 및 불필요한 부분들 삭제함
+    저널 : 1번 위치 설계서대로 최대 2개만 나오도록 변경 / pstSearch사용하는건 pagerow 설정해서 쓸데없는 소모 줄임
+          기사 더보기 버튼에서 selectObject 메서드 삭제하고 게시판 코드 sn 바로 떄려넣어서 시간 감축
+    영어저널 : 바꿔서 pagerow 1처리를 해보았지만 성능차이가 없더라, 그래서 불필요한 쿼리만 삭제함
+
+
+    대표메인에서 공지설정되어 있는 글은 상위로
+    내가 한 방법 : 공지사항만 뽑아내는 쿼리를 추가하여 화면에 추가로 뿌려줌
+    공지사항이 아닌 게시글 위로 공지사항게시물 forEach를 돌려서 공지게시글먼저 위에 뿌려준다음,
+    공지가 아닌 게시글들을 그 밑에 다 뿌리도록 만들었는데 먼가 비효율적인듯한데 다른 방법이 생각 안남
+    수정한 파일 : main.jsp / MainController / cubrid.PstMapper
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월05일
+    홍보관>관람 및 시설안내 에서 내가 수정한 css 운영에 반영 후 띄어쓰기 수정 해야함
+    -> 수정완료
+
+    속도개선
+    저널/영문저널 비즈니스/라이프 | 지난호알림
+    비즈니스/라이프 : 쿼리 삭제할건 따로 없어보임
+
+    통합검색/홍보센터검색/저널검색/영어저널검색
+    통합검색 : db쿼리가아니라 검색엔진이용해서 따로 없어보임
+    홍보센터검색 : 좋아요만 우선 나오도록 쿼리 수정 / stng_sn 찾으려고 selectObject한거 다 삭제하고 번호로 바꿈
+    홍보센터검색 문제
+    -> 저널소식지 이미지 안나옴 (파라미터가 jrnl_pst_sn = ${jrnl_ttl}로 되어있어서 수정함)
+    -> 저널소식지 count가 더보가 count랑 값이 다름 (jrnlSearchVO값에 국문이 안들어가있어서 그럼)
+    -> 사진자료 더보기 부분 키워드 검색이 안됨 (이상한파라미터가 들어가있다.)
+    -> 키워드검색 ,으로 나누고나서 공백때문에 검색이안됨 (trim 처리 필요) -> 검색안된게 아니라 stts_se = wait인 값이라 안나온것. trim처리 생략함
+    -> 대기 파라미터 추가조건으로해줘 걸러내야할듯 검색은뜨는데 들어가면 안뜨니 (stts_se 조건 걸어줌)
+
+    저널검색 : selectObject 지워서 속도 개선
+    저널검색 문제
+    -> 영상 이미지 안뜸/지난호 보기 이미지 안뜸 (StngVO의 pst_id를 넣어야하는데 row.pst_id를 넣어서 없는값)
+    -> 비즈니스, 라이프 더보기에서 count 결과값이 다름 (setpst_frst_val 설정을 안함)
+    -> 더보기 부분 pageblock이 모두 8로 설정되어있는것같음 10으로 해야함 (변경함)
+
+    영어저널검색 : 
+    영어저널검색 문제
+    -> 검색화면 들어가면 위에 layout? header부분에 비즈니스, 라이프 탭이 안뜸 (메뉴에 추가안해서 안뜬거였음 추가해주면 뜸)
+
+    세입세출예산서
+
+    하도급계약현황
+
+    안전보건 목표/경영방침
+
+    열린청장실 메인 / 포토!현장속으로
+
+    통합검색에서 사용안함 처리한 메뉴가 보인다.
+    -> 저번에도 그랬던것 같은데 재색인 필요해보임
+    -> 매주 토요일, 1주일에 한 번 재색인이 자동으로 돌아가는 듯하다.
+
+    궁금점 -> 로컬 cms화면에서 메뉴추가하거나 변경해도 운영서버 반영하면서 변경되나? (db달라서 안될 것 같은데)
+    소스반영되면 할 것     영문저널 메뉴에 영문저널검색 추가해서 영문 저널검색창에 Business랑 Life 뜨게하기
+    -> 관리자에서 메뉴추가해서 상단 비즈니스, 라이프 뜨게 만듬
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월09일
+
+    세입세출예산서
+
+    하도급계약현황
+
+    안전보건 목표/경영방침
+
+    열린청장실 메인 / 포토!현장속으로
+
+    국제심포지엄 수정 마저해야함..
+    나중에 다국어에도 연동?? 똑같은 메뉴가 생김
+
+    고비-> 각각의 테이블에 첨부파일을 넣는것까지는 성공했지만,
+    추가기능 구현을 어떻게 해야하나
+
+
+    추가해서 뭐 숫자처리 list로보낸다음
+
+    자바나 서비스단에서 for문돌려서 횟수만큼 반복한다음에 db에 쳐넣기
+
+    수정화면에서 보여질때는 어차피 for문쓰면 <tr></tr> 계속복사되서 나오니깐 뭐
+
+
+    수정화면에서 update를 눌러도 안됨
+    -> 애초에 controller 처리단에서 atchfile을 불러오질 못함
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월10일
+
+    동적태그 첨부파일 controller 로 보내기
+
+    첨부파일 제외 항목들만 변경했을때 update되도록 
+
+    빅룩와스 소스점검결과 문제점
+    Z:\펜타코드\202207_IFEZ 웹사이트 전면 개편 사업\99.기타\연동모듈\빅룩와스\점검결과
+
+    행사사진, 로고이미지에 이미지만 올릴 수 있도록 처리해주는것도
+
+    추가된 태그들 모두 name은 동일하게 해서
+    mRequest.getFiles("multiple_attach_data1"); 처럼 한번에 모아서 list로만든다음
+    리스트의 길이만큼 반복하여 db에 저장
+
+    수정화면에서 tr태그부분부터 foreach로하면 반복되면서 저장한 데이터들이 보여짐
+
+    임시로 mRequest.getFiles("multiple_attach_data3_insert2"); 형태로 해보니
+    db까지 잘 들어감...근데 수정화면에서 망함
+
+    동적태크가 아닌부분도 forEach로 반복돌때 status이용해서 각각 다르게 만들어야할듯
+    id랑 name이 중첩되니 기능작동을 안함
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월11일
+
+    doc_name
+    doc_se
+    attachList_doc 등 받아오는 데이터들의 name이 다 유동적이기때문에
+    자바에서도 유동적으로 이름을 넣어서 값을 갸져와야함
+
+    첨부파일 여러개 등록할때 이름이 다똑같다
+
+
+    insert
+    행사연도 및 행사사진은 잘됨
+
+    행사자료(첨부파일)
+    추가하기로 생성한 동적태그 첨부파일도 제목, 구분, 첨부파일이 잘 들어갔음.
+    수정화면에서 다운로드 및 삭제 까지 됨
+    삭제 후 새로고침을 해야 반영됨
+
+
+    링크(url)
+    해야됨
+
+    로고이미지 및 기업명 잘됨 (순서가 거꿀로나오긴함)
+
+    update
+    행사연도 및 행사사진은 잘됨
+    행사사진 삭제 후 첨부파일 추가해서 update해도 잘 됨
+
+    doc/link 부분은 건들지도않았는데 insert되서 망함
+    아마 첨부파일없을때도 insert 쿼리 동자갛게만들어서 들어간듯
+    save_atchFile_doc 부분에서 atchlist 체크할때 null일때 동작하도록 만든거였는데
+    sympocontroller에서 내가 atchlist에 name이랑 먼값을 넣어놔서 null이아니라 동작해버린듯하다.
+    -> 그래서 주석처리하면 수정눌러도 insert는 안되지만, 제목만 변경할 수가 없다.
+
+    수정화면에서 첨부파일 추가해서 올리면 첨부파일은 잘 들어감.
+    그러나 제목은 기존에있던 데이터의 제목을 그대로 따라감
+    -> setdoc_nm, setdoc_se 할때 count이용해서 했는데 
+    count는 0부터 하는데 내가 원하는 doc_name은 2,3번 index에 있으니 찾질못함
+    내가 추가한 atchfile은 2개이므로 for문을 2번만 돌기때문에 0,1번 index에 있는 값이 들어가 반영해서 그런듯
+    -> docname도 list로 받고, nm뒤에 번호붙이는식으로 해야하나
+
+    delete
+
+
+    심포지엄 수정화면에서 url이나 첨부파일 두개 모두 뜨는거 스크립트 추가해서 막음
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+   1월12일
+
+   게시글 등록부분은 거의 다 한것같다
+   수정부분이 답이없다.
+
+   행자자료로 되어있는 부분을 수정하려고하면 제목만 수정해서는 동작을안함.
+   첨부파일을 변경해야 하는데 삭제를 누르면 아예 해당 컬럼이 del_yn = Y로 바뀌어서 결국은 새로 insert해야함
+
+   링크부분을 수정하려고하면 serviceImpl의 update부분의 save_atch_doc 부분에서 insert로 들어가기때문에 
+   수정이아니라 새로 추가가됨. 그리고 링크는 따로 삭제버튼이 없는데 행사자료로 바꾼다음에 빈아이콘에서 삭제버튼을 눌러야 위 처럼
+   아예 del_yn = "Y"로 바뀜 즉, 수정하려면 삭제했다가 새로 해야함
+   -> update부분에 doc_se가 event인것만 insert처리해서 막아놈
+
+
+   사용자화면에 띄우고 기능동작하는것까지는 확인
+
+   수정기능 문제
+   1. 추가하기 버튼으로 새로 생성하면 제목명이나 기업명이 0~1번 인덱스의 처럼 앞의 값이 들어감
+   수정때 추가된 첨부파일의 수 만큼만 반복해서 
+   제목이 0번, 1번 인덱스항목만 들어가는 문제가 있었는데 
+   atchFileVO.setDscrp_cn(dscrp_cn[dscrp_cn.length-(count2+1)]); 이렇게 해주면 제대로 들어감
+   -> 이렇게하면 등록할때도 거꿀로 시작해서 오류발생할듯
+
+   2. 첨부파일 및 링크등록에서 링크는 등록이 안됨
+   update save_atchLink_doc 추가하면 들어는 가지지만, 기존의 link항목이 있을경우 추가로 insert됨
+
+   doc_se의 카운터에서 기존항목들을 count에서 제외해서 처리함 (새로 추가한 만큼만 반복하도록)
+   -> 기존것을 중첩해서 insert하지않고, 추가한항목에대해서만 insert 처리가 들어감
+   -> 그러나 첨부파일 url주소가 기존값이랑 똑같이 들어가버림
+
+   doc_se1,2,3... 을 count처리안해서 기존것들은 업데이트가 불가능하다.
+
+   3. 기존의 데이터에 제목만 혹은 링크로 변경해서 수정이 불가능함(기업명도 불가)
+   update를 할려면 해당 파일의 sn번호를 알아내야하는데
+
+   4. 기존의 데이터의 첨부파일을 삭제하면 해당컬럼 자체가 삭제됨 (새로고침 해야 화면에 반영됨)
+
+   5. 자꾸 업로드 용량뜸 (임의조작 불가)
+
+   6. 링크항목을 삭제하려면 첨부파일로 바꾸고 더미 x버튼을 눌러야함
+
+   수정기능을 없애거나 대신하여 삭제기능을 추가해야할듯
+
+
+   홍보센터 검색 홍보관 > 게시글 내용보인는곳에서 태그랑 등 다 노출되어버림
+   관리자에서 홍보관 공지사항 적는 메뉴가 없는데???
+
+
+   수정 - 기존데이터를 바꿀려면 지웠다가 다시 추가해야함
+
+   첨부파일도 추가하면 제목부분에 기존값이들어가버림
+
+   atchFileVO.setDscrp_cn(dscrp_cn[dscrp_cn.length-(count2+1)]);
+   이렇게해놓았는데 등록에서도이러면안되니깐
+
+   아예 TP값을 기준으로 switch나 if나 조건을 나눠서
+   등록일때 수정일때만 처리하게 만들어주면어떤
+
+   링크랑 첨부파일을 동시에 추가하면 또안된다(doc_se랑, doc_name부분이 중복되서나옴)
+   -> 해당문제는 숫자를 세는 변수가 count랑 i가 각각 따로움직여서 서로 마지막인덱스것만 가리키고 있으므로 중복되서 나오는듯하다.)
+   -> 카운터변수를 통합시키던가 하면 될지도? (근데 통합하면 또 여러개 등록시 문제)
+   -> 첨부파일쪽이 먼저실행되서나오니깐 count로 통일해서 사용해보면
+
+   count로 통일해서사용해보니 순서가 또 문제
+   name이랑 url도 se처럼 값을받은다음에 기존항목들은 제외시키면 굳이 역순으로 하지않고 정순으로 insert가가능
+   그리고 만약 링크 링크 첨부파일로 추가했을때 링크부분에는 증감식이 없으므로 또 오류임
+   떄문에 링크부분에도 증감식이 필요
+
+   첨부파일 2개 추가 후 링크는성공했지만
+
+   링크2개추가후 첨부파일 추가하면 또 난리남 
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월13일
+    1링크 2링크 3첨부파일
+    이렇게 해도 첨부파일 처리 코드가 위에있어서 먼저 처리되어 순서가 뒤바뀌는듯
+    
+    행사사진, 파트너는 잘들어감
+
+    첨부파일 및 링크등록에서 망함
+    제대로들어간게없음
+
+    추가에서 문제
+    doc_se에서 event만들어갔음 
+    첨부파일1 이 아예 씹혀버림
+    ->doc_nm의 getparameter의 변수명을 잘못기입함
+
+
+    수정이나 등록이나 문제점
+    행사,행사,행사, 링크,링크,링크 이렇게 하면은 등록이나 수정이 잘 되지만,
+    
+    링크,링크,행사,행사,링크,행사 이렇게 만들면 순서가 뒤틀리고 값이 뒤죽박죽으로 들어감
+
+    뒤죽박죽으로 추가하거나 값을 넣어도 항목에 맞게 들어가도록 수정함
+
+    하지만 수정화면에서 수정할려면 아예 삭제하고 추가하는건 똑같음
+
+    중복되는 연도로 등록하면 오류가 발생하므로, 중복연도는 등록못하게 처리해야함
+
+    국제심포지엄은 중복x 
+    월드엑스포는 중복가능(evnt_nm으로 구분하는듯)
+
+    월드엑스포에서 연도를 바꾸면 evnt_nm값도 같이 searchVO로 넘어가도록 만들기
+    -> 제이쿼리로 처리함
+
+    등록 및 수정화면에서 첨부파일 ~까지 업로드 가능합니다의 용량을 수정하거나 없애기
+
+    
+    문제 -> 파트너 등록시 기업명이 바뀐건지 로고이미지 위치가 바뀐건지 이상함
+    기업명의 순서를 바꾸는게 맞다
+    -> 역순이였던거 정순으로 바꿈
+
+    -> 이러면 기존에 있던것까지 dscrp_cn이 count하기때문에 
+    5,6번째 항목인데 1,2,번째항목의 cn값이 들어가버림
+
+    -> insert를 붙여서 추가한항목에대해서만 count를 세는방식으로 수정
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월16일
+
+    국제심포지엄 수정건 개발서버에 반영하였고 운영에는 반영대기상태
+    등록부분에는 문제없지만, 수정부분에서 수정할려면 연도와 행사사진을 제외하고
+    수정할 부분의 td부분의 첨부파일 delete버튼을 눌르고 새로고침을 해야 반영됨.
+    즉, 수정할려면 새로 추가하기 버튼을 눌러서 등록해줘야함
+
+    그리고 등록 및 수정을하면 첨부 링크 첨부 링크로 등록했던것이 첨부 첨부 링크 링크로 등록됨
+
+    고친다면
+    1. 첨부파일 최대 용량 업로드 MB 숫자 변경
+    -> default 첨부파일 최대용량은 globals.dev.properties에 정의되어있으며, pageIntercepter에서 mav.addObejct로 추가되어짐
+    -> 따라서 심포지엄과 월드엑스포의 공통되는 uri부분을 현재접속중인 uri에 contains로 조건문을 돌려서 포함되어있다면
+    -> maxFileSize와 maxFileSize_format을 원하는 용량으로 바꿔준다.
+    2. 첨부파일 및 링크나 파트너사의 첨부파일 x버튼을 누르면 바로 반영
+    3. 해당코드와 DB구조상 delete버튼을 누르면 해당컬럼이 삭제되기에 기업명도 삭제되어지는듯
+
+
+    해야하는일
+    1.기존에 HTML형식으로 보여줄때의 소스파일에서 이미지들을 지워주자. (다른프로그램과도 문제생기지않는지 확인)
+    (내가 새로 개발한걸로 대체되기때문에 더미 이미지파일? 일듯 심포지엄 100MB 월드엑스포 200MB 정도임)
+    -> html형식으로 보여줄려면 프로젝트 내의 소스폴더안에 이미지들을 집어넣어야하므로 프로젝트를 압축했을때 용량이 매우 커진다.
+    -> 때문에 이제 필요없어졌으므로 해당 폴더와 내용물을 삭제하여 용량확보
+
+    -> 일단 ctrl+H로 각각 폴더에 있는 경로에 맞게 검색을 한 후 해당 이미지파일이 쓰인 파일이 있나 확인해보고 지움 (해당사진백업은 다운로드폴더에 있음)
+    -> 기획에서 수기로 다 올린 다음에 운영서버 관리자에서 HTML 형식을 LINK형식으로 바꿀때 push해주자 
+
+
+    2.웹접근성 마크 따기위한 수정작업(메인본청 페이지만)
+     1) 이미지파일 alt 붙이기
+       -1 그림만있으면 alt="" 이라고 해도됨
+       -2 이미지안에 글씨가 있으면 alt속성안에 모두 들어가야함
+       -> 다른사이트들보니 글이많은사진중에서도 중요한 문구만 들어가있던데 alt값에 
+
+       main에서 img들 모두 alt값은 달려있으나 이미지의 모든 글들이 들어가 있진 않음.
+
+     2) title속성 달아주기
+       -1) label이 있으면 달 필요 없음
+        -> label을 누르면 id랑 for 속성이 일치하면 해당부분으로 이동하기 떄문
+       -2) label태그가 없는 항목들은 title을 달아줘야함
+        -> 시각장애인의 음성기능은 title을 기준으로 나오기때문
+       -3) target='_blank'인 항목은 title속성을 달아줘야한다.
+
+       main.jsp, layout.jsp, hedaer.jsp
+        target="_blank" 적혀있는 a태그들 title="새창열림" 다 추가함
+	통합검색 검색창에 title="검색어 입력" 추가
+       
+     3) table항목에 caption달아야함 (무슨컬럼이 있는지 ex.번호,이름,주소,생년월일,등)
+     4) table항목의 th부분에 scope속성을 달아야함 (가로인지 세로인지
+
+
+     어디서나민원(발급대상 목록 버튼이 새창열기 버튼인데 title이 빠져있음)
+     /main/content/view.do?sn=284
+
+     규제개혁신문고 (글 이미지에 alt값이 빠져있음) 
+     /main/content/view.do?sn=286
+
+     홍보관예약(사진의 alt값이 이상함)
+     /main/content/view.do?sn=316
+
+     1월기준 남은 휴가3 8월 기준 총휴가10
+     2월 2 3월 1 4월 1 5월 1 6월 2 7월 2 8 15
+            2     2   2     1     0   15 
+
+ ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+     1월17일
+     웹와치로 진단 후 진단에 걸린부분 수정 및 추가하기
+
+     다국어사이트에도 심포지엄, 월드엑스포 추가하는거 까먹었다 추가해주자
+     다국어사이트에는 영문으로 등록해야하는데 구분을 해줘야한다
+     심포sympoeng / 엑스포worldeng 로 evnt_se에 구분지어주면될려나 
+
+     글로벌부분에 첨부/링크 쪽은 뺴고 이미지만 우선 나올 수 있도록
+
+     어차피 대표사이트의 심포지엄이랑 다국어의 심포지엄이랑 일치해야하니깐 관리자에 따로 만들지말고
+
+     사용자쪽에 Controller 추가해서 대표사이트>심포/월드 에서 작성한글을 공유해서 사용할 수 있도록 
+     view페이지만 새로 만들어서 적용함 다국어의 view페이지에는 파트너랑 첨부파일쪽 주석처리 해서 반영해놨음
+
+     오류없이 운영서버에 올라가면 이제 진짜 기존 퍼블에서 썻던 image들은 사용 할 일 없으므로
+     모두 지워서 push 해주자
+     -> 운영서버 다국어에는 심포,엑스포 퍼블 없고, 대표사이트는 이미 프로그램으로 바꼈으니 
+     더이상 필요없다고 생각해 바로 삭제하고 push 함
+
+     다국어 추가한것 운영서버 반영되면 메뉴 추가해주고 링크 연결해주기
+     -> 1월18일 운영에 반영되어서 확인해본결과 최대용량 잘먹고, 다국어에서도 잘 나옴
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월18일
+    웹와치
+    9시25분쯤 수집 시작 ㅡ 10시09분 372페이지 ㅡ 10시34분 457페이지 ㅡ 16시13분 477페이지
+    수집 페이지 수 : 0(무한)
+    동일 페이지 수 : 5
+    응답 시간 : 60
+    우선 링크 : https://www.ifez.go.kr/main/main.do
+    제외 링크 : https://www.ifez.go.kr/main/content/view.do?sn=250
+
+    또 검사해야한다면, 검색하는 링크는 빼는게 좋을듯하다 (동일페이지수를 걸었지만 다른 키워드로 너무 반복함)
+    ex) viewMore~ / search~ / 
+
+    jsp단에서 jsp:useBean을 통해 HashMap이나 List 등을 선언할 수 있고 스크립틀릿을 통해서 로직을 만들 수 있다.
+    하지만 언제까지나 view단이기때문에 Controller에서 데이터를 모두 가공 및 처리하고, 
+    view에서는 JSTL을 통해서 화면에 뿌려주기만하는것이 각각 단계에 맞는다고 볼 수 있다.
+    결론 : 프로그램 로직은 mvc패턴에 맞게 controller에서 작성하자.
+
+    제이쿼리 첨보는것들
+    $('p').toggleClass("on");
+    -> p요소에 on 클래스가 없으면 추가하고, 있으면 제거
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월19일
+    어제 시작한 검사 아직도 돌고 있음 9시18분 517페이지 - 2시20분 진단완료
+    톰켓충돌시
+    cmd -> netstat -a -o   -> 충돌포트 찾기 -> taskkill /f /pid 11111 -> 톰켓 재실행
+    캘린더 방법 보는중
+
+
+    웹접근성
+
+    본 청 만!
+    문화관광안내 여행TIP부터
+
+    이미지의 글씨를 최대한 alt값에 모두 쓸 수 있으면 넣으되,
+    foreach로 돌렸거나 부득이할때는 해당 게시물의 제목이나 이미지에서 주된글을 alt값에 넣고 
+    ~~썸네일 ~~게시물 썸네일 ~~포스터 등등으로 설명해놓자
+
+    상세보기의 이미지의 alt값 넣을려면 에디터 안의 img태그 안에 넣는방식으로?
+    (현재 축제/행사는 에디터 오류)
+    
+    내가한것중에 에디터들어간 작업들 (pst말고 따로만든거) ex)기사등록 
+    lucy~~~rule.xml파일에서 경로추가해주기
+    -> pst형식아닌것은 저널기사등록뿐인데 추가 되어있음
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월20일
+
+    통합검색 담당업무에서 부서명검색도 추가해달라 요청와서 추가해줌
+
+    ㅡ분야별정보ㅡ
+    여행TIP - alt값 pst_nm + 리플릿 이미지 라고 추가 (완)
+    테마지도 - 새창알림 title 속성 추가 (완)
+    축제/행사 -> 에디터 수정한거 운영에 반영되면 첫 번째 게시물 이미지 추가해주고, alt값 추가해주기
+    IFEZ즐기기 완
+    시티가이드 완
+    하수처리수 재이용시설 설치 완
+    생활폐기물 자동집하시설 설치 완
+    공원및녹지조성 완
+    추진방향 완
+    IFEZ경관 DATA BASE _blank항목 title 새창알림 추가 (완)
+    IFEZ경관위원회 pst공통파일 미리보기버튼 _blank형식 title 새창알림 추가 (완)
+    IFEZ경관>경관사업 html형식 이미지 alt값 없어서 이미지글자 모두 관리자에서 넣어줌
+    도시브랜딩 새창알림추가, 의미없는 새창이동 삭제, alt값 추가
+    IFEZ리빙랩 혁신센터 완
+    인천스타트업파크 alt값 이미지내용 추가
+    IFEZ스마트시티 운영센터 alt값 추가
+    보유기술 alt값 추가
+    스마트시티 구축사업 alt값 추가
+    비전 및 목표 alt값 추가
+    중대재해 완
+    주택/건축 완
+
+    ㅡ행정정보ㅡ
+    계약정보공개
+    -계약서식 완
+    -대금지급 input title추가 label for과 input 연결
+    -계약정보 수의계약현황,하도급, 준공검사 모두 input title추가 label 연결
+    -입찰정보 완(다른프로그램쓰는듯)
+    -발주계획 완
+
+    재정정보
+    -결산정보 완
+    -세입세출예산서 링크이동 아이콘 변경해줌
+    -재정운영방향 완
+
+    행정정보공개
+    -감사정보공개 완
+    -사전정보공표 완
+    -정보공개청구 이미지 alt값 추가, title 새창이동 설명 추가
+    -정보공개안내 정보공개 청구절차 이미지 alt값 추가
+
+
+    ㅡ민원소통ㅡ
+    온라인 통합예약
+    -생태체험 프로그램 완
+    -자전거 대여 완
+    -아트센터인천 이미지 alt값 추가 및 새창이동 설명 추가
+    -홍보관 예약 title추가 및 label for 일치시키기 (몇개좀보류)
+    -비즈니스센터 회의실 예약 예약하기의 사진 alt값이 파일명으로 되어있긴한데 이미지에 글은 없어서 상관없을지도
+    -투자상담 예약 완
+    -온라인 통합예약 완
+
+    보도/해명
+    -보도자료 완
+    -해명(사실은) 완
+
+    고시/공고
+    -입찰공고 완
+    -고시공고 완
+
+    새소식 완
+
+    시민참여
+    -오픈기념event 완
+    -칭찬합니다 완
+    -자유게시판 완
+    -이벤트 완
+    -설문조사 완
+    -외국어오류표기신고 완
+    -규제개혁신문고 이미지 alt값 추가 / 새창이동 설명 추가
+
+    정부24 이미지 alt값 추가 / 새창이동 설명 추가
+
+    온라인민원시청 이미지 alt값 추가 / 새창이동 설명 추가
+
+    민원안내
+    -민원사무서식 완
+    -민원분야별 처리기관 완
+
+
+    ㅡIFEZ소개ㅡ
+    통계로 보는 IFEZ - canvas태그라서 음
+    -IFEZ 내 입주 사업체 수
+    -외국투자기업 유치현황
+    -외국인투자FDI신고
+    -학교
+    -숙박시설
+    -공원
+    -도로
+    -주택보급
+    -외국인수
+    -인구수
+
+    조직안내
+    -사무실배치도 완
+    -담당업무 테이블 caption없어서 추가함
+    -조직도 완
+
+    기관안내
+    -관계법령 완
+    -CI소개 지정서체 이미지 alt값 추가 / 사용금지규정 alt값 추가
+    -비전 및 전략 완
+    -연혁 완
+
+    웹접근성 1차적으로 깃에 올리고 운영에 반영됨
+
+    메인배너 부분은 이미지 대체 텍스트 항목에 넣으면 되는데 소스에는 다른변수가 들어있어서 적용이 안되는 상태
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월25일
+
+    축제/행사 이미지에 alt값 넣기
+    옛날게시물은 썸네일사진이 없거나, 에디터에 이미지를 넣지않아 
+
+    글로벌센터 캘린더에 news&notice 등록햇는데 뜨지않는다.
+    -> Event Calendar에 등록하면 뜨긴뜸
+    -> News&Notice에 Event Calendar 연동을 눌러도 캘린더에 뜨지 않음. (해당날짜 클릭하면 상세는 뜸)
+    -> 쿼리돌려본 결과 where 절 날자부분에 2022-2-01 라고 적혀있는데 가운데 0이 빠져있어서 인식을 못함
+
+    해결
+    -> 한 자리 월을 두 자리로 만들어서 쿼리 조건절로 보냄 -> 잘 나옴
+    -> 글로벌메인, what's on 캘린더, 관리자 부분 캘린더에도 적용해서 깃에 올림
+
+    -> Event랑 News항목의 색이 바껴서 나옴
+    -> 위 아이콘에서 Event랑 News 색깔 아이콘만 바꿔서 해결함
+
+    본청 메인 사용자화면 변경점
+    sns _blank라고 되어있는 부분의 title을 좀 더 상세하게 변경함
+    pst형식 게시물들을 c:choose 처리해서 게시물마다 알맞은 caption이 나오도록 수정
+    열린청장실 사진부분이 잘못되어서 수정하고, 최근 한 장만 나오도록 수정함
+
+    운영서버 배너 이미지 대체 텍스트에 이미지 내용 채워서 수정함
+
+    웹와치에서 잡힌 부분 수정중
+    닫는태그오류 여는태그오류 태그삭제함
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월26일
+    web watch 다시 돌리기
+    Web Watch 본청사이트 제외, 모두 검색에서 제외함 재검사중
+    검사페이지 0(무한), 동일페이지1
+
+    Web이란?
+    웹서버에게 url을 가지고 통신규칙(http)에 맞게 요청하면, 알맞은 내용 (html)을 응답 받음
+    웹서버는 클라이언트의 요청을 기다리고, 웹 요청(http)에 대한 데이터를 만들어서 응답. 이때 데이터는 웹에서 처리할 수 있는
+    html, css, 이미지 등 정적인 데이터로 한정한다.
+
+      1)Statiac Pages
+      Web Server는 파일 경로 이름을 받아 경로와 일치하는  file contents를 반환한다. 항상 동일한 페이지를 반환
+      ex) html, css, javascript, image 파일과 같이 컴퓨터에 저장되어 있는 파일들
+
+      2)Dynamic Pages
+      인자의 내용에 맞게 동적인 Contents를 반환한다. 즉, 웹 서버에 의해서 실행되는 프로그램을 통해서 만들어진 결과물
+      (Servlet: WAS) 위에서 돌아가는 Java Program
+      개발자는 Servlet에 doGet()을 구현한다.
+
+    Web Server
+    1)개념
+    Web 서버가 설치되어 있는 컴퓨터
+    웹 브라우저 클라이언트로부터 HTTP 요청을 받아 정적인 컨텐츠(HTML, css, js, image 등)를 제공하는 컴퓨터 프로그램
+    2)기능
+    http 프로토콜을 기반으로 하여 클라이언트(웹 브라우저 또는 웹 크롤러)의 요청을 서비스하는 기능을 담당
+    요청에 따라 아래의 두가지 기능 중 적절하게 선택하여 수행
+     ·정적인 컨텐츠 제공
+     ·WAS를 거치지 않고 바로 자원을 제공
+    3)예시
+    Apache Server / NginX / MicroSoft IIS
+
+    WAS
+    1)개념
+    웹 어플리케이션이 서버 환경을 만들어 동작시키는 기능을 제공하는 소프트웨어 프레임워크. 즉, http를 통해 컴퓨터나
+    장치에 애플리케이션을 수행하는 미들웨어
+    PHP, jsp, asp 와 같은 언어들을 사용해 DB조회나 다양한 비즈니스 로직 처리를 요구하는 동적인 컨텐츠를 제공하는 서버
+    웹 서버 + 웹 컨테이너로 구성 (웹 서버와의 차이점은 컨테이너를 가진다는 것)
+    컨테이너 : JSP, Servlet을 실행시킬 수 있는 소프트웨어. 즉, WAS는 JSP, Servlet 구동환경을 제공
+    2)역할
+    WAS = Web Server + Web Container
+    Web Server 기능들을 구조적으로 분리하여 처리하고자 하는 목적으로 제시되었다.
+     ▶분산 트랜잭션, 보안, 메시징, 쓰레드 처리 드으이 기능을 하는 분산 환경에서 사용
+     ▶주로 DB서버와 같이 수행됨
+     ▶현재 WAS를 가지고 있는 Web Server도 정적인 콘텐츠를 처리하는데 있어서 성능상 큰 차이는 없다.
+    3)기능
+    프로그램 실행 환경과 DB 접속 기능 제공
+    여러 개의 트랜잭션 관리 기능
+    업무를 처리하는 비즈니스 로직 수행
+    4)예시
+    Tomcat : 톰캣은 웹 서버와 연동하여 실행할 수 있는 자바 환경을 제공하여 자바서버 페이지(JSP)와 자바 서블릿이
+    실행할 수 있는 환경을 제공 / 관리툴을 통해 설정을 변경할 수 있지만, XML 파일을 편집하여 설정할 수도 있다. 그리고 HTTP 서버도 자체 내장하기도 한다.
+
+
+    웹접근성
+    서식 레이블 미제공 (textarea 같은 태그도 레이블 제공 필요)
+    화면에 일대일로 매칭할 정보가 없는 서식은 title 속성으로 이해 정보를 제공해야 함
+
+    지시사항은 모양,크기,위치,방향,색,소리 등에 관계없이 인식될 수 있어야 한다.
+    ex) 위 사항 모두 숙지하였습니다. -> 위 사항(취소 및 환불안내, 수강 시 유의사항, 할인혜택) 모두 숙지하였습니다.
+
+    콘텐츠는 논리적인 순서로 제공해야 한다.
+    조직도 콘텐츠의 계층구조를 이해할 수 있도록 제공해야 한다.
+    ex) <ul> <li>를 이용하여 3dep의 계층정보를 제공해야 한다.
+
+    동일한 제목 정보 제공
+    select박스의 title 문구가 동일하여 해당 셀렉트박스가 무엇을 선택하는지 모르는 경우가 있음
+
+    미흡한 제목 정보 제공
+    전화번호, 휴대폰 앞자리 제목정보가 미흡하게 제공됨.
+    ex) 앞자리, 중간자리, 뒷자리 모두 제목정보가 동일하여 시각장애인이 어느항목에 기입하는지 모름
+
+    미흡한 대체텍스트 제공
+    ex) alt="성남문화재단" -> alt="성남문화재단 로고"
+
+    QR코드 이미지의 대상 사이트 정보를 이해하기 어려운 대체텍스트를 제공하고 있음
+
+    지도 이미지도 alt값 ex) "성남아트센터 지도" 라고 넣어야함
+
+    iframe의 용도나 목적을 title 속성으로 제공해야 함
+
+    링크의 용도나 목적을 이해할 수 있는 정보를 추가로 제공해야 함
+    ex) <area alt="1열 4번(무대정문에서 좌측)-무대사진 보기">
+    <button>지도</button>
+
+    입력 오류를 정정할 수 있는 방법을 제공해야 한다
+    필수 입력 서식에 대해 미 입력시 오류 정보를 제공하지 않음.
+
+    1차적으로 모든 메뉴돌면서 alt값이나 select값 보강함
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월27일
+    Web Watch
+    페이지 계속 돌렸다가 해커인줄알고 전화옴
+    -> 하나씩하거나 페이지 지정해서 돌려주자
+
+    WSL2 리눅스 - 우분투 설치완료
+    ID : weekbook
+    PW : 8520qwer!
+
+    컴퓨터 본체 교체
+    ssd만 바꿔껴서 교체하면될듯
+    부팅 ssd 찾아야함 (2개중 1개)
+
+    조직도ㅡ담당업무 수정
+    조직도에서 본부 및 하위부서 클릭시 
+    본부와 선택한 하위부서가 바로 나오도록 변경
+    그리고 해당 본부에 존재하는 모든 부서들이 위쪽에 탭형식으로 나오도록 기능 추가
+
+    up_and_dept_id 존재 유무에따라 기능 작동하게
+    ex) 그냥 담당업무 탭으로 들어갔을경우에는 탭 추가 없이 그대로 
+
+    문제.업무자 목록에서 본부와 해당 과만 나오도록해야하는데 
+    클릭하면 본부는 안나옴 dept_emp 쿼리수정해서 탭클릭시 출력되도록 변경함
+    문제1-1) 쿼리를 AND를 OR로 변경했더니 검색기능이 먹통이되어버림
+    -> 조건절에 dept_id 부분을 안쓰니깐 주석처리하고 up_and_dept_id 쿼리에 tde.dept_id 조건쿼리 추가
+
+    문제2. 조직도에서 본부 클릭시 null값이들어감
+    -> url파라미터에는 dept_id가 없어서 그러는 문제인데 
+    controller에서 searchVO에 set으로 줘도 쿼리에서 못받아쳐먹음
+    ->해결 : 걍 서순 문제
+
+    문제3. 기존쿼리를 주석처리해버리면 다른곳에 문제가 생길 수 있으므로
+    최에에에대한 아니 기존 쿼리를 없애버리는일은 생기면 안되겠다
+    -> 이에대한 해결법으로 searchVO에 새로운 변수를 선언해서 마이바티스 if문에 해당 변수가 들어오면 
+    -> 해당변수값을 검색하는걸로 바꿈 그러면 기존 dept_id검사도 벗어나고 결과도 제대로 나옴
+
+    관리자 비밀번호 5번 틀릴경우 24시간 잠금으로 변경하기
+    시간조정하는 부분을 못찾겠다
+    그리고 바꾸면 회원관리부분에서 잠금푸는것도 수정해야한다나?
+
+    잠금해제부분 쿼리 INTERVAL 24 HOURS로 변경함 맞는지는 모르겠다
+    -> 이부분은 그냥 30분이내 로그인 틀린 횟수만 초기화시켜주는거아닌가??
+
+    정리
+    1. 30분이내에 5번 틀리면 계정잠김
+    2. 관리자가 잠금해제 누르면 로그에서 del_yn = "Y"로 바뀜
+    3. 실패selectcount가 del_yn='y'는 카운트 하지 못하므로 잠김이 풀어짐?
+    4. 그럼 count기준으로 판단하는건가?
+    
+    2-1. 그러면 잠금해제부분은 그대로하는가? 아니면 이것도 24시간으로 바꿔야하는가
+
+    24시간 잠길경우 15시간 후에 사용자가 풀어달라고 요청 할 수도있으므로 
+    로그인 log 기준 24시간 이내에 기록들을 delete 하는게 맞다고 봄
+
+    개선점
+    1. 잠긴상태에서 계속 로그인을 할경우 24시간 잠금이 갱신이 된다.
+    2. 잠긴상태에서 로그인을 할 경우 문구는 24시간 남았다고 똑같이 뜬다
+    -> 잠겼는데도 괘씸하게 계속 로그인해서 24시간으로 계속 갱신한다고 하면은 고칠껀 없긴함
+
+    3. 4번틀리고나서 5번째에서 옳은계정으로 로그인해도 무조건 틀렸다고 뜸
+    -> 4번틀림 log에 4개기록
+    -> 맞는걸로 로그인시도 -> 하지만 이미 selectCount 결과가 4개인상태에서 + 1을하니 5가나옴
+    -> if문에서는 틀린횟수 >= 횟수max 로 처리해놔서 걍바로 못하게해놈 
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월30일
+    로컬 접속하려는데 오류 ERR_CONNECTION_TIMED_OUT
+    -> 컴퓨터 교체후 IPv4 주소가 바뀜 192.168.1.53 -> 192.168.1.194
+
+    이상화과장님께 추가적으로 운영서버 반영법에대해 배움
+    ifez cms -> 게시판관리 -> 첨부파일용량 200MB로 변경
+    자바 InputStream, OutputStream 공부하기
+
+    리눅스명령어 실습해보기
+
+    도시브랜딩
+    관리자 월드엑스포에 행사명탭 하나더 추가하기 (영문)
+    -> 영문명필드 넣을 자리가없어서 evnt_nm 컬럼옆에 영문명컬럼 새로 추가해야할듯(수정허가받음 하지만 이상화과장님에게도 알려야함)
+    -> 행사명(국문) / (영문) 중에 하나만 달라도 등록이됨. (국문만그러는듯)
+    -> 행사명이 같지 않도록 기도해라 / 그리고 행사명둘다 필수값으로 변경함
+    -> 일단완?
+
+    버튼누르면 popup나오도록 만들기?? (controller에서 .world 부분을 popup으로 변경하면)
+    -> open_popup 이라는 자바스크립트 함수 사용하면 controller 건들 필요도없긴한데
+    -> 해당 형태가 원하는 형태인지를 모르겠음
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    1월31일
+    도시브랜딩 기능 추가
+    도시브랜딩에서 영문버튼 클릭하면 팝업으로 영문 탭이나옴 (단, header, footer 나오면 안됨)
+
+    방법> HttpServletRequest request 매개변수를 추가해서
+    팝업 url 부분에 파라미터로 choose_view 라는 파라미터를 추가해 choose_view=popup 이라는 값을 받아와
+    if문으로 choose_view값이 존재한다면 mav.setViewName부분의 마지막 ~.world부분을 없애고 
+    mav.setViewName("/world/branding/world_expo/view." + tiles); 이렇게 만들어준다
+    값이 존재하지 않으면 기존 경로대로 .world가 붙여서 화면이 뜨게된다.
+
+    tiles에 .world~ 라고 끝나면 자동으로 header와 footer이 붙도록 만들어 놓았기 때문에
+    .popup으로 끝나면 tiles에는 없는 사항이라서 header와 footer가 적용되지 않는다.
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월01일
+    BIOS 가상화 킴 (Intel Hyper ~~)
+
+    해외진출 활성화 팝업창 크기 1200으로 수정
+    도시브랜딩 기능추가건 확인받음 -> 운영에 적용 이상없음
+
+    우분투에서 리눅스 명령어 연습함
+    -> tomcat 실행을 못해봄 (설치오류)
+
+    경자단 자동수집 API 관련 자료 받음
+    뭐어떻게해야하는지 모르겠고 아직 확인만 하는 단계
+    Z:\펜타코드\202207_IFEZ 웹사이트 전면 개편 사업\99.기타\연동모듈\대한민국 경제자유구역
+
+    ifez홈페이지의 보도자료, 고시/공고, 새소식, 포토뉴스의 항목이 추가,수정,삭제가 되면
+    경자단 홈페이지도 똑같이 해당 게시물에 대한 추가, 삭제, 수정이 이뤄지게 api를 쏴야함.
+
+    메뉴얼을 보면 각 메뉴에 대해서 게시판 번호가 존재하는데 param 에 해당 번호를 넣으면
+    해당 번호에 맞는 메뉴가 조회됨.
+
+    방법?
+    - 조회,입력,수정,삭제,포토뉴스,첨부파일에 대해 각각 메소드를 만들어서
+    ifez 각 메뉴 controller나 serviceImpl 부분에 해당 메소드들을 집어넣어
+    조회,입력,수정,삭제가 발생될때 같이 api를 쏴주도록 만들면 되는건가?
+    api에 게시물 제목,내용,첨부파일,사진등을 같이 싣어서 보내줘야하나?
+    
+    아이피가 실서버라서 테스트하다 등록이나 삭제나.. 테스트하면 실제 경자단 홈페이지에도 영향이감
+
+    BbsTypeServiceImpl / AdminBbsType1Controller 이라는 개편전 ifez에서 사용한것같은
+    파일을 받았지만 일부만 받았기에 뭐가 어떻게 돌아가는지 알 수가 없음. 7분
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월02일
+
+    조회부분 함수 만들어서 controller나 serviceImpl에서 수정,삭제,입력 할 때 작동 확인해보기
+
+    IFEZ 수정사항
+    1. 인트로 페이지의 ifez를 대문자로 변경하기
+    2. 계약정보공개의 대금지급현황과 대금지급예고에서 계약금액과 지급금액에 "원" 붙이기
+
+    ㅡㅡ만화규장각 프로젝트 설정 및 세팅ㅡㅡ
+    프로젝트 받고나서 .classpath가 없고 src폴더만 있는 상황이라면
+    Existing Projects into Workspace로 할께아니라 
+    File -> Open Projects from File System으로 프로젝트 import 시키기
+    문제 개생기는데 원인 찾는중
+
+    -> 처음부터 src폴더만 import시켜서 아예 maven프로젝트로 인식하지 않아 생긴 문제
+    -> 그래서 지우고 import할때 workspace_kmas폴더 자체를 넣었더니 .metadata가 있는 폴더는 안들어가는듯
+    -> 그래서 workspace_kmas폴더 안에 kmas폴더를 또만들어서 그안에 git clone시킴
+    -> 서버구동까지 완료 -> problems에 문제는 많은데 jsp나 javascript문제라 구동에는 문제없음
+
+    로컬서버 DB
+    Server Host : 192.168.1.80  / Port : 3306
+    Database : webtoon
+    username과 password는 properties 파일에
+    properties가 많은데 들어가보면 주석으로 로컬서버 전역변수 관리라고 써져있음
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월03일
+    SSD m.2 추가 장착
+    (앞으로 m.2 ssd가 주 부팅 디스크) 
+    (아직 기존 쓰던 ssd는 초기화 안함)
+
+    ㅡMariaDB 익숙하지 않은 함수ㅡ
+
+    계층형 구조 테이블에서 상위 메뉴ID와 하위 메뉴 ID를 동일한 테이블에서 가져오는 재귀쿼리로 활용
+    WITH RECURSIVE 테이블명 as (
+	select 초기값 as  별명1
+	union all
+	select 별명1 반복_할_계산식 from 테이블명 where 반복을 멈출 제어문
+    )
+
+    CAST(컬럼명, 값 AS 변경하려는 TYPE명)
+    ex) select cast("2021-09-27 AS DATE);
+
+    LPAD,RPAD(원본문자열, 원하는 자리수, 채울 문자열)
+    ex) select LPAD('ABC',10,'0') FROM ~~;
+    결과 : 00000000ABC
+
+    EgovMap??
+    -> 전자정부프레임워크에서 제공하는 제네릭 타입 
+    -> Map형태의 클래스로 마이바티스 parameterClass 또는 resultClass에서 사용할 수 있도록 제공되는 클래스
+    -> 해당타입을 쓰는이유는 자동으로 컬럼을 맵핑할 수 있는 객체이름을 생성해 주기때문
+
+    ex) select user_id from user where name='홍길동' 이라는 sql문을 통해 유저의 아이디를 사용하고자 할때,
+    map.get(user.id)와 같이 column명으로 참조를 하게 되는데 egovMap을 사용하면 camelcase의 규칙에 따른
+    이름으로 객체를 참조할 수 있다.
+
+    즉, 컬럼 명이 user_id 라면 userId로 참조, 컬럼 명이 userId라면 userid로 참조하게 된다.
+    컬럼명의 _다음 알파벳은 대문자로 인식하며 컬럼명에서 대문자는 그대로 소문자 변수로 맵핑된다.
+
+    카멜 표기법?
+    단어 전체적으로 소문자를 사용하지만, 맨 첫 글자를 제외한 각 합성어의 첫 글자만 대문자로 표시
+    ex) camelCase (일반적인 변수 이름)  /  isCamelCase(Boolean 타입의 변수 이름)
+    잘못된 예시
+    camel_case (스네이크 표기법 형태로 지어진 변수명)
+
+    카멜표기법이랑 스네이크 표기법 뭘 써야할까?
+    둘 다 사용 가능하고 개개인마다 다르지만, class명은 카멜 케이스, 나머지 변수 및 함수명을 스네이크 케이스로 혼용하여 사용
+
+
+    ifez와 kmas의 db접근방식 차이
+    ifez는 serviceImpl에 Mapper를 의존성 주입시키는 방식으로 xml상단에 <mapper>태그로 해당 주입한 mapper의
+    이름을 선언하고 시작한다.
+    kmas는 mapper태그의 namespace에 service의 이름을 선언하고 시작한다.
+    ifez는 따로 DAO없이 DB에 접근하지만, kmas는 DAO를 만들고 DB에 접근
+
+    IFEZ > Controller.java - Service.java - Mapper.java - Mapper.xml
+    KMAS > Controller.java - Service.java - DAO.java - Mapper.xml
+
+    IFEZ는 기능들을 직접 만들어서한 프로젝트같고
+    KMAS는 기존 스프링,자바 등 소프트웨어에 의존하여 기존에 있던 기능들을 최대한 활용해서 만든 프로젝트 같다.
+
+    DAO(Data Access Object)란?
+    실질적으로 DB에 접근하여 데이터를 조회하거나 조작하는 기능을 전담하는 객체
+    사용 이유는 효율적인 커넥션 관리와 보완성 때문이다. DAO는 저수준의 Logic과 고급 비즈니스 Logicd을 분리하고
+    domain logic으로부터 DB관련 mechanism을 숨기기 위해 사용
+
+    Mapper인터페이스?mvc3 패턴
+    Mybatis 매핑XML에 기재된 SQL을 호출하기 위한 인터페이스이다.
+
+    Mapper인터페이스를 사용하지 않을 경우
+    SqlSession을 등록해줘야 한다.
+    DAO인터페이스와 인터페이스를 구현한 DAO클래스를 생성해줘야한다.
+    Mapper인터페이스를 사용하지 않았을 때는 네임스페이스 + "." + SQL ID로 지정해서 SQL을 호출해야한다.
+    ex) session.selectOne("com.test.mapper.TimeMapper.getReplyer,bno))
+    SelectOne, insert, delete 등 제공하는 메소드를 사용해야 한다.
+    문자열로 작성하기 때문에 버그가 생길 수 있다.
+    IDE에서 제공하는 code assist를 사용할 수 없다.
+
+    Mapper인터페이스를 사용하는 방법
+    Mapper인터페이스는 개발자가 직접 작성한다.
+    mapper 네임스페이스는 패키지명을 포함한 인터페이스 명으로 작성한다.
+    SQL id는 인터페이스에 정의된 메서드명과 동일하게 작성한다.
+
+    SqlSession : 핵심적인 혁할을 하는 클래스로서 SQL 실행마다 트랜잭션 관리를 실행한다. 
+    SqlSession 오브젝트는 Thread-Safe 하지 않으므로 thread마다 필요에 따라 생성한다.
+    
+    penta_file(\\192.168.1.5) Z 드라이브
+    드라이브 문제 > 부팅pc를  c드라이브로 옮겨야함
+    
+    회사 아이디 : 이기훈D
+    패스워드 : 8520qwer!
+
+    자리ip는 유지되어야한다.
+    본체변경하면 ipv4 가 자동으로 바뀌도록 설정이바뀜
+    192.168.1.53 (내자리)
+
+    변경방법
+    네트워크 -> 이더넷 -> IP설정 -> 편집 -> 정보입력 (서브넷 접두사 "길이"를 입력해야함)
+    IP주소 192.168.1.53
+    서브넷길이 24
+    게이트웨이 192.168.1.1
+    기본 설정 DNS 168.126.63.1
+    대체 DNS 162.126.63.2
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월07일
+    1. ifez global센터 캘린더 연동이 안되더라
+    -> 관리자에서 다시 수정버튼 누르니 관리자 및 사용자 캘린더에 뜸 (다른게시물에 다 연동 및 period가 없더라)
+
+    2. 투자개발 -> 투자유치현황 -> 유치현황의 게시물을 직접 관리하고싶다. (global에도 똑같은 데이터)
+     1) 테이블 및 컬럼 만들기 (만든 후 과장님께 확인)
+     2) 메뉴는 투자유치현황 관리 밑에 새로 만들기
+     3) 목록페이지는 없고, 메뉴를 누르면 바로 등록페이지가 나오도록
+     4) 등록페이지에서 바로 전년도 데이터들도 출력되어야함
+     5) 추가하는 방식이아니라..
+     data1 = 계약(외국인투자기업) data2 = MOU체결 data3 = 외국인투자
+
+     테이블만들기->vo만들기->mapper,xml만들기->service,Impl만들기->Controller등록,처리->화면
+
+     문제
+     1. db테이블 만들었더니 한글깨져 보임 (collate는 utf-8bin으로 뜨는데)
+     2. 다른곳 화면 긁어왔는데 방식이 좀 틀려서 방법을 바꿔야함 (내가 db를 그렇게 만들었으니)
+     -> 간단하게 해당 연도에 3개의 값이 들어가면 된다.
+     -> 그러면 name을 다르게해서 controller에서 받아온뒤 가공해서 db로 넘기면 될려나?
+
+     하나의 연도에 3개의 값이 들어간 vo가 있는 list까지 만드는데 성공
+     이제 잘 db에 쳐 넣으면 됨
+     넣을려는데 문제 > sn값이 없어서 업데이트를 못함 그리고 처음엔 insert로 해야하지않나?
+
+     if에 sn값이 같다면 update를 하도록 뭐 해야할듯
+     방법1. 임의로 for문 돌면서 list에 값 넣을때 1씩 증가하는 sn값을 넣어버리기
+     -> 그러면 다음연도가 되면 1씩변경되지만 다르면 update가 되므로 상관없지않을까? 함 해보자
+
+CREATE TABLE tb_attr_status (
+	attr_status_sn BIGINT NOT NULL AUTO_INCREMENT COMMENT '유치 현황 일련번호',
+	attr_yr CHAR(4) NOT null COMMENT '유치 연도',
+	ctrt_vl VARCHAR(10) NOT null COMMENT '계약 값', 
+	mou_cncls_vl VARCHAR(10) NOT null COMMENT 'MOU 체결 값', 
+	frgn_ivst_vl VARCHAR(10) NOT null COMMENT '외국인 투자 값',
+	del_yn CHAR(1) DEFAULT 'N' NOT null COMMENT '삭제 여부',
+	inpt_mbr_id VARCHAR(64) NOT null COMMENT '입력 회원 아이디',
+	inpt_dt DATETIME NOT null COMMENT '입력 일시',
+	updt_mbr_id VARCHAR(64) NOT null COMMENT '갱신 회원 아이디',
+	updt_dt DATETIME NOT null COMMENT '갱신 일시',
+	CONSTRAINT pk_tb_attr_status_attr_status_sn PRIMARY KEY (attr_status_sn)
+) COLLATE utf8_bin COMMENT '유치 현황';
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월08일
+    EditPlus 라이센스 등록하기(기존ssd에 있을듯)
+    내일할일 DUPLICATE KEY 테스트해보기
+    -> DUPLICATE KEY를 사용할때 기존 UPDATE 쿼리문처럼 [테이블] SET을 적을 필요가없고
+    -> 기존처럼 where절을 추가하면 오류가 발생한다. 아마 DUPLICATE문이 where절 역할을 이미 하고 있기 때문인
+
+    List로 묶어서 한번에 DB로 보내고싶었는데 방법이 생각이안나서 insert를 여러번 돌리는 방식으로 만들었음
+
+    1차확인
+    고칠점
+    1. 굳이 enum이 필요한가? 굳이 enumlist로 3번을 돌아야하나? -> enum 및 반복문 없애자
+     1-1) 돌필요가없으니 연도도 중복이안되므로 연도중복 작업도 필요가없어짐으로 없애기  -> 완료 
+
+    2. 사용자부분에서 입력할때는 23,22,21년~ 차례대로 하되, db에는 2010년부터 들어가야하지 않나?
+    -> 배열에서 리스트로 값을 넣을때 sn빼고 나머지 값들을 역순으로 넣게 변경함
+    -> insert할때도 역순으로 들어가길할텐에 어차피 db에서 pk값기준으로 정렬되므로 상관없지않을까?
+
+
+    3. update를 사용안할꺼면 주석처리 -> 완료
+
+    4. 처리메소드에 AttrStatus 파라미터 지우고, vo에 list를 담았으면 이에맞게 기능을 제작
+     4-1) list의 길이만큼 insert를 반복하도록 만들었느데 이러며 트랜잭션이 작동안함
+     4-2) ifezStatsServiceImpl에 과장님이 saveList라는 메소드를 만드셨는데 참조해서 만들기
+     ->해당메소드를 테이블에 맞게 변형해서 만들었긴한데, 여전히 NextSn을 사용하지 않음.
+
+     ifezStatsDtlServiceImp방식
+     tb_ifez_stats의 sn의 값을 이용하는 방식으로
+     내가 만든 테이블에는 그런것이 없고 pk만 존재하므로 nextsn을 이용할 수 없다는 결론 
+     savelist에서 1씩증가시켜서 하는게 좋을듯
+
+     ON DUPLICATE KEY UPDATE
+		updt_mbr_id = #{updt_mbr_id}
+	,	updt_dt = #{updt_dt}
+
+	,   attr_yr = #{attr_yr}
+	,	ctrt_vl = #{ctrt_vl}
+	,	mou_cncls_vl = #{mou_cncls_vl}
+	,	frgn_ivst_vl = #{frgn_ivst_}
+    DUBPLICATE KEY UPDATE 안쓰는이유 : 성능상좋지않다.
+
+
+    ifez오류수정
+    1. 조직도에서 부서가 변경되었는데 화면에 적용이 안됨
+    -> 바이오신산업과 > 신성장산업유치과
+    -> 신성장산업유치과가 뜨는건 확인되었지만, 바이오신산업과가 그대로 뜸 (로컬서버에서는 제대로 나오더라)
+    -> 내가 짠 코드는 본부장 직책이 항상나오도록 만들어서 해당 조직에 아무도 없어도 본부장 하나로 인해서 탭이 나오는듯하다.
+    방법1. 하나만나왔다는건 본부장이라는 소리니깐 그냥 jstl로 count가 1이면 안나오도록 만든다 
+    -> 근데 좀 아닌것같음
+    방법2. 자바단에서 selectList의 길이가 1이면 보내지 않는다?
+    -> 방법1이랑 비슷한데 자바단에서 한다는 차이
+    방법3. 그냥 해당 부서를 사용안함처리하면 되는거아닌가? (채택)
+    -> 쿼리에 조건절없어서 추가해야함, controller searchvo에도 조건 추가해야함
+
+    2. CMS > 회원관리 > 조직도 > 조직관리 에서 과로 검색이안됨
+    -> 로컬에서 돌려보니 쿼리 오류가 발생함
+    -> dept_nm을 dept_name이라 해두어서 오류가 발생함
+    -> 부서전화 form 검색부분 option이 둘다 A로 되어있어서 부서전화는 B로 수정함
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월09일
+    selectObject로 데이터를 확인 후 존재하면 update, 없다면 insert
+    nextSn메소드는 tc_sn이라는 각 테이블마다의 sn값을 누적한다.
+    select_snCount메소드를 통해 해당 테이블이 db에 등록되어있는지 확인하고 count가 1이라면 있는것이므로
+    1증가된 sn값을 update시켜준다.
+    없다면 insert시켜줘서 테이블을 db에 저장시켜주고, retrun값으로 메소드를 재귀하여 위에 반복을 다시 시도한다.
+    그러면 테이블이 등록안된 상태에서 시작했지만, 테이블을 만들면서 sn에 0이 들어가고 재귀하는과정에서 sn에 1이 더해지면서
+    테이블에 어떠한 데이터를 넣었다면 sn값이 1로 시작되어 insert가 되어지는것이다.
+    serviceImpl에서 insert나 update안에 넣으면 분기에따라 update, insert가 되어지는데,
+    이러면 savelist가 또 돌게되므로 controller에서 선언하는게 맞다고봄
+
+    없다면 insert -> 2010~2023까지 14번 반복(연도는 반드시 넘어오기때문에 list의 객체는 14개 만들어짐)
+
+    ifezstats -> 게시물 등록(stats의 sn값) -> 연도row마다 주어지는 sn값(stats_dtl_sn값)
+    stats_sn이 1인 게시물에서 14개의 연도가 입력되어 stats_dtl_sn은 14개
+
+    saveList에서 임의로 sn을 넣은이유
+    ifezstats은 상세(dtl)을 위한 테이블이 또 나눠져 있으므로 해당 테이블의 nextsn을 통해서 넣는게 가능하지만
+    지금 하고있는 환경은 큰 범위의 sn 그런거 없이 테이블이 1개인 상태로 바로 데이터가 들어가야하기 때문에
+    saveList메소드 안에서 반복을 돌때마다 +1이 늘어나는 sn값을 사용하게 됨
+
+    list안에 있는 객체들을 db에 넣는법
+    for문돌려서 db에 넣으면 됨.
+
+
+    view의 form input값이 자동으로 객체에 들어감.
+    -> 일반적으로 스프링에서 form을 post방식으로 전송할때 form element의 name속성과 데이터 전송 객체 (DTO : Data Transfer Object)
+    또는 VO(Value Object)의 변수명을 일치시켜주면 자동으로 해당 객체가 변환되어 전송되게 함
+	=
+    Controller 인자에 DTO가 있다면 해당 DTO가 자동으로 생성되어 폼에서 넘어온 값이 주입된다.
+    이때 DTO 변수에 해당하는 값이 없을 경우 변수 기본값이 자동으로 할당된다.
+
+
+    ---> 일단 관리자등록하는것 까지는 통과
+    보완점
+    1. 메소드부분 url 이랑 매핑url이 같도록 변경 (다르면 찾기가 힘듬) -> 완?
+    2. vo를 새로 만들 필요가 없다 (어차피 saveList로 list형식으로 보내기 때문에) -> 완
+
+    
+    이제 사용자화면
+    -> 새로 view화면을 만들거나 link형식으로 바꾸거나 하는 작업이아니라 등록한 데이터를 이제 뿌리기만 하면됨
+    -> ifez-user에 새로 AttachStatusController 라는 이름으로 만들어서
+    -> ajax로 /attr/status/process.json.do를 실행했을때
+	var chart_data = [
+	{"attr_yr": "2010",	"ctrt_vl": "41",	"mou_cncls_vl": null,	"frgn_ivst_vl": null}
+	, {"attr_yr": "2011",	"ctrt_vl": "10",	"mou_cncls_vl": null,	"frgn_ivst_vl": null}
+	, {"attr_yr": "2012",	"ctrt_vl": "3",		"mou_cncls_vl": null,	"frgn_ivst_vl": "1448"}
+	, {"attr_yr": "2013",	"ctrt_vl": "16",	"mou_cncls_vl": null,	"frgn_ivst_vl": "553"}
+	, {"attr_yr": "2014",	"ctrt_vl": "6",		"mou_cncls_vl": "91",	"frgn_ivst_vl": "2110"}
+	, {"attr_yr": "2015",	"ctrt_vl": "2",		"mou_cncls_vl": "5",	"frgn_ivst_vl": "943"}
+	, {"attr_yr": "2016",	"ctrt_vl": "5",		"mou_cncls_vl": "3",	"frgn_ivst_vl": "1714"}
+	, {"attr_yr": "2017",	"ctrt_vl": "6",		"mou_cncls_vl": "6",	"frgn_ivst_vl": "1206"}
+	, {"attr_yr": "2018",	"ctrt_vl": "4",		"mou_cncls_vl": "0",	"frgn_ivst_vl": "1569"}
+	, {"attr_yr": "2019",	"ctrt_vl": "2",		"mou_cncls_vl": "2",	"frgn_ivst_vl": "992"}
+	, {"attr_yr": "2020",	"ctrt_vl": "0",		"mou_cncls_vl": "2",	"frgn_ivst_vl": "1334"}
+	, {"attr_yr": "2021",	"ctrt_vl": "2",		"mou_cncls_vl": "2",	"frgn_ivst_vl": "906"}
+	, {"attr_yr": "2022",	"ctrt_vl": "1",		"mou_cncls_vl": "0",	"frgn_ivst_vl": "502"}
+	];
+    -> 이렇게 데이터를 띄우는것까지가 내가 해야할 일
+    -> 개발서버에서만 해야한다 (운영서버 X)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+    2월10일
+    controller만들어서 ajax로 view에 출력하는것 까진했는데 데이터를 사진과 맞도록 가공해야함
+    개발서버랑 운영서버랑 데이터랑 데아터가 틀린데 운영서버 기준으로 하자
+
+    지금형태
+    -> 중괄호 안에 중괄호가 있는형태.
+    -> 원하는 형태 : var char_data라는 변수는 각 연도별로 데이터가 들어가있는 배열이여야함
+    
+    굳이 HashMap으로 보낼필요없이 배열만들어서 그안에 객체들을 넣으면 똑같아지니깐 
+    스크립트에서 또 데이터를 가공 할 필요가 없음.
+    문제1) AttrStatus객체를 그대로 보내면 변수명과 값이 null인 변수까지 모두 출력되어서 차트가 안그려짐.
+    -> vo객체 새로 만들어서 했는데 문제2가 발생
+    문제2) 새로운 vo 객체를 만들어 label,data1,data2,data3 으로 이루어진 변수들에 setter로
+    attrstatusvo값들을 넣어주면 결과값과 똑같이나오지만 쓸때없이 class하나 더 만들었다고 빠꾸당할듯
+    -> 다른방법이 생각안나서 우선 이렇게 진행
+    문제3) 배열의 길이를 14로 정하였는데 내년이되면 15개의 값이 들어갈텐데 가변으로 해야할듯하다.
+    -> ArrayList로 변경하였는데 잘 되더라.
+
+    새로 추가된 기능
+    외국인투자 차트에 2012년도를 ~2012년도로 바꾸고 2006년부터 2012년데이터를 모두 더한 값으로 변경해야함.
+    값을 변경하는건 쉽지만, 연도를 변경하는건 어렵다. 변경하면 다른 차트도 모두 영향을 받기 때문이다.(애초에 db값에서 가져오는것인데)
+    -> 새로 차트 데이터변수를 추가해서 외국인투자부분 연도만 ~2012로 변경하던가, 아니면 다른 방법을 찾아봐야할듯
+
+
+    인디고플랫폼 - 인천대산단 플랫폼
+    1차년도 작업으로 이상화과장님, 인호님, 나 이렇게 시작하고, 2차년도 부터는 모두 투입?
+    대략적인 틀을 git에서 clone하여 파일들을 세팅하고, 자바는 11, tomcat9, eclipse 4.0, 마리아db를 사용하여 세팅함
+    세팅한 결과 cms화면이나, 사용자화면도 모두 뜨는것을 확인 -> ifez에서도 사용한 툴과 다르지 않아 보임
+    -> 실행엔 문제없으나 현재 자바관련 코드에서 빨간줄이 많이 뜨는 상황
+    ->해결 : import -> existing maven projects로 하면 안뜨더라
+
+
+    DBeaver 한글깨짐
+    C:\Users\PPC070\AppData\Local\DBeaver
+    경로로 가서 dbeaver.ini 파일에 -Dfile.encoding=UTF-8 을 맨 아래에 추가해주면 끝남
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월13일
+    open project from file system과 import existing maven project 의 차이
+    open project from file sysytem
+    -> 컴퓨터 로컬에 저장된 프로젝트를 여는것이다. 일반적으로 작업하고 있는 프로젝트가 있고 작업을 계속하기 위해 다시 열려고
+    할 때 수행된다. 이 경우 추가 설정이나 구성 없이 프로젝트를 있는 그대로 여는 것이다.
+
+    import existing maven project
+    -> 이미 생성 및 구성된 Maven 프로젝트를 가져오는 것이다. Maven은 종속성을 관리하고 Java프로젝트를 빌드하는 데
+    사용되는 빌드 자동화 도구이다. 기존 Maven프로젝트를 가져오면 IDE가 필요한 모든 종속 항목을 다운로드하고 프로젝트를 설정하므로
+    바로 작업을 다운로드하고 프로젝트를 설정하므로 바로 작업을 시작할 수 있습니다. 이 프로세스는 이미 생성된 프로젝트에서 작업 중이고
+    기여를 시작하려는 경우 또는 기존 프로젝트를 자체 프로젝트의 시작점으로 사용하려는 경우에 유용하다.
+
+    ifez유치현황--
+    사용자 controller 이름 바꾸고 / if문 null처리 빼기(스크립트 차트에서 수정하는게 더 나음)
+
+    경자단 이제 본격적으로 경자단 작업해야할듯하다.
+    FuncFacebook 했을때처럼 api쏴주는 메소드 만들어서 controller나 serviceImpl에서 
+    insert, update, delete 할 때 같이 메소드 불러서 작동시키는 방식으로 하면 될 듯 하다.
+
+    저장,수정 api를 보내고 확인되면 바로 삭제 api를 보내서 삭제해줘야한다.
+    바로 운영서버로 연결되는 api이기 때문에 웹페이지에 바로뜨기때문.
+
+    경자단 소스 궁금한것
+    1. 저장api를 보내면 자동으로 fez DB 테이블에서 게시물 번호를 할당해주나? (~~sn)
+    2. 수정api에서 게시물번호를(게시판번호X) 인자로 받아야할텐데 해당정보는 어떻게 가져오나?
+    3. 삭제api도 마찬가지로 게시물번호가 필요
+    4. 포토뉴스와 새소식(첨부파일)은 다른api과는 다르게 @RequestMapping 어노테이션이 붙어있는데 왜 붙었는지?
+    5. 영문은 어케하지? (일단 나중에 생각)
+
+
+    투자유치현황 > 유치현황 운영서버에 반영되어서 메뉴 추가하고 사용자화면 ajax 연동함 (문제없음)
+    수정사항
+    1. 외국인투자 2012년도에 물결표시 나오도록
+    -> 인덱스 이용해서 하면 모든 2012년도에 적용되어서 X
+    -> 편법같지만 if(datas1[0] > 2000){
+		    labels[0] = "~2012"
+		}
+	스크립트에 코드 추가해서 외국인투자 2012년도 데이터만 물결 추가함
+	과거데이터가 갑자기 엄청 바뀌지 않으니깐 괜찮지 않을까?	
+    ----->> 유치현황 완료! 
+
+    경자단
+    1. 스케줄러 작동 (나중에)
+    2. 스케줄러작동시 그날이 2023-02-13일이자나. 1일전 2023-02-12일 00시00뷴00초부터 최종수정일 데이터 조회
+    3.  2번의 조회 결과에 (첨부파일포함) <-- 한번에 불러오는거말고 먼저 2번꺼 조회하고 for문 돌려서 해당데이터의 첨부파일 조회 한후 api 처리
+    
+    참고 : 
+    - 3번의 데이터 항목중에	nttId값이 없으면  insert api 처리 (처리후에 nttId값 결과받아서 우리게시판 테이블(tc_pst)의 에 nttId 필드값만 업데이트 )
+    - 있으면    delete_yn 값에따라 update api / delete api  api 처리후 끝.
+
+    fez의 포토뉴스 썸네일부분은 로직이 어떻게 작동되는지 아직 확인이 안되서 api돌려보면서 해야함
+
+    처음에는.우리가 작업다하면,수동으로 마이그레이션 처리할거야,
+    기존 fez에 올라간 사이트 데이터들 우리가 select해서 다 삭제api 던질거야. 
+    그다음에 우리가 모든게시판을 다 insert 해줘야할듯.. 해주면서 nttId값 업데이트 해줘야댐.
+
+    nvl함수 활용해서 해당필드가 null 이면 inpt_dt 데이터 가져오게 구현하면대.
+    새소식, 보도자료, 고시공고, 포토뉴스, 영문포토뉴스 5개의 일련번호 조회해야대.
+    where nvl(updt_dt, inpt_dt) > '2023-02-12 00:00:00'
+    오늘날짜가 2023-02-13 00:00:00 스케줄작동하자나.
+    17,18,19,41,60
+    조회하고 조건은 주의사항이 기본이 삭제아닌것만 조회하기때문에
+    삭제조건 빼야함. api 도 던져줘야해서.
+
+    과장님이 새로 tc_pst 게시물에 ttlId를 추가하여 해당 필드의 여부에따라 insert update 갈릴 것.
+    -> 추가하심.
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월14일
+    유치현황
+    관리자에서 24년도 까지 뜰 수 있도록 변경 (천천히 해도됨 급하게 운영에 반영할 필요 없음)
+    -> 내꺼 말고 다른것들도 깃에 반영되면 그때 해도될듯
+
+    TIP : JSON으로 데이터를 보내려 할때 보낼려는 객체에 보내고 싶지 않은 변수가 있다면 
+    @JsonIgnore 보내지 않는다.
+
+    insert Test
+    {"bbsId":"3","nttId":66640}
+
+    정리
+    1. 스케줄러 작동 시간(yyyy-mm-dd 00:00:00) 기준으로 하루 전 까지의 updt 데이터를 조회하기. (기본이 삭제아닌것만 조회하기때문에 삭제조건 뺴야함?)
+    -> 고시공고에 3개 게시물을 업데이트했으니 조회해서 3개의 결과가 나와야함
+
+    2. updt가 null이라면 inpt_dt 데이터를 가져오도록 쿼리에 추가
+    -> where nvl(updt_dt, inpt_dt) > '하루전날짜'
+    -> nvl함수는 두 번째 인자가 null일 경우 첫 번째 인자를 가져오는 함수인데 updt_dt가 null인 데이터는 없는데?
+    -> 글을 등록할때 inpt_dt랑 updt_dt는 같은 값이므로 updt_dt만 검사해도 상관없을 듯 하다.
+
+    3. 2번을 통해서 List를 받아왔다면 반복문을 돌려서 해당 게시물번호에 대한 첨부파일이 존재하는지 조회 후
+    존재하면 똑같이 2번과 같이 updt가 없으면 inpt를 하루전날짜로 검사 후 where 모두 통과하면 api param에 첨부파일 추가
+
+    4. 조회했는데 nttID값이 없다면 Insert api 메소드 실행
+    -> insert api 처리 후 nttID 값 받아서 tc_pst 테이블의 extrl_pst_sn컬럼에만 업데이트 해야함.
+
+    5. nttID값이 있다면 del_yn 값에 따라 update api / delete api 처리
+
+    ----> 잠시 멈추고 IFEZ 웹 접근성 수정해야함 (이번주 금요일까진 해야하는듯)
+    (끝나고 다시 FEZ 첨부파일 조회하는것부터 해야함)
+    -> 경자단도 끝나면 산단 투입
+
+
+    웹접근성 보고서
+    8page > '선택됨' 추가하였는데 확인이 안되서 보류
+    9page > 제대로 한건지 모르겠음.
+    10~12page > 심포지엄 및 월드엑스포인데 alt값 괜찮나?
+    11~12page > 이미지 상세보기 화면에서 alt값 및 화살표에 텍스트 넣는 방법 모르겠음
+    23page > 키보드접근 
+    -> 개발개요, 투자대상통지정보 버튼이 tab이동이안됨 (슬라이드가 움직여야 tab 이동 가능)
+    -> ifez소식쪽에 더보기 버튼과 게시물들이 a태그로 묶여있는데 a태그에 tabindex="-1"이 적혀져있음
+    -> 근데 코드를 뜯어봐도 tabindex라는 코드는 하나도 안보임
+    24page > 키보드접근
+    -> 심포지엄,월드엑스포 unitegalley 사용한 이미지는 tab이동이 안됨. (사진들을 묶는 div에는 적용가능하지만..)
+
+ㅡㅡㅡㅡㅡㅡㅡ
+    25page > 초점 또는 키보드 위치 표시 X 
+    -> 퍼블영역인지 개발여영ㄱ인지 모르겟ㄷ 수정하지도 못하겠고
+    26page > 배너 포커스가 씹힘
+    -> 처음 5개가 뒤에서부터 5개가 나와서 탭해도 씹히는것처럼보임
+    27page > 배너 포커스링 명확하게
+    -> css수정??
+    28page > 배너 초점 안맞음
+    -> 초점 및 개체 화면에 안보임
+    ~~38page > 포커스링 관련 (css???)
+ㅡㅡㅡㅡㅡㅡ
+    39page > 건너뛰는 위치가 부적절하게 지정
+    -> 본문이동 잘하는데 뭐가 문제인지 모르겠음
+    41page > 세분화된 페이지 타이틀 제공해야함
+    -> 탭에있는 것까지 title에 추가시켜야하는듯
+    42page > 위 동일
+    43page > 제이쿼리써서 뭐 해봣는데 안되서 걍패스
+
+
+    ㅡㅡㅡㅡㅡ
+    7페이지 이후에 수정한것
+    40page > 적절한 제목
+    -> 연혁부분 <h2>태그 붙여줌(layout.jsp라서 딴곳도 적용됬을듯)
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월14일
+    44page title 수정했는데 맞게했는지 모르겠다.
+    45page > 문서 타입에 맞는 기본언어 명시
+    -> <html lang="ko"...>로 변경해야하는데 해당 원패스창 코드가 오디있는지 모르겠음
+    46page > 전송버튼 추가해서 처리함
+    -> 디자인이 변경되었는데 마크받은다음 다시 돌려놓으면 되지않을까?
+    49page 뭔소린지모르겟음
+
+
+    tab_list에 선택된항목에대해서 title로 활성화된 탭메뉴라고 다른 모든 페이지에도 공통으로 적용해야함
+    layout.jsp에서 수정하면 모두 적용되는데 멀해야 잘들어갈까
+    +
+    세분화된 탭메뉴에 대해서 각페이지마다 페이지 <title>태그에 해당 탭메뉴 항목 이름을 넣어서
+    세분화해야함
+    41, 42, 66,70 페이지 모두 같은 위와 같은 사항
+
+    문제1. id로 할려니깐 첫번째 탭만 적용됨
+    -> id는 고유한 값이기때문에 하나만 적용되는듯 따로 클래스를 만들어서 적용해야할듯
+    -> class로 변경하고 뒤에 status.count 붙이니깐 잘 작동함
+
+    depth_4 받아와서 list에 값이 존재한다면 title에 값 넣기??
+
+    기본적으로 서버가 작동할 때 JAVA > JSTL > HTML > Javascript 순서로 동작한다.
+
+<c:if test="${not empty __menuVO.menu_nm }">
+	<c:if test="${duplicateTitle ne 'Y' }">
+		<c:set var="pageTitle">${pageTitle } - ${__menuVO.menu_nm }</c:set>
+	</c:if>
+</c:if>
+
+중복에 또중복에.. 계속 처리중
+관리자에서 탭메뉴가 존재하는데 부메뉴명이 존재하지 않으면 탭메뉴이름 그대로 제목부분에 들어가서
+title에 IFEZ - 상위메뉴 - 서브탭메뉴 이렇게 나오지 않고 IFEZ - 서브탭메뉴 이름으로 바로 나오게되서 부메뉴명을 추가해줘야함
+
+문제1.
+문화관광 -> 테마지도의 타이틀명은 오디서 바꾸는지 모르겠음. 적용도 안되고
+
+
+8페이지, 44페이지, 67페이지 -> 해당건들은 모두 ~~예약 페이지임 caption이나 title추가해야함
+
+링크의 용도와 목적을 알 수 있는 링크텍스트 제공
+(오늘, 선택가능일, 선택완료 누락)
+
+
+<td class="${td_className }">
+	<a href="javascript:;" id="cal_rent_${settingDay }" <c:if test="${onclickScript ne ''}">onclick="${onclickScript }"</c:if> title="<c:if test='${settingDay2 eq settingToday}'>오늘</c:if>${title }" class="day ${className} calendarInfo_rent <c:if test='${settingDay2 eq settingToday}'>today</c:if>">
+		<span><fmt:formatDate value="${dateSetting}" pattern="d"/></span>
+	</a>
+</td>
+
+내일와서 달력 마저하기
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    2월16일
+
+    만화진흥원(규장각)
+    검색엔진 기존꺼 사용 vs konan 엔진으로 교체
+    검색한 결과에 대해서 상세결과를 검색하는 기능을 구현해야함
+    ex) 검색1 : 홍길동 / 검색2 : 홍길동의 만화 중에서 1950~1960년 사이의 만화 검색 or 
+    -> https://www.kmas.or.kr/search/searchDetail 여기서 보면될듯 항목이 많다;
+    검색 후 검색결과 좁혀보기 라는 기능도 있음 
+
+    비즈니스회의센터
+    1. 오늘날짜 타이틀 추가 + 예약가능/불가능 여부
+    2. 선택한일자를 타이틀로 알려줘야함
+    3. 선택된 시간을 타이틀로 알려줘야함
+
+    국제심포지엄/월드엑스포
+    사진 alt값을 넣어야함.
+    하지만 atch_file 테이블에서 뽑아오는거라 골치가아픔.
+    1. atch_file에 새 컬럼을 추가한다. (ex. row.img_altrn_cn) / 배너처럼 텍스트 추가
+    -> db에 dscrp_cn 이라는 컬럼이 이미 존재한다 해당 컬럼을 이용해서 alt값이 들어가도록 만들면될것같기도?
+    -> 그러면 fnLoad_attch 함수를 새로만들어야하나? 이미지설명 파라미터를 추가해서
+
+    attach.js에 첨부파일 추가하면 텍스트 창이 나오도록 기능 추가.
+    첨부파일을 등록할때만 가능하고 수정할려면 파일을 삭제 후 다시 올리는 방법으로 해야한다. (수정때는 readonly로 해놈)
+
+    문제1) css 모르겠음 - 완
+    -> 일단 그냥 넘어간듯..
+    문제2) 행사사진 뿐만아니라 다른 항목도 이미지 텍스트 태그가 나옴 - 완
+    -> 받아온 file_div 인자를 url if문 안에 추가로 if문을 넣어서 판단하면 나머지 항목은 안뜨더라
+
+    문제3) 심포지엄 상세이미지 화면이미지는 alt값이 안뜸
+    -> unitegalley 뭐 고쳐봐야하나?
+
+    페이지 접근성
+    active된 항목을 이용하여 선택된 항목을 알려주는 속성이 필요하다.
+
+    예약달력
+    1. 비즈니스센터 회의실
+     1) 시설별 예약하기
+      apply.jsp
+     2) 날짜별 예약하기
+      apply2.jsp
+    
+    2. 홍보관예약
+     1) 예약하기
+
+
+    공통사항
+    <caption>추가하기  -> <caption>시설예약일정 달력</caption> 라고 추가함 - 완?
+
+    달력 불가, 오늘, 선택됨, 선택가능 title표시
+
+    예약불가 ok
+    오늘 ok
+    선택가능 ok
+    
+    선택됨 
+    $("#cal_"+option+"_"+vRdate).attr('title', "선택한일자");
+    추가하면 선택됨으로 바뀌지만, 
+    다른날로 바꿔도 그대로 유지됨, 때문에 다른 요일 선택하면 다시 바뀌도록 해줘야할듯.
+    분홍색으로 뿌려주는 코드부분 찾아서 거기서 바꿔줘야할듯
+    $(".calendarInfo_"+option).attr('title', "선택가능일"); 코드 추가하면 선택전 title변경가능
+
+    시간선택 선택됨 표시
+    클릭한 항목들에 대해서 title="선택됨"
+    클릭을 풀었다면 다시 원래대로
+
+    문제. 예약일자 선택하면 선택한 날짜 제외 모든 날이 선택가능일로 바껴버림.
+    $(".calendarInfo_"+option).attr('title', "선택가능일"); 이게 문제
+
+    hasclass로 active랑 possible이 없는 항목은 예약불가
+    active가 없고 possible이 있는 항목은 선택가능일
+    둘다있는경우는 따로 cal_option으로 되어있음.
+
+    생각난방법
+    더미속성 제공 후 여부판단?
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월17일
+    개발쪽 접근성 끝내야함
+    23,25,26,28,29 키보드 접근
+    64페이지 초점문제
+
+    8페이지
+    다른예약페이지처럼 재클릭시 색이 없어지고 title이 바뀌는 방식으로?
+    전 시간값 (rnt_hm_+timeKey)값을 임시변수에 저장한다음에 시간태그의값의 title을 선택가능함 또는 공백으로 바꾸면 좋을텐데
+    -> 해결 : 전 시간값 저장할 임시변수를 만들어서 title속성 변경전에 전 시간대의 title값을 변경시킨 후 
+    -> 변수에 새로운 전 시간값을 넣어줌으로써 해결.
+    //선택된 항목 title 추가
+	$("#rnt_hm_"+timeKey).attr('title','선택됨');
+	$(prev_rnt_id).attr('title', '');
+	prev_rnt_id = "#rnt_hm_"+timeKey
+	//체크된 항목 재클릭시 위 코드에서 title속성 제거로 인한 재선언
+	$("#rnt_hm_"+timeKey).attr('title','선택됨');
+
+    월드엑스포는 잘되는데 심포지엄 상세보기는 죽어도안열림
+    href="javascript:;" 가 심포지엄만 추가되어서 a태그가 막고있으니 안들어가진것
+
+    외국어신고페이지
+    키보드 이동 포커스는 맞출 수 있으나, 엔터를 눌렀을때 첨부파일 창이 안뜸.
+    엔터를 누르면 form자체가 전송되어져버림
+    button태그를 줘서 포커스를 추가한다음에 $().on으로 keydown했을때 엔터키라면, 클릭되도록 
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월21일
+    저널소식지 메인에서 영상부분 공백됨
+    (최신호의 영상만 나오도록한 것 같은데 그냥 데이터중에 최신데이터만 나오도록 하자)
+    -> 위 문제가 아니라 대표 영상 체크가 안되어있어서 생긴 문제. (게시물에 대표영상 Y하면 나옴)
+
+    투자계약(외국인), MOU체결, 외국인투자 각각 모든연도의 합계를 메인 부분에 노출시켜주기
+    -> 새로 쿼리 추가해서 완료
+
+    ifez메인 페이스북썸네일 이미지 alt값 스케줄러때문에 계속 초기화되니깐 확인해야할듯
+    (아 1시간에 1번씩 도는 스케줄러라 망함)
+
+내일까지 빨리해야하는작업
+인천대산단 가족회사 관리 기능 빨리만들어야함
+
+소재지 : 공통코드 이용해서 만들기 (광역시 단위까진 나와야함)
+우수가족회사여부에 따라 등록에서 추가로 정보 입력가능하게 만들기 (첨부파일은 일단 제외시키고진행)
+업종은 일단 input text 형식으로 
+삭제버튼은 수정화면에서 나오게하거나 목록화면 수정버튼 옆에 삭제버튼 만드는형태로
+가족회사 통계
+지역별현황 : 소재지 데이터를 기준으로 만들면됨
+업체별 현황 텍스트로 받아와서 애매하긴한데 distinct로 최대한 뭐 해야지
+
+-> 등록, 목록 출력까지는 완료 
+
+남은거 : 수정화면, 등록에서 여부 선택시 추가 정보등록 나오도록 기능 추가
+가족회사 통계 
+
++ 사용자
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월22일
+    수정화면, 기능 완료
+    y,n여부에따른 추가 정보입력 완료
+    (필수값 에디터 내용필수인데 적용이 안된다)
+
+    ajax안된이유
+    1. 위에랑 겹쳐서 save로 동작해서 안됨
+    2. post타입인데 getmapping했음
+    
+    추가오류 -> 삭제는 잘 처리되었는데 다시 목록으로 돌아가는과정에서 error가 발생해서 목록으로 돌아가지않고 오류 발생
+
+    통계해야함
+    구글차트이용해서
+    구글차트에는 범례위에 단위를 입력할 수 있는 기능은 없나?
+    
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월23일
+    문제1. 상세페이지에서 삭제를 눌르면 error처리됨 (db에서 삭제는 잘 됨)
+    -> datatype json오류로 인해서 html로 변경함 (error 로그보니 받아온 데이터는 페이지를 받아오더라)
+    -> controller를 계속 수정해도 안되서, 임의로 스크립트에서 성공시, 처리완료 alert띄우고 window.location.href로 목록이동하게 만듬
+    문제2. 관리자 통계페이지 개못생김
+    -> 사용자에 있는 css 복사해서 admin style.css에 때려박음 
+    문제3. 사용자 우수 가족회사 상세화면 에디터 적용안됨
+    -> 수정완료
+    문제4. 통계에서 범례위에 단위가 안나옴
+    -> 이걸 title로 대체해서 적용하여 해결 (근데 오른쪽 정렬이 안된다)
+    문제5. y축 단위 소수점
+    -> 정수로 변경
+
+    사용자쪽에는 아직 메뉴 추가시 depth적용되는 기능은 구현안된 것 같음 (임의로 태그 만들어서 진행중)
+
+    나중에할작업
+    2023-02-21 16:31 조지혜 기훈님!
+2023-02-21 16:31 조지혜 https://www.ifez.go.kr/investment/content/view.do?sn=71
+2023-02-21 16:32 조지혜 그래프 3개
+2023-02-21 16:32 조지혜 (사진)
+2023-02-21 16:32 조지혜 마지막년도 영역에
+2023-02-21 16:32 조지혜 누계노출 부탁드려요
+2023-02-21 16:32 조지혜 보라색으로 출력되어야할 영역 추가해두었습니다!
+2023-02-21 16:41 이기훈 대리님 혹시 급한작업이 아니라면 인천대 작업부터 끝내고 작업해도될까요?
+2023-02-21 16:42 조지혜 넵 !
+2023-02-21 16:42 조지혜 반영하고만 알려주세요~
+    조대리님 : 위에 내용
+    
+    황과장님 : 임시로 test.jsp 만들어서 구글지도 api 이용해서 지도 띄운다음에 일단 암데다 마크 찍어서 과장님께 알려드리기
+
+    유차장님 : 수요일까지 가족회사 관리 진행
+    -> 검사맡아야함
+    -> 문제1. 가족회사 현황 홈페이지 링크가 이상하다.
+    -> 해결 : <c:set var="url" value="//${row.hmpg_addr }" />
+	<c:if test="${fn:contains(url, 'https://') || fn:contains(url, 'http://')}">
+		<c:set var="url" value="${row.hmpg_addr }" />
+	</c:if>
+	<a href="${url }" target="_blank" class="cm_icon icon_homepage">홈페이지</a>
+
+    -> 문제2. 이미지가 없을때 엑박이 뜨면안된다, 그리고 png파일 넣었더니 배경이나옴?
+    -> 엑박은 없앳는데 배경은 모르겠다 도오오오저히
+
+    -> 문제3. 관리자 통계부분에서 너무 벌어져있다. 퍼블에게 도움을 구해서 붙여 나올 수 있도록 
+    -> (이슬님이 해주신 뒤 올려주신다고함)
+
+    -> 문제4. 가족회사 통계부분만 메뉴 네비게이션이 안나온다
+    -> 해결 : url이 linc 가아니라 link로 되어있어서 생긴 문제
+
+    개발서버반영방법 알려달려고하기
+    2023-02-23 13:28 이상화 개발서버 풀받는법 알려줄께
+    2023-02-23 13:28 이상화 192.168.1.101
+    2023-02-23 13:28 이상화 원격접속
+
+    -> 원격 데스크톱 연결 실행 -> 192.168.1.101 입력 후 연결 -> (아이디랑 비번은 안알려주심)
+    -> 접속 성공하면 소스트리 띄어져있다면 pull받고, 해당 이클립스 프로젝트에서 project파일들마다 새로고침해주고 서버 재시작
+    -> 재시작 끝나면 개발서버 들어가서 작업한거 반영되었는지 확인
+
+
+    산학협력단 > 연구과제공모 api 이용해서 해야함
+    따로 관리자 거쳐서 하는 작업은 아니고 api이용해서 바로 사용자에 띄워주면 되는듯
+
+    적용화면 : 연구지원 > 연구과제공모 
+    서브페이지가 끝나면 메인에도 적용해줘야함 (2개만 노출됨)
+
+    작업순서
+    FuncNtis에서 api받아오는 함수 정의 > NtisController를 만들어서 받아온 데이터를 가공
+    > 가공한 데이터를 연구과제공모 페이지에 뿌려주기 > 그런데 더보기 기능이있네? > 좆됨 > 페이징처리방식으로 해야할듯
+
+
+    https://www.ntis.go.kr/rndopen/openApi/pjtSearch/project?apprvKey=DEV_TEST_APPRV_KEY&SRWR=%EB%
+82%98%EB%85%B8&userId=&collection=project&searchFd=BI&displayCnt=1&startPosition=1&searchRnkn=
+DATE%2FDESC&addQuery=PY%3D2017%2FSAME
+
+필요한 데이터
+
+과제수행기관 ? 부처명?
+과제명
+
+과제상세페이지 링크 방법
+
+더보기(페이징)방삭은 startPosition과 displayCnt 필드를 이용하여 해보자 + TOTALHITS필드 -> 이거 응답필드임;
+ex) 1~6까지 1페이지 7~12 까지 2페이지
+
+무한정 더보기 할 수는 없으니 5페이지 까지만 나오게 (그럼 총 30개의 게시물)
+
+displayCnt, startPosition로 조정
+
+문제
+삭제된 데이터까지 읽는건지는 모르겠지만 알앤디 홈페이지랑 일치하는 항목이 하나도 없음
+
+일단 api쪽은 문의하고 -> 데이터 더보기 되는지 해보기'
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월24일
+    키워드는 필수가 맞음 (무슨 키워드 넣어야하는지 확인중)
+    검색에 or and 맞는지 확인
+    
+    더보기 기능 동작하는지 확인
+    
+    json데이터의 {} 안에있는 [] 배열 데이터에 접근하는방법
+    https://compogetters.tistory.com/87
+
+    대충해서 대충 나오게까지는함
+
+    페이징처리할려면 ajax로 새로 함수 만들어서 띄워줘야할듯
+    버튼 누르면 작동하는 함수 하나 추가
+    
+    그보다 api랑 통합공고랑 아예 딴 작업인것같다.
+    RSS를 이용해야할것같은데
+    게시물id 값도 모두 검색해도 안됨
+    -> 상세페이지 링크를 걸지 못한다는 뜻
+
+    //접수예정 그런거 없음 (이건 내가 따로 접수일, 접수마감일 계산해서 화면에 띄우는듯)
+	//프로젝트 시작, 종료만 존재 (접수일, 접수종료일 없음)
+	//공고일 존재 X 
+
+    일단은 임시데이터들로 더보기까지는 구현함
+
+    과장님께 새로운작업 지시받음
+    링크쪽 아이디찾기, 비번찾기, 회원가입 
+
+
+    회원가입 작업은 끝냈고,
+    근데 이메일 유효성검사 물어봐야함
+    그리고 완료페이지 안했으니 담주와서 해라
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월27일
+    역시 api이용해서 하는게 아니였나봄 정보가 전혀 틀림 -> RSS이용해서 작업하고 아직 안옴
+    일단 과학기술정보통신부|산업통상자원부|해양수산부|산림청|식품의약품안전처|보건복지부|해양수산부|환경부 검색어 이용하여 나온는거 보기
+    -> rss로 새로 바꿔서 모든기능 적용함 (css 하나 바꿈 선안보여서)
+
+    더보기 받아오는동안 좀 기다려야하는데 그동안 그 로딩표시 뜨게하기
+
+    -> 메인에도 적용애햐니깐 나중에 메인할때 똑같이 추가
+
+    페이징 url 바겼으니 내가작업한 작업중에 페이징있는 페이지는 수정하기
+    -> 우수가족회사부분 수정했음. 
+
+    api지도작업 목요일까지(욕먹음) + 조대리님 유치현황 합계표시
+
+    회원가입페이지의 맞춤형 공고? 그거 하는지 물어보기
+    -> 해야댐 
+
+    관리자 통계데이터관리도 내가해야함,테이블 2개쓰는듯, 사용자 메인에서 뿌려주는 역할
+
+    팁 1
+	beforeSend: function() {
+			 fnLoading_show()
+	},
+	complete: function() {
+		fnLoading_hide()
+	 },
+	 ----> ajax 실행 기다리는동안 로딩띄워주는 방법 (필수 -> async : false 이부분을 삭제해야 동작한다! 몰라서뻘짓함)
+
+    팁 2
+    String[] array = request.getparametervalue("abc");
+    이렇게 해서 컴마별로 분류해서 리스트로 만든 다음 db에 힘들게 보낼필요없이,
+    vo객체에 있는 변수와 input의 name만 일치한다면, 메소드 파라미터에 해당 vo객체를 사용해서 따로 가공필요없이 바로 db로 보낼 수 있다.
+    public ModelAndView ctrl_processJoin(ModelAndView mav, HttpServletRequest request, MbrVO mbrVO, BizPbancMapngVO bizPbancMapngVO) {
+    (단, db에 저장은 a, b, c 이렇게 들어감)
+
+
+    오늘끝내고가야하는거
+    마이페이지 - 수정, 탈퇴
+    
+
+
+    내일
+    링크 메인
+    마이페이지 맞춤형공고?
+    관리자 통계
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    2월28일
+
+    우수가족회사 사진 존재시 백그라운드 제거
+    메인페이지
+    마이페이지 맞춤형공고
+    관리자 통계
+
+    비밀번호 확인 후 개인정보 수정갈때 wirte.do를 url에 입력해서 들어가는 편법 막아야함
+    통과해서 보낼때 특정값을 같이 보내서, wirte.do가 실행되는 메서드에 유효성검사해서 해당값이 없다면다 확인페이지로 롤백
+
+    연구공모 D-Day 수정하기 (마감일 - 오늘날짜) - 완
+
+    통계데이터
+    statsdatavo 에 dtl값담긴 list 변수추가하여
+    controller에서 array에 담겨진 데이터들을 list에 담아서 statsdatavo에 저장해주고
+    statsdataserviceimpl insert부분에서 for문을 돌아 횟수만큼 반복하여 dtl값을 집어 넣어준다?
+    
+    수정화면에서 기존데이터와 새로운데이터 insert update 하는거 잠깐패스
+
+    <c:if test="${fld eq row.biz_pbanc_cd }">checked</c:if>
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월02일
+
+     정리
+     비로그인 상태에서 리다이렉트 잘되는 이유
+     보던페이지 -> 로그인페이지(login페이지 메소드에서 redirect 값을 가져옴) -> redirect_uri 암호화한거 다시 복호화하고
+     return this.createMessageRedirect(mav, "", MessageScriptEnum.TOPREPLACE, redirect_uri); 로 다시 이동시킴
+     (단 url에 /member가 포함된다면 회원가입, 로그인 페이지이므로 메인으로 복귀시킴)
+
+
+
+     -완료-
+
+    2. 회원가입 및 개인정보수정 수정사항 - 완료?(마이페이지에서 창이 두번뜨긴하던데)
+     1.개인정보 수정 가기전에 비밀번호 확인 하고가니깐, 비밀번호 변경하는경우가 아니라면 필수체크 하지마라.
+      -> 필수체크 제외시킴
+     2.핸드폰번호 및 이메일주소 유효성 검사 넣어주기 / 번호는 숫자만입력되도록, 이메일주소는 유호한 이메일 주소인지 체크
+
+	-> 수정사항 - 이메일 체크 두 번 하는거 수정하기 - 함수 한 번더 호출하는거 삭제함.
+	-> 핸드폰번호 방법은 그냥 &&	chk_field(formJoin.find("input[name=mbl_telno_encpt]"), "number", "핸드폰 번호")
+	   이렇게 하면 해결되는 문제였음.
+	-> 이메일 null체크하는데 둘 다 null일경우? -> 어차피 위에서 chk_field 에서 체크하지않나?
+
+    3. 회원가입 후 로그인 버튼 링크 수정
+     -> 인트로 페이지로 이동하는것을 링크 메인으로 이동하도록 변경
+     -> 다른페이지는 로그인하고나서 보던페이지로 다시 리다이렉트되는데 회원가입완료 페이지에서는 리다이렉트가 안됨
+     -> 그냥 회원가입 후 로그인에서 링크메인으로만 보내면 되는것..
+
+     해결은했지만 만약에 리다이렉트 보낼려면 
+     String move_url = this.getContenxtURI(
+	"/linc/member/login.do?uri_redirect=" + FuncEncypt.encodeBase64("/linc/myinfo/check.do"));
+    이렇게 하면 되는듯
+
+    4. 통계데이터 산학 메인에서 사용여부 관계없이 다 뜸 - 완료
+    -> use_yn 쿼리 조건 추가
+
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월03일
+
+    IFEZ
+     0. 구글지도 api 만든 후 마커까지 찍기
+    -> 최종 전 단계 : 지도를 영문으로 변경하고 지도 위에 버튼 2개를 만드는데 각 버튼마다 좌표가 틀리고 클릭하면 해당 좌표의 건물 이름이 마커로 뜨게? 
+    -> ㄴㄴㄴ -> 버튼이 아니라 지도에 마커가 2개 뜨도록 하기 -> 마커를 배열로하고 마커위치를 파라미터로 받아야함
+
+    -> 최종 : world페이지에서 Major Prjects에 각 명소마다 버튼을 추가해서 버튼을 누르면 파라미터값으로 명소 이름과 x,y좌표를 던져주고 해당위치로이동?
+    -> 버튼이 아닌듯?
+
+    1. 유치현황 마지막 항목에 합계 추가하기?
+    -> 선형그래프에 합계 뜨도록 추가했는데 모두 떠버림, 조건을 줘서 마지막에만 뜨도록 변경해야함..
+
+
+
+    개인정보관련작업
+    만14세 이상입니다 체크박스 추가하기
+    외국어오류표기신고 - 완료
+    비즈니스센터 회의실 예약 - 완료
+    홍보관 예약 - 완료
+    투자종합상담 - 완료
+    기업애로상담 - 완료
+    저널 구독 - 완료
+    문자알림서비스 - 완료
+
+    
+    INDIGO
+    1. 이미지 유무 처리  +  노이미지 center! 뒤에 100%
+      - 방법1. 실제로 운영할때는 타회사쪽 운영db를 사용하니 img_orgnl_name같은걸로 유무 판단후에
+       style태그를 적용할지 안할지 기능 구현
+      - 방법2. ajax를 이용하여 이미미 처리 메서드를 실행해 이미지가 없을때 특정 y,n 변수를 받아오면서
+      	해당 값을 이용하여 stlye태그 적용여부 판단하기
+    
+    -> 로컬에서는 아예안나오던게 개발서버에는 잘나오네? db에 이미지 넣어놓았나?????
+	
+    -> 파일 불러오는 유무처리 방법모르니 상화과장님이 하는거 보고 따라하여 수정하기.
+    -> 구현이 어려우니 일단은 img 이름? 으로 c:if 판단 후 있으면 뜨게하면되고 아니라면 안뜨게
+    -> 단, 안뜨는경우라면 자바자체에서 뜰 수 있도록 변경하기.
+
+    2. 가족회사 통계부분 도넛그래프 호버시 레이어 떨림현상
+    -> svg > g > g:last-child { pointer-events: none } 스타일 태그 적용하니 해결됨
+
+    3. 모바일 그래프 영역 틀어짐
+    -> 일단은 모바일화면에서도 보여지게 만들었는데 글자 기울여지고 ...으로 되는건 길어서 어쩔 수 없음
+
+    4. 회원가입 > 비밀번호 일치하지 않는다는 alert 출력되나, 확인 시 blank 화면 출력
+     1) 스크립드상에서 check = true시에만 넘어가도록 추가하기
+     2) controller에서 실패시 넘어가는 주소값을 변경하기
+
+    leepenta
+    이펜타2
+    01012345678
+    penta123@naver.com
+
+    pentatest123
+    이펜타2
+    01012345678
+    penta123@naver.com
+
+    5. 이메일,이름 중복 제거 기능이 없기때문에 똑같은 이름과 이메일을 가진사람이 아이디 찾기하면 결과가 2개 이상 나옴
+    object -> list로 변경해야함
+
+    6. 회원가입할 때 메일도 중복검사로 넣고, 메일 1개만 가입되도록 수정 하기.
+      6번을 해결하면 5번을 할 필요가 없어지니 괜찮을듯 일단 이메일 중복기능 부터 추가하자
+      form데이터 보낼때 이메일중복 검사를해야하나? 아니면 ajax?
+      tbmbr 돌면서 사용자가 입력한 이메일과 일치하면 return해서 alert 띄워주도록
+
+    7. 가족회사 도넛그래프 하단이 짤림?(height때문인듯) -> 일단은 보이게해놓았는데 좀 못생기긴함
+
+    8.관리자> 통계데이터 maxlength=5 걸어버리고 숫자만 입력되로록 수정
+    -> pattern="[0-9]+" 추가해서 진행하는데 가끔 db오류나던데 왜지??? 
+    -> smallint 범위가 32796까지인데 내가 그 이상으로 입력해서 오류가 발생한거임.
+
+    + 사용여부가 y인게 여러개면 메인에 모두 노출되어버려서 글자가 꺠져보임
+    -> 때문에 사용여부가 y이면서 가장 최근꺼 4개가 노출되도록 쿼리 수정
+    -> 완료
+
+    맞춤형공고 이상화과장님이 보완 및 수정해주신거 보고 배우기
+
+    9. 아이디찾기 이름,이메일 입력시 결과가 2개일때 화면에 여러개 뿌려주기
+    -> STring 으로 해서 함
+
+
+    &&&&&&&&&&&&&&&&&&&&&중요&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    about:blank 창이 떳던이유
+    form 태그에 target="hidden_iframe" 속성을 추가 안해서 그럼...
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월06일
+    산학협력단 사이트명 수정
+    팝업/레이어 기능 추가
+    개인정보 수정 기능 보완
+    ifez 개인정보 관련 추가 문구 작업
+
+    팝업/배너 삭제기능 구현
+    막힌부분 : 삭제처리하는데 메뉴가 없어서 접근이 불가하다고 함.
+    -> 쿼리를 보니 site_id=null이 생겨서 불가능했음.
+    첫번째이유: ajax부분에 site_id 랑 controller부분이랑 일치하지 않았음
+    두번째이유
+    //페이지 공통항목 불러오기 
+    CmsSiteVO cmsSiteVO = this._init(mav, site_id);
+    searchVO.setCms_site_sn(cmsSiteVO.getCms_site_sn());
+    site_id를 불러오지 않았음.
+
+    ifez 지도 작업 중
+
+    팀장님
+    일단 FEZ 작업부터 하기.
+    (이미지 보낼때 우리 도메인을 붙여서 보내야함. 안붙이면 상대측 도메인이 붙는데 그럼 경로에 사진이없으니 안뜰것)
+    fez끝나면 ifez 수정요청온거 고쳐야함 개많음
+
+    구글지도랑 유치현황은 언제하냐..
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월07일
+    일단 구글지도랑 유치현황부분 끝낼수있으면 빨리하고 fez해보기
+    오전안으로 할 수 있을까
+
+    -> 조대리님 유치현황부분 완료함 (누계합계 표시는 반영대기상태)
+
+    산단협력단
+    - 연구공모과제 접수일,마감일 없는 항목
+    -> 없는 항목은 공모확인 이라는 글자로 대신 표기하도록 함
+
+
+    ajax postmapping으로 값을 전달하는데까진했는데, 지도화면으로 뿌려주질 못하고있음
+    그냥 json방식으로 하면되는듯 form태그안에 input hidden value값으로 
+    var business_complex = [
+	{ "attraction" : "POSCO Tower", "x_coordinate" : "37.3892", "y_coordinate" : "126.6442"},
+	{ "attraction" : "Songdo Convensia", "x_coordinate" : "37.3881", "y_coordinate" : "126.646"},
+    ];
+    $("input[name='maps_value']").val(JSON.stringify(business_complex));
+    값을 통째로 넣은다음에, 그다음은 controlelr에서 항상하던 json가공방식대로 가공하여 list로 만들고 
+    mav.addobject로 뿌려주면 되는듯.
+
+    --> 황과장님 : 이거해주면 다른것도 해줘야할 것 같아서 일단 보류 다른일 하고 있기
+
+    --> 일단 투자개발 관리자 > 프로젝트 관리 > 송도,영종,청라 관리자 부분에 카카오지도가 띄워지는 버튼을 만들고, 지도에서 해당부분 클릭시 위도,경도 좌표가 관리자 탭의 input readonly 태그 안에 각각 x,y 입력되도록 하고 저장누르면 테이블에 저장되도록
+    --> 테이블에 저장시키는데 해당컬럼은 없으므로 각각 x,y가 저장될 컬럼 2개를 만들어야함.
+    일단 다 만들고 과장님께 확인 받기
+
+    -> 일단은 지도 띄우고 위도,경도 값을 부모창까지 보내는건 완료
+
+
+    FEZ 시작
+    정리
+    1. 스케줄러 작동 시간(yyyy-mm-dd 00:00:00) 기준으로 하루 전 까지의 updt 데이터를 조회하기. (기본이 삭제아닌것만 조회하기때문에 삭제조건 뺴야함?)
+    -> 고시공고에 3개 게시물을 업데이트했으니 조회해서 3개의 결과가 나와야함
+
+    2. updt가 null이라면 inpt_dt 데이터를 가져오도록 쿼리에 추가
+    -> where nvl(updt_dt, inpt_dt) > '하루전날짜'
+    -> nvl함수는 두 번째 인자가 null일 경우 첫 번째 인자를 가져오는 함수인데 updt_dt가 null인 데이터는 없는데?
+    -> 글을 등록할때 inpt_dt랑 updt_dt는 같은 값이므로 updt_dt만 검사해도 상관없을 듯 하다.
+
+    3. 2번을 통해서 List를 받아왔다면 반복문을 돌려서 해당 게시물번호에 대한 첨부파일이 존재하는지 조회 후
+    존재하면 똑같이 2번과 같이 updt가 없으면 inpt를 하루전날짜로 검사 후 where 모두 통과하면 api param에 첨부파일 추가
+
+    4. 조회했는데 nttID값이 없다면 Insert api 메소드 실행
+    -> insert api 처리 후 nttID 값 받아서 tc_pst 테이블의 extrl_pst_sn컬럼에만 업데이트 해야함.
+
+    5. nttID값이 있다면 del_yn 값에 따라 update api / delete api 처리
+
+
+    -> insert/update 까진 완료
+    -> 첨부파일, 이미지, 스케줄러 작업 남음
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    
+    3월08일
+
+    산학협력단 메인 연구과제 class 변경
+    통계데이터 값 항목 필수입력으로 변경
+
+    - 투자개발 좌표 기능-
+    -> 내일 컬럼 만들고 과장님께 이렇게 만들어도 되냐 확인 후 이상화과장님께도 말씀드리고 쿼리 알려드리기
+    -> 컬럼만들면 vo랑 searchvo에 새로만든 컬럼 변수 추가하고, select, upate ,insert에 해당 변수들 추가하면 끝날듯
+    -> 끝나면 globals.dev에 있는 key값 원상복귀 시키기
+
+
+    -FEZ-
+    delete 쿼리에서 del_yn 조건을 뺴야함
+    -> 쿼리에 if조건 isEmpty 추가해서 해당값이 비어있을때만 추가하도록 했는데 적용 안됨
+    -> 새로 select쿼리 만들었는데도 del_yn을 체크함
+
+    -> select에서 작성자이름 암호화,복호화가 안붙어 있어서 include말고 내가 만들어야할듯;
+    -> atchfile list돌려서 vo에 담아버리니 update할때 기존 게시물 첨부파일이 복사되는 문제
+    -> 첨부파일들을 함수실행할때 보내서 거기에서만 for문을 돌며 fez에 업데이트 되도록 해야할듯
+
+    스케줄러 하루에 한 번
+    삭제한 글은 db에서 따로 처리하지 않는 이상 복구 되지 않는다.
+
+    삭제한 nttID번호는 fez에서 자체적으로 없애서 다음게시물을 insert하면 삭제했던 nttId번호가 들어가게됨.
+    아마도 하루에 한번씩 삭제된 게시물으 nttID에 대해서 리셋되는듯
+    그러면 다른 지역에서 올린 게시물이 삭제되지 않는가?
+    -> 삭제하면 nttID번호를 null로 바뀌도록 해야할듯하다.
+    -> 그러면 삭제진입 부분에도 pstservice.update를 추가해야겟다.
+    -> null로 바꾸면 특정시간에 도는 스케줄러 특정상 12시에 돈다고 하면 11시 30분에 삭제하면 
+    -> extrl_pst_sn값이 없어지지만, 내가짠 코드에는 해당 값이없으면 insert를 한다고 되어있기때문에 또 insert되는 문제발생
+    -> 그렇다고 del_yn을 체크하면 아래 update/delete 분기문이 무용지물이 되므로 
+
+    ->일단 update하면서 해당 값을 음수로 -1 같은 숫자로 하면서, fez가 nttID값을 갱신하는지 불확실하므로 
+    -> 오늘 사용한 번호를 기록한 다음에, 내일 insert 해보고 갱신안하면 그냥쓰고 하면 음수로 두자.
+
+    ->삭제한걸 사용자가 어떻게 할 수가 없으므로 어짜피 하루에 한 번 돌고 삭제처리된것을 다시 스케줄러가 돌때는 fez_data에 
+    -> 걸리므로 어차피 안도니깐 걍 상관없을듯?
+
+
+    http://192.168.1.53:8080/other/attach/process.file.do?TP=dn&sn=16925&key=E8AD9BAAF5D125A
+    https://www.ifez.go.kr/other/attach/process.file.do?TP=dn&sn=51224&key=4C8FF2C05A06AC1
+    javascript:fn_egov_downFile('FILE_000000000004044','0',' https://www.ifez.go.kr/other/attach/process.file.do?TP=dn&sn=42652&key=7CE5D5ED0C0F20C%27)
+
+    update에 첨부파일은 일단 빼자,
+    이미 입력된 게시물에 첨부파일을 추가하고 다시 스케줄러통해서 update를 하여 첨부파일이 추가된다해도,
+    이미 입력된 첨부파일에 기존 첨부파일 + 새로 추가한 첨부파일이 쌓여서 총 3개의 첨부파일이 들어갈 것 같음
+    
+    거기다가 첨부파일을 삭제하고 반영하고 싶어도 삭제기능이 api에 존재하지않으므로, 걍 update는 제목,글만 수정하는걸로
+
+
+    첨부파일 여러개도 올라가도록 완료
+
+    에디터 이미지 및 썸네일 남음
+
+    변수안에서 반복문은 안된다.
+    그러면 content param을 그냥여러개 사용하는건 해봤는데 안됨
+    -> 어차피 param 길게 쭊쓰는거니깐 
+    param += URLEncoder.encode("<br><img src='https://www.ifez.go.kr/other/attach/process.file.do?TP=dn&sn="+vo.getAtch_file_sn()+"&key="+key+"'/>", "UTF-8"); /*내용 */
+    이렇게 ?content= 부분만 빼고 쭉 쓰면 해결이지
+
+    개발서버에 라서그런듯한데 썸네일이 안뜸
+
+    처음 insert할때는 괜찮은데 update 하고나서 사진이 안보임
+    1. insert 사진 모두 나옴 ok
+    2. update 후 사진 모두 증발
+    
+
+    3. 첨부파일도 사라지는지 테스트 해봐야함
+    -> 첨부파일은 update해도 안사라지는데 왜 사진은 사라질까?
+    -> update 메서드에 insert처럼 이미지부분을 추가하니 사라지지않고 유지됨 그렇다고 더 추가되지도 않음
+    -> 이미지가 삭제되거나 추가되면 update 가능함 (로컬에서 올리니 엑박처리되긴하는데 fez에 반영되긴함)
+
+    4. 그럼 update 에도 첨부파일 추가하면 어떻게 될까
+    -> 첨부파일은 바뀌지 않음.
+    
+    
+    -투자개발 위도,경도 저장하기-
+    컬럼명은 위도 : LAT,  경도 : LOT
+    datatype은 numeric
+    데이터 자리수는 위도는 12 경도는 13
+    소수점수는 위도는 10 경도는 10
+
+    받아온 위도 경도는 자릿수를 초과하므로 처리해서 db에 저장시켜야 할 듯
+
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월09일
+    답장이 없으셔서 컬럼 추가못했음
+    -> 추가해도된다는 답장 받음 -> 나중에 운영 반영하실때 운영db에도 반영해달라고 요청드리기
+    alter table tb_ivstrgn_plan_artcl add column lat_crdnt VARCHAR(10) default null comment '위도 좌표' after rls_yn ;
+    alter table tb_ivstrgn_plan_artcl add column lot_crdnt VARCHAR(10) default null comment '경도 좌표' after lat_crdnt;
+
+
+    통계데이터 삭제기능 추가하기
+    -> cmsPopup에 적용했던것 처럼 적용하여 완료함
+
+    투자개발 위도 경도 db에 저장하기
+    -> db컬럼 변수명에 맞춰서 vo추가하고, 쿼리 및 input태그 수정하기
+    -> db에 저장하는 과정에서 해당 값을 db자릿수에 맞게 10자리 이내로 소수점을 버리던가해서 진행하기
+    -> 자바에선 해당 값을 String으로 받아오기때문에 String -> float -> String 과정을 거쳐야하므로
+    -> 그냥 지도팝업창에서 계산하여 부모창으로 보내는게 더 좋을 것 같다.
+
+    -> 위도/경도 저장 완료함 -> 일단 완료했다고 보고드리고 지도내에 검색기능 필요한지 여쭤보기55
+
+    fez 스케줄러 처리하기
+    -> 새소식,포토뉴스만 테스트해보았는데,
+    -> 보도자료, 고시/공고, 새소식, 포토뉴스, 영문포토뉴스 게시물 한번에 넣어서 진행해보기
+    -> 개발서버에서 올라온 글은 가능할테니 첨부파일 및 이미지 도메인을 개발서버로 바꿔서 진행해보기
+    -> 1. 임시로 funcfez부분 이미지와 첨부파일 처리부분 도메인을 개발서버 도메인으로 바꿔놈 끝나면 원상복귀시키기.
+
+    -> 2. 각 게시판에 글 하나씩 올려서 insert 확인하고, 예전글들 랜덤으로 하나씩 업데이트해서 업데이트도 확인하기
+    -> 새소식 완료 고시공고 완료 보도자료 완료 포토뉴스 완료 영문 포토뉴스 완료
+    -> 테스트 결과 모두 잘되나, 포토뉴스 / 영문 포토뉴스 둘 다 썸네일이 미출력됨. / 에디터에 올린 사진이 안나옴
+    -> 깜빡하고 /commissioner/pst/process.file.do? 경로로 안해서 그런것같음
+    -> 에디터 사진은 기본 설정이 ifez.co.kr 로 되어있기때문에 개발서버 도메인으로 바꿔주면 제대로 출력됨.
+    -> 때문에 에디터는 따로 뭐 손 볼 필요가 없어보임.
+
+    -> 2.1 제목, 글자, 첨부파일, 이미지 수정해보기
+
+    -> 3. 첨부파일, 이미지 이상없고 에디터 글도 잘 올라왔다면 끝
+    -> 첨부파일은 업데이트가 안됨, 이미지는 업데이트가 가능하다. 글 및 제목도 업데이트 가능
+
+    -> 이상없다면 이미지는 갱신가능하지만, 첨부파일은 업데이트가 안된다고 말씀드리고 조치
+
+    
+    IFEZ 개발서버 반영방법
+    사용자이름 : WIN-LNBFBMSA366\penta_db
+    암호 : penta3377&*()
+
+
+    새업무
+    인디고 과제신청? 수정해야함
+    관리자 -> 확인, 보완요청 버튼 추가
+    -> 승인은 선정으로, 미승인은 미선정으로 변경하기
+
+    사용자화면
+    -> 신청현황에서 관리자가 접수로 처리했다면 -> 담당자확인중으로
+    -> 관리자가 확인으로 처리했다면 -> 심사중으로
+    -> 관리자가 보완요청으로 처리했다면 -> 보완요청
+    -> 관리자가 선정으로 처리했다면 -> 선정
+    -> 관리자가 미선정으로 처리했다면 -> 미선정
+    -> 관리자가 취소로 처리했다면 -> 취소
+
+    사용자는 접수기간이 끝난 과제건으로는 수정이 불가능한데,
+    관리자가 보완요청을 보냈다면 접수기간은 무시하고 서류 수정이 가능하도록 만들어야함
+
+    관리자에 보완요청을 클릭했다면 
+    아래에 보완사유 탭이 생기고, textarea로 추가하며됨 
+
+    사용자 view에서 해당 보안사유가 필수서류 윗부분에 띄워지도록 추가
+
+    
+    문제
+    사용자 신청현황 view화면에서 수정기능이 아예 없더라.
+    일단 보완요청 상태일때만 필요서류부분에 첨부가 가능하도록 만들어야함
+    아니라면 수정불가능하고 보기만 가능한 지금처럼 화면으로
+
+    관리자 게시판 작성할때처럼
+    사용자가 올린 서류들이 보이게하고, 삭제버튼 누르면 db에서 del_yn으로 삭제되도록 만들어야함
+
+    하나로 통일 시키기 
+    
+    파일명 받아오고 옆에 파일선택만 추가하기
+
+    파일선택해서 수정이 되었다면 해당 연번의 atchfile을 del_yn = y 처리하고
+    새로 추가한 첨부파일을 insert시키기
+
+    여러개일때도 마찬가지 
+
+    내일 와서 수정한거 올리고 과장님께 검사받기
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월10일
+
+    프로젝트 관리 > 위도 경도 작업 수정 및 보완할 것
+    1. 마커 클릭시 나오는 위도, 경도 값 없애기
+    2. 위도/경도 저장버튼 오른쪽으로
+    3. 밑에 여백 지우기
+    4. 마커 클릭안하고(위도경도 값 안받고) 저장버튼 눌렀을때 alert같은걸로 알려주기 (위도경도 선택)
+    5. 위치선택 버튼 옆에 좌표삭제 버튼 만들어주기 (위도경도 값 없애기)
+
+    
+    FEZ
+    -문제1. insert에는 첨부파일 잘 들어가지만, 업데이트할때는 첨부파일 반영이 안된다.
+    -> insert때 처럼 param값을 줘도 업데이트가 안됨
+    -문제2. 이 때문에 첨부파일을 수정하고나서 fez update를 돌리면 삭제한 첨부파일이 그대로 남아있어서 db문제 발생했다고 뜸
+
+    
+    첫 insert를 하고나서 첨부파일에 변동이 없다면 (del_yn = Y 가 아니라면) 첨부파일 받는데는 오류가 발생하지않지만,
+    첨부파일을 수정 (즉, 삭제하고 다시 넣었을경우) 했다면 바뀐 param값으로 바껴야하는데 바뀌지 않아서 삭제한 첨부파일이 그대로 남아 오류가 발생한다.
+
+     //추가된 첨부파일이 존재 할 경우
+    if(atchList != null) {
+	for(AtchFileVO vo : atchList) {
+		//유효성 체크 > 다운로드 key 체크
+			String key = FuncFile.getFileDownloadKey(vo.getInpt_dt());
+			
+//			param += "&" + URLEncoder.encode("fileUrl"     ,"UTF-8") + "=" + URLEncoder.encode("https://www.ifez.go.kr/other/attach/process.file.do?TP=dn&sn="+vo.getAtch_file_sn()+"&key="+key+"", "UTF-8"); /*파일url */
+			param += "&" + URLEncoder.encode("fileUrl"     ,"UTF-8") + "=" + URLEncoder.encode("https://e.pentachord.com:58102/other/attach/process.file.do?TP=dn&sn="+vo.getAtch_file_sn()+"&key="+key+"", "UTF-8"); /*파일url */
+//			param += "&" + URLEncoder.encode("fileUrl"     ,"UTF-8") + "=" + URLEncoder.encode("https://www.ifez.go.kr/other/attach/process.file.do?TP=dn&sn=76083&key=2400CE4E85878AC", "UTF-8"); /*파일url */
+			param += "&" + URLEncoder.encode("fileNm"      ,"UTF-8") + "=" + URLEncoder.encode(vo.getFile_orgnl_nm(), "UTF-8"); /*파일명 */
+	}
+    }
+    해당 param>>ServiceKey=SWyE%2BCAhy0I3ZtNQ%2Fx1yATjZz9p980b8vaRdp1iLgHs%3D&bbsId=5&nttId=66861&subject=%EC%82%AC%EC%97%85%EC%88%98%ED%96%89%EB%8A%A5%EB%A0%A5%ED%8F%89%EA%B0%80%EC%84%9C+%EC%A0%9C%EC%B6%9C%28%EC%86%A1%EB%8F%84%EA%B5%AD%EC%A0%9C%EB%8F%84%EC%8B%9C+%EC%9B%8C%ED%84%B0%ED%94%84%EB%9F%B0%ED%8A%B8+2%EB%8B%A8%EA%B3%84+%EA%B8%B0%EB%B3%B8%EA%B5%AC%EC%83%81+%EB%B0%8F+%EA%B0%9C%EB%B0%9C%EA%B3%84%ED%9A%8D%28%EB%B3%80%EA%B2%BD%29%EC%88%98%EB%A6%BD+%EC%9A%A9%EC%97%AD%29+%EA%B4%80%EB%A0%A8+%EC%96%91%EC%8B%9D+%EC%88%98%EC%A0%953&content=%3Cp%3E%3Cspan+style%3D%22font-family%3A+%EB%8F%8B%EC%9B%80%2C+Dotum%2C+sans-serif%3B+font-size%3A+11pt%3B+background-color%3A+rgb%28244%2C+248%2C+253%29%3B%22%3E%EC%9E%85%EC%B0%B0%EA%B3%B5%EA%B3%A0%EB%B2%88%ED%98%B8+20230245423-00%282023.02.28%29%3Cstrong%3E%26nbsp%3B%27%EC%82%AC%EC%97%85%EC%88%98%ED%96%89%EB%8A%A5%EB%A0%A5%ED%8F%89%EA%B0%80%EC%84%9C+%EC%A0%9C%EC%B6%9C%28%EC%86%A1%EB%8F%84%EA%B5%AD%EC%A0%9C%EB%8F%84%EC%8B%9C+%EC%9B%8C%ED%84%B0%ED%94%84%EB%9F%B0%ED%8A%B8+2%EB%8B%A8%EA%B3%84+%EA%B8%B0%EB%B3%B8%EA%B5%AC%EC%83%81+%EB%B0%8F+%EA%B0%9C%EB%B0%9C%EA%B3%84%ED%9A%8D%28%EB%B3%80%EA%B2%BD%29%EC%88%98%EB%A6%BD+%EC%9A%A9%EC%97%AD%29%27%3C%2Fstrong%3E%EA%B3%BC%3Cstrong%3E%26nbsp%3B%3C%2Fstrong%3E%EA%B4%80%EB%A0%A8%ED%95%98%EC%97%AC%3C%2Fspan%3E%3C%2Fp%3E%0D%0A%3Cp%3E%3Cbr+%2F%3E%3C%2Fp%3E%0D%0A%3Cp%3E%3Cspan+style%3D%22font-size%3A+11pt%3B%22%3E%26nbsp%3B%28%EB%B6%99%EC%9E%843%29%EC%82%AC%EC%97%85%EC%88%98%ED%96%89%EB%8A%A5%EB%A0%A5+%ED%8F%89%EA%B0%80%EA%B8%B0%EC%A4%80+%EB%B0%8F+%EC%9E%91%EC%84%B1%EC%9A%94%EB%A0%B9%28%EC%88%98%EC%A0%95+%EB%B0%98%EC%98%81%29%26nbsp%3B%EC%A4%91+%26lt%3B%EC%96%91%EC%8B%9D5%26gt%3B%2C%26lt%3B%EC%96%91%EC%8B%9D11%26gt%3B%2C+%26lt%3B%EC%96%91%EC%8B%9D16%26gt%3B%EC%97%90+%EB%8C%80%ED%95%B4+%EB%B6%99%EC%9E%84%EA%B3%BC+%EA%B0%99%EC%9D%B4+%EC%88%98%EC%A0%95%EC%82%AC%ED%95%AD%EC%9D%B4+%EC%9E%88%EC%96%B4+%EC%95%8C%EB%A0%A4%EB%93%9C%EB%A6%AC%EC%98%A4%EB%8B%88+%EC%82%AC%EC%97%85%EC%88%98%ED%96%89%EB%8A%A5%EB%A0%A5%ED%8F%89%EA%B0%80%EC%84%9C+%EC%A0%9C%EC%B6%9C%EC%8B%9C+%EC%B0%B8%EA%B3%A0%ED%95%98%EC%8B%9C%EA%B8%B8%26nbsp%3B%EB%B0%94%EB%9E%8D%EB%8B%88%EB%8B%A4.%3C%2Fspan%3E%3C%2Fp%3E%0D%0A%3Cp%3E%3Cspan+style%3D%22font-size%3A+11pt%3B%22%3E%3Cbr+%2F%3E%3C%2Fspan%3E%3C%2Fp%3E%0D%0A%3Cp%3E%3Cspan+style%3D%22font-size%3A+11pt%3B%22%3E%26nbsp%3B%3Cspan+style%3D%22font-size%3A+12pt%3B%22%3E%26nbsp%3B-%26nbsp%3B%3C%2Fspan%3E%3Cspan+style%3D%22font-size%3A+12pt%3B%22%3E%26lt%3B%EC%96%91%EC%8B%9D+5%26gt%3B+%EC%84%A4%EA%B3%84+%EB%93%B1+%EC%9A%A9%EC%97%AD%EC%97%85%EC%9E%90+%EC%82%AC%EC%97%85%EC%88%98%ED%96%89%EB%8A%A5%EB%A0%A5+%EC%9E%90%EA%B8%B0%ED%8F%89%EA%B0%80%EC%84%9C%2837%EC%AA%BD%7E39%EC%AA%BD%29%3C%2Fspan%3E%3C%2Fspan%3E%3C%2Fp%3E%0D%0A%3Cp%3E%3Cspan+style%3D%22font-size%3A+12pt%3B%22%3E%26nbsp%3B%26nbsp%3B%3C%2Fspan%3E%3Cspan+style%3D%22font-size%3A+12pt%3B%22%3E-%26nbsp%3B%3C%2Fspan%3E%3Cspan+style%3D%22font-size%3A+12pt%3B%22%3E%26lt%3B%EC%96%91%EC%8B%9D+11%26gt%3B+%EC%98%81%EC%97%85%EC%A0%95%EC%A7%80%26nbsp%3B%EB%93%B1%28%26nbsp%3B49%EC%AA%BD%29%3C%2Fspan%3E%3C%2Fp%3E%0D%0A%3Cp%3E%3Cspan+style%3D%22font-size%3A+12pt%3B%22%3E%26nbsp%3B+-+%26lt%3B%EC%96%91%EC%8B%9D+16%26gt%3B+%EA%B0%80%EC%A0%90%2857%EC%AA%BD%29%3C%2Fspan%3E%3C%2Fp%3E%0D%0A%3Cp%3E%3Cspan+style%3D%22font-size%3A+12pt%3B%22%3E%26nbsp%3B%3C%2Fspan%3E%3C%2Fp%3E%0D%0A%3Cp+class%3D%220%22+style%3D%22line-height%3A+26.6667px%3B+text-align%3A+center%3B%22%3E%26nbsp%3B%3Cspan+style%3D%22font-size%3A+20pt%3B+background-color%3A+rgb%28207%2C+226%2C+243%29%3B%22%3E%3Ca+href%3D%22https%3A%2F%2Fwww.ifez.go.kr%2Fpromote%2Fmain.do%22+target%3D%22_blank%22%3E%3Cimg+title%3D%22%22+alt%3D%22%22+src%3D%22https%3A%2F%2Fwww.ifez.go.kr%3A8082%2Feditor%2Fimages%2F000004%2F20230227153344119_JEJ2T60G.png%22+style%3D%22border%3A+0px+solid+rgb%280%2C+0%2C+0%29%3B+vertical-align%3A+baseline%3B%22+%2F%3E%3C%2Fa%3E%3C%2Fspan%3E%3C%2Fp%3E%0D%0A%3Cdiv%3E%3Cbr+%2F%3E%3C%2Fdiv%3E&bbsId=5&fileUrl=+https%3A%2F%2Fwww.ifez.go.kr%2Fother%2Fattach%2Fprocess.file.do%3FTP%3Ddn%26sn%3D42745%26key%3D6318F03778FE637&fileNm=001+%281%29.JPG
+    
+    위 insert때 사용한 방식대로 param값을 줘봤지만 안됨.
+
+
+    -> fez update api에는 첨부파일 업데이트 기능이 없다고 함 (오피셜 왈)
+    -> 때문에 해당문제는 고려하지않고 진행하는걸로
+
+
+    첨부파일 2개이상도 잘 들어감
+
+
+    -> getsitedomain으로 바꾼 url로 테스트해보기
+
+    -이미지-
+    http://192.168.1.53:8080/commissioner/pst/process.file.do?TP=img&pst_id=mayor_photo&pst_sn=193228"
+    http://192.168.1.53:8080/other/attach/process.file.do?TP=img&sn=42748&key=32F925484532E50
+
+    -첨부파일
+    javascript:fn_egov_downFile('FILE_000000000004083','0','http://192.168.1.53:8080/other/attach/process.file.do?TP=dn&sn=42749&key=6E20798F2EF241E%27)
+    javascript:fn_egov_downFile('FILE_000000000004083','1','http://192.168.1.53:8080/other/attach/process.file.do?TP=dn&sn=42726&key=36395E7BA214606%27)
+
+
+    https://dev.ifez.go.kr:8082/editor/images/000004/20230215143135424_J4U6P4H0.jpg
+    나모에디터 이미지는 자동으로 domain이 붙어나가서 따로 수정할 필요 없어보임
+
+
+    인디고 
+    1. 사용자가 보완요청 완료했다면 상태를 다시 신청접수로 바꾸기
+    -> 수정 처리 메서드에 setaply_stts_se(enum.accept); 해서 처리함
+    2. 보완요청 창 절반으로 변경하기
+    -> css에 새로 추가해서 진행했음.
+
+    fezapi 속도측정
+    한 건 기준 0.2769606
+    두 건 기준 0.4519934
+    세 건 기준 0.8038584
+
+    건 당 평균 0.2679528
+
+    스케줄러 테스트
+    페이스북 피드 수집 스케줄러는 잘되는데
+    왜 fez연동건은 오류가 발생하는가
+
+    팀장님 왈
+    -> 1시간마다 하는데 갑자기 서버가 잠깐 멈추거나해서 그 시간동안 못올라간 게시물들은 어떻게하는가?
+    -> 방법 : 스케줄러를 두 개 만든다.
+    -> 새벽 3시? 쯤에 하루전게시물을 모두 update/insert/delete 시켜주는 스케줄러 하나
+    -> 하나는  매 시간마다 작동하는 스케줄러 하나
+
+
+    로컬에서 스케줄러 테스트중인데 오류가 발생함
+    java.lang.NoClassDefFoundError: Could not initialize class com.pentachord.util.func.FuncFez
+
+    FuncFez클래스를 사용하는 부분전까지는 잘 돌다가 해당부분에 멈추고 해당 클래스가 사용되는 부분에서 에러가 발생
+    https://nhj12311.tistory.com/84 
+
+    다음주 와서 과장님께 해당 오류 여쭤보기
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월13일
+    스케줄러 오류 원인 찾기
+
+    로컬에서 스케줄러 테스트중인데 오류가 발생함
+    java.lang.NoClassDefFoundError: Could not initialize class com.pentachord.util.func.FuncFez
+
+    FuncFez클래스를 사용하는 부분전까지는 잘 돌다가 해당부분에 멈추고 해당 클래스가 사용되는 부분에서 에러가 발생
+    https://nhj12311.tistory.com/84 
+
+    clean돌리고 해도 똑같음
+
+    D:\workspace_ifez\ifez\cms-core\target\classes\com\pentachord\util\func
+    경로 클래스파일 삭제하고 재컴파일해도 똑같음
+    아예 FuncFez 삭제 후 새로 만들어도 똑같음
+
+    static String servicekey / domain 을 주석처리하고 하드코딩으로 기입하니 잘 작동함
+
+    해당부분이 request 때문에 오류난거같은데 뺴고 하드코딩으로 걍 하기
+    근데 내가 수동으로하면 pst 업데이트문이 돌아가는데 스케줄러가 돌면 update가 돌지 않음
+
+    delete -> insert
+
+    java.lang.IllegalStateException: No thread-bound request found: Are you referring to request attributes outside of an actual web request, or processing a request outside of the originally receiving thread? If you are actually operating within a web request and still receive this message, your code is probably running outside of DispatcherServlet: In this case, use RequestContextListener or RequestContextFilter to expose the current request.
+    No thread-bound request found: Are you referring to request attributes outside of an actual web request, or processing a request outside of the originally receiving thread? If you are actually operating within a web request and still receive this message, your code is probably running outside of DispatcherServlet: In this case, use RequestContextListener or RequestContextFilter to expose the current request.
+
+     "스케줄러에 의해 동작하는 요청은 request에서 필요한 정보를 가져올 수 없다." 
+
+    pstService.update seriviceImpl에 getUpdteValue나 getRemoteAddr 메소드가 있기때문에
+    결국 이 메소드또한 request를 요청한다는 것을 알 수 있음
+
+    -> 원래 있던 update를 사용하지않고, update_fez라는 메소드를 새로 만들어서 외부게시물번호만 업데이트되도록 변경함
+
+    마지막 테스트
+    새소식, 고시공고, 포토뉴스, 보도자료, 영문포토자료에 게시물 하나씩 추가한다음에
+    모두 잘 들어가는지 insert, update, delete 확인해보기
+
+    -> 이상없음
+
+    $$$$$$$$$$$$$$$$$$$$$$$중요#####################
+    1. 스케줄러에서 request 관련 기능 사용할려고 하면 오류 발생함 (IllegalStateException)
+    2. pstService.update에서 getipaddr 이란 메서드가 있는데 여기서 requst를 사용해서 발생한듯
+
+    로컬개발에서 스케줄러 실행막는 방법
+    AbstractBaseScheduler라는 클래스에서 isServerRunable이라는 메소드가있는데
+    해당 메서드에서는 property에 있는 sheduler.run.was_name과 web.xml에 있는 run.was.name이 있는데
+    두 개가 일치해야 스케줄러가 돌아가는 방식으로 되어있다.
+    그러므로 실행을 막을려면 properties에 있는 scheduler.run_was_name을 web.xml에 있는 값이랑 불일치하게 설정하면
+    다르므로 실행이 되지 않는다.
+
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월14일
+    1. 윈도우 프린트 스크립트 새창나오도록 기능 추가
+    -> 만화규장각 > 아카이브 > 만화 아카이브 > 청구기호 출력에 기능 추가
+    -> 출력창에서 프린트버튼 눌렀을때 하도록 만들었는데 맞는지는 모르겠음
+
+    2. 아카이브시스템 -> 웹진 -> 캐러셀 관리에서 수정기능이 없는데 수정기능 추가하기
+    -> 관리에 수정하기 버튼 추가
+    -> 해당 프로젝트는 모든지 ajax로 처리하도록 되어있는듯 (창이동이 없음)
+    -> mgntManfrmAction.do은 계속 유지되고 다른 메뉴를 클릭하면 ajax로만..
+
+    ->controller에 새로 메소드를 만들어야하는가 아니면 기존 메소드에 추가하는 방식으로...
+    ->캐러셀 재사용이 수정하기아닌가? 재사용은 기존걸 복사하는 방식으로 신규등록으로 봐야함
+    -> 그럼 그냥 수정하기 jsp를 만드는게 나을수도
+
+
+
+    3. 캐러셀 관리 상세, 등록, 수정부분에 첨부파일 용량부분 하드코딩 되어있는데 프로퍼티에서 가져와서 사용하도록 수정
+    String image_size =  fileUploadProperties.getProperty("WEBZINE.CAROUSEL.IMAGE.SIZE");
+    -> 캐러셀 재사용, 등록 부분에 properties값 받아와서 하는것 완료 (수정페이지에도 해야함)
+
+
+    로그인을해야 뭘하는데 CryptoUtil 클래스가 잡히질 않으니
+    debug as -> maven clean -> mmven install, clean 별거 다했더니 들어가지긴함
+
+
+    일단 xml에 쿼리 master랑 detail 업데이트 쿼리 만들었음
+    ajax도 대충 복붙해서 update로만 수정함
+    이제 사용자에서 눌렀을때 연결하도록 해야함
+
+    현재 신규/재사용부분 복붙해서가져와서그런지 저장하면 신규로 등록되는 문제 발생
+    자바스크립트 함수 새로 만들어서 수정에 진입하고 동작 확인
+
+    들어가는 항목은 잘 들어갔지만, UPDDE랑 where절에 CARUL_ID가 들어가질 않음
+
+    의심1. 등록에서 복붙해왔기때문에 id값을 받아오는 장치가 없음
+    -> 따로추가해줘야할듯 (input hidden?)
+
+    수정하는건 좋은데 추가했을경우 insert도 해야함
+
+    carul_id 받아오는건 어찌저찌 성공했는데 updde값을 못받아와서 null로 들어감
+
+    detail 수정하기 위해서는 1씩 증가하는 detail_id와 부모 게시물인 carul_id를 받아와야함
+
+    text들은 모두 잘 수정됨
+
+    이미지는 어림도 없음 수정이안되고, div를 삭제하면 모든이미지를 등록하라고 뜸
+    캐로셀 추가하면 쿼리는 동작하는데 update가아니라 insert로 동작해야함
+    때문에 분기의 핵심이되는 변수를 가지고 분기해서 insert처리해줘야할듯
+    
+    동적태그 추가부분에 input hidden 넣어봤는데 안됨
+
+    삭제 후 새로 너을 수 있게?
+
+    방법1. 삭제버튼 누르고 나서 이미지 등록 (ajax) - 안됨
+
+    방법2. 기존 들어있는 상태에서 이미지 등록하면 기존건 삭제되고 새로 들어온것이 insert
+
+    둘다 삭제하기위해서는 carul_id와 carul_detail_id를 받아와야함
+
+    수정화면에서 캐로셀 추가 버튼 누르고 이미지 수정하면 잘됨 
+    이 현상을 이용해야한다
+
+    --> 자바스크립트 순서떄문에 안먹혔던것 
+    document.ready 마지막부분에
+    var fileNum = $('.file_upload').length/2;
+    fnInit(fileNum);
+    해주면 잘먹음
+
+    남은거 삭제...
+
+    div삭제 누르면 삭제되고, 그 순서를 다른 div가 메꿔야함
+    ex) 2개가 있는데 첫번째꺼를 삭제하면 두번째껀 번호가 첫번째꺼로 바껴야함
+    -> 두번째꺼가 자동으로 첫번째껄로 업데이트됨
+    -> 즉 삭제한부분만 삭제처리를 먼저해준다면 두번째...
+    -> 삭제를 먼저하면 업데이트를 못하는데?
+    -> 그러면 업데이트 후 해당 detail_id 번호 + 1한 테이블을 del_yn Y로 바꿔주면되지않을까
+
+    체크박스로 list받아서 삭제한것처럼 detail_id도 list로 받아서 삭제하는 쿼리를 만들면 되지않을까?
+
+    수정 캐러셀 추가
+    -> param에 특정한 값을넣어서 처리해야할것같은데..
+    branch_value로 값 받아오는것까지성공했는데 
+    branch_value_1 처럼 숫자로 해야할듯 안그러면 모두 값이 들어가버림
+
+MgntCarouselService_deleteCarouselDetailList
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월15일
+    branch_value 뒤에 숫자를 붙여서 보냈는데
+    첫번째껀안들어가고 두 세번째껀 들어감 먼가 한칸씩 밀린 느낌
+    
+    N, Y 까지만 들어감 처음꺼 N이 없음
+    애드캐러셀 2개 추가했더니 N, Y, Y가 넘어감
+    console.log에서는 제대로 4개가 찍힘
+
+    i%2==1 일때만 push가 있고, push가있기전까지 branch_value값을 넣어도 의미가없다
+    위에 조건에 해당할때만 들어가기때문에..
+
+    ㅡ캐러셀 추가 해결ㅡ
+    imgObj.branch_value = $('input[name=branch_value_'+(i-idx)+']').val();
+    이렇게하면 잘 들어감!
+
+    이제 삭제만하면된다.
+
+    문제점
+    1. db에 detail_id가 1,2,3,4로 차례대로 들어가있기 때문에 삭제하고나면 번호를 하나씩 업데이트 해줘야함
+    2. 업데이트를 1,2,3,4 업데이트 하기때문에 중간에 DELETE_YN값이 Y인값도 업데이트해버림
+    3. 그렇다고 드랍을할순없을듯
+    4. 1,2번째항목 삭제 -> 3,4번째가 1,2번째 항목으로 업데이트 -> 하지만 업데이트된 1,2번째항목의 delete_yn이 y임
+    5. 그러면  1,2번째항목 다시 delete_yn = n으로 바꾸고 3,4번째 항목은 delete_yn으로 바꿔야함
+    6. 근데 이러면 나중에 캐러셀 추가하면 3번째로 들어가야하는데 3번엔 삭제된파일이 자리하고있음
+    
+    방법1. delete from절로 삭제시키기
+    방법2. delete_yn을 y로변경하고 detail_id를 -1이나 999같은 사용자가 사용시 들어올 수 없는 숫자로 만들기
+    -> not null이라 null은 안될듯
+
+    방법2로 해보기
+    삭제하면 vo의 carulDetailIdArr에 배열로 넣어서 저장후,
+    쿼리에서 foreach를 돌며 해당값들 삭제 처리하기
+
+    그러면 1,2번째 삭제 -> 삭제쿼리 진행 -> detail_id = 999 delete_yn = "Y" -> 3,4항목 1,2번째로 업데이트를 
+    해야하는데 없는숫자임.
+
+    1,2번 삭제 -> 3,4항목 1,2번째로 업데이트 -> 3,4,항목 삭제처리
+    1,2번째를 삭제했는데 나머지 항목을 db에서 삭제처리 하는 방법>?
+
+    6개가 있음
+    1,2,3,4,5,6
+    여기서 1,3,5 번째 항목 삭제
+    그러면 2,4,6번째항목이 1,2,3번째로 update됨
+    나머지 항목은 모두 삭제처리하면 해결
+
+    fileNum개수를 받으면 3개니깐 해당 숫자보다 크다면 삭제처리되도록??
+
+    순서
+    update처리 -> delete처리
+
+    div 삭제 -> fileNum은 2개가됨 -> 2개에 대해서 update하여 1번,2번 필드에 저장 
+    -> 받아온 select로 해당 캐로셀의 detail 갯수를 count로 받아오고 if문으로
+    -> count > detail면 -> deleteDetailMulti 쿼리문 실행(fileNum 전달)
+    -> update
+		tb_wz_carul_detail 
+	set
+		carul_detail_id = -1,
+		DELETE_YN  = 'Y',
+		UPDUSR_ID = #{UPDUSR_ID},
+		UPDDE = NOW()
+	where
+		carul_detail_id > #{fileNum};
+
+    문제 > primary key값이라 중복되면 안됨..
+    그렇다고 delete_yn만 처리하면 다음에 insert수정할때 select max()라서 상관없나?그러면 이렇게걍해보자
+
+    문제>carousel에 붙여논 branch_value값이 div를 삭제했을때도 branch_value_3,4,5...이렇게 진행하기때문에
+    fnsetParma에서 값을 찾지 못하는 문제 발생
+
+    삭제 확인됨
+
+    마지막으로
+    문제>carousel에 붙여논 branch_value값이 div를 삭제했을때도 branch_value_3,4,5...이렇게 진행하기때문에
+    fnsetParma에서 값을 찾지 못하는 문제 발생
+    이것만 해결하면 완성!
+
+    해결방법1 : 임의의 count변수를 만들어 지운 횟수만큼을 fnsetparam 함수에 전달해주기
+    그러면 전달한값만큼 branc_value
+    console.log($('input[name=branch_value_'+(i-idx+count)+']').val());
+    해주면 딱 맞지않을까? 삭제안햇으면 0이므로 이상없고 
+    삭제했다면 그만큼 더해주면 name태그가 일치할테니...
+    -> 문제 중간 li를 삭제했을경우 잘 작동하지만, 끝에있는걸 삭제하면 count +1이 들어가서 괜한 숫자값을 받아올려함
+    -> 마지막임을 알아낼 수 있는 변수가 필요함
+    -> 기존데이터들 뿌려주는 함수에 html += '	<input type="hidden" name="last_index_' + cnt + '" value="Y" >';
+    추가해보았는데 어차피 삭제누르면 삭제되는 부분이라 안넘어감 ㅡㅡ
+
+    타업체에서 짠 코드에서 fileNum이 10까지만 증가되더라. 그럼 막아놔야지ㅡㅡ
+
+    답이없다
+
+    새로운방법
+    지웠을때 branch_value를 갱신...
+    이미 문서시작될때 다 만들어놓았는데 멀..
+    
+    중간껄 삭제하면
+    1, 3, 4 이렇게 남는데
+    내가만든 코드를 돌리면 1,2,3 이렇게 돌게됨
+    
+    방법1
+    fnsetparam메솓에서 지운것을 판단해서 1,3,4를 가져온다.
+    방법2 xxx
+    webzineCarouselUpdt.jsp에서 삭제하면 현재있는 것을 지우고 1,2,3으로 만들어버린다. 
+    li를 모두 지우고 fnMakeSingleCarousel를 다시 세팅하는 것도 생각했는데 어차피 또 4개로 원상복귀시켜버릴테니..
+
+    지운 branch_value 뒤에 붙은 번호들을 삭제버튼을 눌렀을때 배열에 넣은뒤 전달해주기
+
+    전달한 배열값을 토대로
+
+    1  2  3  4 
+
+    에서 2 와 3 을 삭제했다면
+
+    setparma에서는
+    1 과 4의 값을 받아야함
+
+    1  2  3  4
+
+    에서 1과 3을 삭제했다면
+
+    2와 4의 값을 받아야함
+
+    하지만 무조건 3,4값을 받아오는중
+
+    기존데이터 생성 함수에 
+    배열 push 코드를 넣어서 cnt
+
+    [1,2,3,4]이렇게 넣도록 동작시켜보기
+
+    그리고 해당 배열을 fnsetparam에 보내기
+
+    그리고 또다른배열 삭제버튼을 누른 해당 div의 번호를 받아와서 배열에 저장
+    [2,3]
+
+    fnsetparam에서 
+    1,2,3,4 반복문을 돌게하고
+    그안에또 2,3반복문으 돌아서 
+    일치한다면 imgObj.branch_value = $('input[name=branch_value_'+(i-idx+count)+']').val(); 생략
+    불일치라면 실행하도록 만들어보기
+
+    문제 이미 반복문 안에서 작동하기때문에 3중 반복문이 되버리고 값이 잘안들어 갈것
+
+    삭제할때 fileNum보다 크면 삭제해도록했는데 
+    삭제후 다시 insert 하고나면 1,2,3,8,9,10이렇게 진행되기때문에
+    다음에 fileNum이용해서 삭제한다면, fileNum은 2라고하면 detail_id > 2가 되버리니
+    모두 큰 숫자는 모두 지워버리는 사태가 발생한다.
+
+    문제1.
+    delete시키지 않는이상 삭제후 insert하고 나서 다시 삭제하면 fileNum이후 데이터들이 싹 날라감
+    문제2.
+    중간번호를 삭제할경우 branch_value값이 맞지 않아서 update, insert실행이 안됨
+
+    문제 -> insert후에 바로 아래서 삭제가 되어버림.
+    -> 3번째항목이 원래 삭제되어야하는데 삭제가 안됨
+
+    내일 할 작업
+    delete_count 받아와서 쿼리돌려보기
+    내가생각하기엔 String으로 변환 뭐 잘못되서 null로 넘어오는거 아닐까??
+    
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월16일
+
+    위도경도 기능 추가 작업 완료해서 깃에 올림
+
+    반영파일 정리해서 보내기
+    export -> war file로 하고
+    압축풀고나서 내가한 작업들만 추려서 보내드리기
+
+    캐러셀 검수
+    문제1. 기존에 db에 있던 데이터들이 문제가 있음
+    -> insert를 하면 맨위에께 삭제됨
+    -> 2개인데 편성수가 3개로 나옴
+
+    -> 내가 쿼리 테스트하다 잘못해서 carul_detail_id가 1인 부분에 모두 넣어버려서 생긴 문제
+    -> 기존 데이터 첫번째 항목에 모두 update되어버린듯
+
+    FEZ관련 api 팀장님이 말씀해주신다고함
+    - 아무래도 게시예정 글이 먼저 올라가서 그런것 같음
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월17일
+    imgObj.branch_value = $(fileList[i]).parent().find('input:eq(1)').val();
+    다음부턴 반복되는 코드에서 특정값을 받아올려면 parent.find.val 자주 이용하자.
+    아래에 있으면 children()
+
+
+    고시공고 api 관련 작업 (fez 아님) -> 보류
+    인천시청의 고시공고 항목처럼 표출하고 싶되, 경제자유구역청 게시물만 추출해서 보여주고 싶다.
+
+    IFEZ
+    - 첨부파일 수정 필요 (html인데 담장자가 수정 가능하도록 해달라나..)
+    -> 관리자 > 첨부파일 관리에서 작성후 나온 첨부파일 주소를 이용하여 html에 삽입하여 이용하는 방식으로함
+    -> 이걸 관리자가에서 수정할려면 html을 program으로 바꾸거나,
+    -> 아니면 첨부파일 이미지명을 첨부파일 관리에서 검색하여 해당 첨부파일을 수정하여 나온 링크를 html에 적용시키는 방식으로 해야함
+
+    공부해야할것
+    파일업로드 관련 공부
+    제이쿼리 함수 공부
+    구동 원리 공부
+
+    제이쿼리 사용자 정의 메소드
+    $.fn.메소드명
+    ex) $.fn.fnPopupFileUpload = function(option){} 
+    -> 문제 : jQuery 에서 사용하는 $변수는 다른 라이브러리들도 많이 사용한다. 그래서 변수가 충돌하여 동작을 하지 않을
+    가능성이 항상 있다. 우리가 만드는 플로그인이 이러한 충돌을 피할 수 있도록 즉시 호출 함수 표현을 사용하여 감싸 준다.
+    (function($) { 
+	$.fn.fnPopupFileUpload = function(option){} 
+    }
+    (function($) {}) 랑 $(function() {}) 랑 같은 기능을 하는 것 같음
+
+    $.extend(target, [object1], [objectN])
+    해당 함수는 복수의 오브젝트를 합쳐서 되돌려 주는 함수이다. 
+
+
+    ifez 기능 추가 업무 
+    관리자 -> 회원관리 메뉴에서 첫번째 항목에대한 권한을 가지고 있는 회원의 리스트(팝업창으로)를 보여주는 기능 추가하기
+    일단 필수로 번호, 아이디, 이름 정도가 나오도록 하면되고 더 나오게 가능하다면 넣으면되고
+
+    authrt_id = mbr_sn 같다!!!
+
+
+    SELECT A.* FROM ( SELECT mng_menu_authrt_sn , mng_menu_dtl_sn , authrt_se , authrt_id , del_yn , inpt_mbr_id , inpt_dt , updt_mbr_id , updt_dt 
+    FROM tc_mng_menu_authrt WHERE mng_menu_dtl_sn = '1' AND authrt_se = 'PRIVATE' ORDER BY mng_menu_authrt_sn ASC ) A
+
+    위의 값 통해서 authrt_id 가져오고 where절에 추가조건으로 각 항목의 첫번째 mng_menu_dtl_sn을 줘서 
+    쿼리 join일하던 뭘하던  authrt_id = mbr_sn 조진다음에 mbr_nm 이랑 아이디 나오도록하기
+
+    위처럼 돌려야 해당 메뉴 권한 sn에 대해서 회원목록이 나오게됨
+    나온 목록의 authrt_id를 뽑아서 mbr_sn을 반복하면서
+    같다면 따로 vo에 저장시킨후 list에 add하기
+    그리고 화면에 뿌리기 
+
+    쿼리수정안하고 진행하고있는데 검색이랑 페이징 부분에서 막힌다..
+    걍 join쿼리 하나 만들어서 진행해야겠다
+    
+    끝나고 일이 끊켯다면 php 공부하기 
+
+
+    다음주에 와서 쿼리만들어서 진행하기...
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월20일
+    simplepagingbulder에서 파라미터 3개받는 함수 사용해서하면 새로 파일 안만들고 해도 될듯
+
+    그룹회원 > 권한회원조회 기능 완료 
+    -> 쿼리로 만들억서 진행함
+
+    권한회원목록 기능 그룹도 나오도록 기능 수정해야할듯 (아무것도 안나옴)
+    
+    지금 만든건 개인권한만 나오도록 해놈
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월21일
+    그룹권한 + 개인권한 모두 나와야함 
+    그룹 정보 나온는곳 tc_mng_grp_dtl
+    회원이름,로그인 나오는곳 tc_mbr
+    개인권한 나오는곳 tc_mng_menu_authrt
+
+    그룹권한에서 등록하면 authrt_id에는 grp_dtl테이블으 mng_grp_sn값이 들어감
+    mng_grp_sn = authrt_id
+
+    하지만 개인권한에서 등록하면 authrt_id에는 mbr_sn값이 그대로 들어감
+    mng_dtl_sn번호도 그룹에에서 할때랑 개인에서 할때랑 틀림
+
+    그냥 mng_menu_dtl_sn = #{sn} and del_yn = 'N'인거 다 가져오면 되는거아닌
+
+    문제.
+    개인이랑 그룹이랑 authrt_id나오는게 달르기때문에
+    join on에서 공통으로 들어가는 값이 맞지 않음
+    때문에 mbr테이블에서 값을가져올려면 grp_dtl테이블에서 mbr_sn값을 가져와야할듯
+
+    &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&중요&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    Indigo수정사항
+    산학에서 연구공모과제 rns?인가 가져오는걸 ajax방식으로 가져오자 (문서업로드 끝나면 실행되도록)
+    내가 한 방식대로 하면 외부 기능이 동작을안하면 메인페이지 자체가 먹통이되어버리기때문에..
+    -> 때문에 앞으로 외부 api나 rss같은걸 메인에다 쓸경우 문서 로딩이 끝나고 실행되도록 ajax로 처리하자
+
+    + 동적태그 함수 파라미터 오류시 따옴표 문제
+    html += "		<a href='javascript:;' onclick='openPopupWindow(\""+item.link+"\");' >";
+    이렇게 사용하면 됨
+
+    순서
+    authrt 랑 grp_dtl 조인 하면 그룹권한 값이 나옴
+    여기에 추가로 tc_mbr 조인하면 값은나오지만 개인권한 값이 나오진 않음
+
+    만화규장각
+    소장자료연구 쪽은 내가할듯
+    사용자에서 첨부파일 보여지는건 모두 문서뷰어로 보여야함
+    ex)https://www.kmas.or.kr/webzine/exhibit/2023010003
+
+    수서/대출 > 개인정보 접근이력은
+    보존실 만화 열람 관리의 상세페이지에 들어갈때 기록이 추가되는듯 (해당 페이지만!)
+
+
+    Z:\펜타코드\202211_웹툰아카이브 통합시스템 고도화 및 유지보수 용역\02.설계\웹툰아카이브_소장품,구술채록,소장자료연구집 페이지 추가_Ver0.3
+    웹툰아카이브_도서관보존실온라인열람신청_Ver0.3
+
+    보존실은 4월14일까지 구슬채록은 4월 21일까지
+
+    로컬에서 로그인이 안되더라
+    http://192.168.1.53:8082/mgnt/manfrm/mgntManfrmAction.do
+
+    아카이브 > 웹진 > 게시판
+    카드뉴스 위에 순서에 소장자료 연구탭 추가하면 됨
+
+    http://192.168.1.53:8082/mgnt/manfrm/mgntManfrmAction.do
+
+    아카이브 게시판 생성
+    시스템관리 > 관리자료 > 시스템 메뉴 > 프로그램 URL에서 bbsId파라미터값은 임의로 만드는건가
+
+    
+    소장자료 연구 템플릿이 없기때문에 내가 새로 만들어야함
+    (사용자화면)
+    -> 근데 거의 똑같던데 기존 faq 템플릿 복사해서 추가된 기능만 만들어주면 될 듯
+    -> 1. 사용자 집필진 부분 + - 기능
+      해당 연구으 대표자만 위 + - 기능을 사용할 수 있도록 구현해야함
+      (사용자 화면이고 저장기능이 있는것도 아닌데 왜 굳이? )
+    -> 2. 에디터 2개임
+       하나는 목차, 하나는 컨텐츠부분
+       기존에 좋아요 및 sns기능 버튼들을 목차 옆에 나올 수 있도록 만들어야함
+    -> 3. 검색부분은 다른 게시물과 마찬가지로 전체검색인듯
+    -> 4. 무조건 첨부파일이 있다면 뷰어보기 버튼이 나와야하고 문서뷰어가 작동해야함 (기존코드 참고)
+    -> 5. 설계서에 40건인데 5페이지면 한 페이지당 8개의 컨텐츠가 나와야 하는듯
+
+
+    (관리자화면)
+    -> 제목을 명칭으로
+    -> 집필진, 발행일, 목차 추가해야함
+    -> 집필진은 이름, 이름, 이름 형식으로 컴마를 찍어서 구분해야함
+       가장 첫 번째 에 있는 이름이 사용자에서 대표자로 노출됨 
+       사용자에서 대표자 구분 방법은 해당 게시물 id에서 가장 첫번째 이름을 받아오면 될지도?
+    -> 발행일 설계서에는 그냥 input박스뿐인데
+       입력형식이 어떻게되는지 물어봐야할듯 (아니면 이것도 캘린더로 하던가?)
+    -> 설계서에는 board형식인데 tb_wz_bbs_detail 테이블에는 집필진,발행일,목차 값이 들어갈 컬림이 존재하지 않음
+       여쭤봐서 테이블을 수정하는지 아니면 program으로 바꿔서 진행하는지 여쭤봐야 할듯
+    -> 개발서버에서도 crosseditor가 안되는데 등록이 안되있는건지??
+
+
+    웹진 > 게시판 관리에서 게시판 등록
+    여기서 나온 bbsID를 가지고 
+    
+    시스템 메뉴를 만들때 프로그램 URL에 넣어서 추가하면 아카이브 쪽에 메뉴가 생김
+
+    
+    아카이브 소장연구 연구집 url 및 view name
+    request uri = /mgnt/webzine/bbs/webzineNttList.do
+    view name = mgnt/webzine/bbs/webzineNttList
+  
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월22일
+    ajax 동기식 비동기식
+    옵션에 async 옵션이 있는데 동기식 비동기식 설정이다
+    동기식 : 요청 후 응답을 받아야지만 다음 동작이 이루어짐
+    비동기식 : 요청을 보낸 후 응답과는 상관없이 동작하는 방식
+    옵션에 async : false를 주게되면 응답을 받은 다음에 동작하기 때문에
+    해당 응답을 받기 전까지는 홈페이지가 동작하지 못한다. (ex. 이미지,css같은것도 응답 동작 후에 작동하게됨)
+    때문에 비동기식으로 해야 페이지가 동작하면서 병렬적으로 요청을 응답받아 처리하게된다.
+
+    동기식을 쓰는 예제
+    ->게시물을 작성하고 저장을 눌렀을때 로딩창을 띄우기 위해서는 async를 false로하여 동기식 처리를 해야한다.
+    ->비동기로 할경우 같이 실행되기때문에 로딩창이 나오지 않는다.
+    ->처리순서 저장버튼누름 -> ajax실행 -> async:false -> 서버에서 응답 요청이 오기전까진 계속 로딩창임
+    -> 요청이 오면 로딩창 사라지고 alert 저장완료 뜨게됨
+
+    원문시스템 임시 적용 올리신거 pull받으면 로그인에 오류가 생김
+    CryptoUtil클래스에서 문제가 생기거나 / session open failed 라는 오류가 발생한다.
+    java.lang.NoClassDefFoundError: Could not initialize class common.user.CryptoUtil
+    +
+    referenced libraries에 추가해서 진행도해봄
+    java build path > libraries > add jars -> 안됨
+
+    그전 커밋으로 초기화를 하면 아카이브에서만 로그인 오류가 발생
+    
+    만화규장각
+    게시물 게시판
+    TB_WZ_BBS_MASTR에서 BBS_TMPLAT_CD의 게시판 스킨 번호를 가지고 controller에서 
+    if(bbsInfo.get("bbsTmplatCd").toString().equals("5")) {
+	return "mgnt/webzine/bbs/webzineNttCardReg";
+    }
+    해당 번호로를 이용하여 return할 view페이지를 설정하는 방식인듯
+
+    스킨만드는 방법은??
+    시스템 관리 > 공통코드에서 게시판템플릿코드 그룹으로 가서 만들면되는데
+    카드뉴스 템플릿 5번이면서 저장이안되있다?? 그래서 일단 빼놓고 6번에다 설정함
+
+    따로 템플릿 공통코드만들어서 적용은 시킴
+    이제 집필진, 발행일, 목차의 input 태그 값들을 수정해줘야하는데
+    아직 해당 변수들이 나오지않았음, 그리고 db에 저장해야하는데 남는 컬럼이 없는걸로 알고있음
+    -> 다른테이블에 저장하는지 아니면 테이블에 컬럼을 추가하는지 여쭤봐야함
+    -> 다른테이블에하면 그건 program이 아닌가?
+
+    ERROR [common.viewer.web.DocumentViewerController] Cannot run program "/SynapDocViewer/sn3hcv/sn3hcv.exe": CreateProcess error=2, 지정된 파일을 찾을 수 없습니다
+    문서뷰어 컨트롤러 동작은 하나, 문서뷰어 프로그램을 찾을 수 없다고 뜨며 오류 발생
+    
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월23일
+    ifez 운영 반영 필요 (권한회원목록)
+
+    java.lang.UnsatisfiedLinkError: no pcjapi in java.library.path
+    java.lang.NoClassDefFoundError: Could not initialize class common.user.CryptoUtil
+
+    -> native library랑 web-inf/lib에 넣어보기도함 (petraciperAPI)
+    원문 시스템 임시 적용 pull받고나서 로그인에서 오류가 발생함
+    
+    해결 : 과장님이 SINSIWAY파일 보내주시고나서 
+    C:\Program Files\SINSIWAY\Petra\api 경로에 파일들을 풀었더니 작동하였음 (해당경로가 아니라면 모두 오류뜸)
+    +
+    java build path에 jar파일들 4개 넣으심
+
+
+    주요소장품 > 주요 소장품 노출 여부 부분은
+    저작권 해결 유무 기능처럼 참고해서 만들면 될듯하다.
+
+    주요소장품 실즉치 부분은 공통코드에서 추가해서 만드는게 좋을까?
+    사용자화면에서 나오는 부분은 주요 소장품 > 상세 > 크기 부분에서 mm이 있는데 여기서 쓰는듯
+
+    주요소장품 이미지 등록 1,2 는 사용자에서 이미지 2개가 나오는 화면에서 그대로 적용되는듯
+
+    주요소장품 이미지등록1, 2에서 fileupload/FileUploadServlet파일의 확장자부분에서 자꾸 걸려서 등록이 안됨
+    -> 확장자부분 주석 후 확인하니 이상없이는 동작하는데 왜이런지 원인을 찾아봐야할듯
+    -> 원인 : userExts 부분이 출력이 안되서 오류가 발생한것.
+    -> 기존에 있던 이미지 첨부파일은 첨부시 확장자가 나오는반면, 내가추가한건 해당확장자 목록이 나오지 않음
+    -> 보니깐 path를 기존꺼로 했을때는 잘 작동하지만 다른 임의의 path로 변경하면 동작하지 않음
+    -> 따로 해당 path에대한 사용자 확장자 설정을 해둔것 같음
+
+    #수장고유물 이미지 경로
+    #RELIC.HDCH.IMAGE.PATH = /repository/uploadfiles/relicHdch/image
+    RELIC.HDCH.IMAGE.PATH = /data/relicHdch/image
+    RELIC.HDCH.IMAGE.PATH.TYPE = LINK
+    RELIC.HDCH.IMAGE.AUTH = Y
+    RELIC.HDCH.IMAGE.SIZE = 104857600
+    RELIC.HDCH.IMAGE.EXT = jpg,bmp,png,gif,jpeg
+    RELIC.HDCH.IMAGE.USETMP = N
+    이렇게 property에 저장되어 있었음.
+    따라서 다른 경로에할려면 fileUploadProperty에 추가해야할듯
+
+    저장된 이미지 경로보니깐 그냥 D드라이브에 생성되고있었네..
+
+    일단 화면에 보여지는 작업만 해놓았는데 추가되는 컬럼들에 대해서 DB작업해주시면 바로 할 수 있도록...
+
+    javascript:void(0);
+    - a태그의 디자인성은 살리면서 링크 기능을 업애는 것
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월24일
+    캐러셀 수정화면 들어가면 request uri랑 view name 부분에서 /common/error404.do 값이 나옴
+    -> 확인해보니 logginginterceptor가 두 번 돌더라
+    
+    원인 : ajax로 화면 만드는 함수가 2개인것같은데 1개는 정상적으로 도는데 또 돌아서 문제가 생김
+    -> 이미지 못불러와서 생긴 문제인가?
+
+    IFEZ
+    홍보센터 > 발간책자에서 첫 번째 영역에는 브로셔, 두 번째는 리플릿 세 번째는 기타만 나오도록 하고
+    화살표 클릭시 모두 각각 다음 책자가 나와야함(단, 다음 책자가 존재하지않으면 해당 항목은 false하고 존재하는 항목에
+    대해서만 다음 책자가 나오도록 구현해야할듯)  -> 내가 생각한 처음 방식이 맞는듯
+
+    방법?
+    각각 항목에 대한 selectList_paging을 만들고 페이지는1, 컨텐츠는 하나만 보여지도록 만든다음,
+    화살표 버튼에 ajax 함수를 넣는다.
+    controller에 해당 ajax의 url로 하는 메서드를 만든다
+
+    ex)page=1,2,3,4....? 증가하면서 데이터를 받아오는데 받아온 데이터가 null이라면 그대로 두고,
+    null이 아닐때 list 에 추가해주기
+
+    그러면 
+    list[ {object1, object2, object3, object4...} 
+    	,{object1, object2, ojbect3},
+	,{object1, object2}] 
+	이런 형태로 데이터를 받아서.. 진행하면되나'
+    -> 문제) 해당 형태는 리스트인데.. 나는 매번 클릭마다 1개씩 가져오므로 위의 형태는 나올 수 없음
+    즉, selectList_paging은 하되, 거기서 1개의 데이터만 나올텐데 그걸 pstVO object에 넣어서 보내는 형식으로 행햐라듯
+    [{브로셔, 리플릿 기타}]
+    다음 버튼 누르면 또 새로운 데이터들이 해당형태로 들어가고 만약 없다면 처리해줘야할듯
+
+    저널 더보기할때처럼 방법이 유사하나, 이건 추가가아니라 다음셋트가 보여져야 하기때문에
+    ajax로 문서가 로드할때 비동기방식으로 가장 최근 책자 3개가 보여지도록 만들면될듯
+    그리고나서 화살표누르묜 2page 3page...이동할 수 있게
+
+    문서뷰어만 나오도록하면되는데 스크립트에서 안먹힘
+
+    ifez
+    /other/attach/process.file.do?TP=preview&sn=75838&key=49994BC11EB9074
+    local
+    /other/attach/process.file.do?TP=preview&sn=42834&key=abc"
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월28일
+    아무리 시도해도 안됨 cannot convert String to Date
+    그럼아예 vo에 담아서 보내버릴까 서버단에서 끝내버리기 
+    먼가 돌아가서 되긴 되는듯 로컬 개발에서 뷰어작동이 안되서 확인을 못함
+    스와이프 일정거리 이동시 다음/이전 페이지로 이동할 수 있도록 만들
+    ajax로 할려니 애니메이션이 적용이 안됨 (다음 페이지)
+
+    mav.addobject로 뿌려주는 방식대로할려면..
+    브로셔 List / 리플릿 List / 기타 List
+    페이징 1, 2, 3
+
+    학술연구자 관리 내 아이디 승인해놓기
+    <select id="" name="" class="applicationStateSelect w120 mr4" onchange="fnSttsSeChange('70', this.value, this.options[this.selectedIndex].text);">
+
+	<option value="examine" selected="">승인대기</option>
+
+	<option value="hold">승인보류</option>
+
+
+	<option value="appr">승인완료</option>
+
+
+	<option value="cancel">승인취소</option>
+
+
+	<option value="re_wait">갱신대기</option>
+
+
+	<option value="re_hold">갱신보류</option>
+
+    </select>
+
+http://192.168.1.53:8080/synap/skin/doc.html?fn=c471f09d_50d1_4d91_8278_b76b40b74e68.pdf&rs=/synapc471f09d_50d1_4d91_8278_b76b40b74e68.pdf
+https://www.ifez.go.kr/synap/skin/doc.html?fn=00e422e3_983d_42e3_ae7f_d46851a267e2.pdf&rs=/synap/00e422e3_983d_42e3_ae7f_d46851a267e2.pdf
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월29일
+
+    저널소식지에있는 3번노출 최근꺼 4개항목 홍보센터 배너 아래다 뿌려주기
+    저널소식지 3번노출부분 더보기 없애고 모두 노출 시키기
+    -> 완료해서 깃에 올림
+
+    브로셔 리플릿 기타 브로셔 리플릿 기타 브로셔 리플릿 기타 
+     1     1   1   2    2    2   3    2    2  
+
+    selectList 불러오기(전체) -> 
+    setList라는 리스트변수의 0,3,6,9,12...번째 인덱스에 브로셔 저장
+    1,4,7,10 번째 인덱스에 리플릿 저장
+    2,5,8,11 번째 인덱스에 기타 저장
+
+    만약에 null이라면 마지막에 존재한 인덱스를 그대로 넣어서 진행
+
+    List 48 48 48 48 49 49 49 50 50 50 
+
+    48브로셔 1 49리플릿 1 50기타 1 
+    48브로셔 2 49리플릿 2 50기타 2 
+    48브로셔 3 49리플릿 3 50기타 3
+    48브로셔 4 49리플릿 3 50기타 3
+
+    List 3개로 분리
+    for문 all_book.size 길이만큼 반복할때
+    각 list i번째의 항목을 차례대로 setBook list에 add시킨다.
+    그렇게 진행하다보면 어느 list에서는 i번째 항목이 없을텐데 없다면 i번째에서 그 list의 인덱스는 멈추고
+    다른 존재하는 list의 인덱스는 증가해서 add처리 시킨다.
+    좀 비효율적이지만 결과는 나옴..
+    try {
+		int brochure_count = resultList_brochure.size();
+		int leaflet_count = resultList_leaflet.size();
+		int etc_count = resultList_etc.size();
+		
+		int stop_brochure = 0;
+		int stop_leaflet = 0;
+		int stop_etc = 0;
+		
+		int big_number = brochure_count;
+		
+		if(leaflet_count > big_numbe자바 표준편차r) {
+			big_number = leaflet_count;
+	}
+	if(etc_count > big_number) {
+		big_number = etc_count;
+	}
+		
+		for(int i=0; i<big_number; i++) {
+			if(brochure_count > i && stop_brochure == 0) {
+				resultList_setBook.add(resultList_brochure.get(i));
+			}else {
+				stop_brochure = brochure_count-1;
+				resultList_setBook.add(resultList_brochure.get(stop_brochure));
+			}
+			
+			if(leaflet_count > i && stop_leaflet == 0) {
+				resultList_setBook.add(resultList_leaflet.get(i));
+			}else {
+				stop_leaflet = leaflet_count-1;
+				resultList_setBook.add(resultList_leaflet.get(stop_leaflet));
+			}
+			
+			if(etc_count > i && stop_etc == 0) {
+				resultList_setBook.add(resultList_etc.get(i));
+			}else {
+				stop_etc = etc_count-1;
+				resultList_setBook.add(resultList_etc.get(stop_etc));
+			}
+		}
+		
+	}catch (IndexOutOfBoundsException e) {
+		e.printStackTrace();
+	}catch (NullPointerException e) {
+		e.printStackTrace();
+	}catch (Exception e) {
+		e.printStackTrace();
+	}
+}
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월30일
+    만화규장각
+    ajax처리를 하고싶을때 fnValajax 이용하면 된다.
+    동기식으로 처리하도록 되어있으며, form태그의 이름을 파라미터로하여 선택자로 data에 값을 넣는다
+    주말 : 영화, 자전거 청소, 로아, 운동, 태블릿세팅, 형ㅂㅂ, 
+
+    제이쿼리
+    .after() : 요소 뒤에 내용을 추가
+    $("#document").after("<div>뒤에 내용 추가.</div>");
+    .before() : 요소 앞에 내용을 추가
+    $("#document").before("<div>앞에 내용 추가.</div>");
+    .html() : .text() 메소드와 기능은 유사하지만 삽입하는 내용에 html 태그가 있다면 태그가 적용
+    $("p").html("<div>여기 구문을 변경.</div>");
+    https://parkjh7764.tistory.com/9
+
+    document.ready() 와 window.load()
+    웹브라우저 시작 -> 웹문서읽기 -> DOM생성(이때 ready메소드가 실행) -> 이미지를 포함한 요소들 로드시작 
+    -> 모든 요소들이 로드가 완료되면 load메소드가 실행
+
+    var coffees = $("li");
+    $("#length").text("커피의 종류는 총 " + coffees.length + "가지 입니다.");
+    위 예제처럼 변수에 저장하고 메소드를 사용 할 수 있다.
+
+    .find() 메소드는 선택한 요소의 자손(descendant) 요소 중에서 전달받은 선택자에 해당하는 하위 요소를 모두 선택한다.
+    이때 별표("*")를 인수로 전달하여, 선택한 요소의 자손 요소를 모두 선택할 수도 있다.
+
+    .eq() 메소드는 선택한 요소 중에서 전달받은 인덱스에 해당하는 요소를 선택한다.
+    인덱스가 음수인 경우에는 선택한 요소 집합의 맨 마지막 요소를 인덱스 -1로 놓고, 뒤에서부터 검색된다.
+
+    ifez
+    그룹권한->권한부여 모달창에서 이름 검색기능 추가하기
+    모달창이라 ajax로 해야할것같은데.. 보니깐 새로운방식으로 화면을 채움 
+
+    검색버튼 누르면 기존에 뿌려져있던것 모두 remove시킨다음에 기존코드 활용 + if문에다가 검색한 이름과 같을때만 추가되도록 구현하면>?
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    3월31일
+    체크된 항목 나올수있는방법
+    체크된항목의 id값을 추출한다음 if문?
+
+    체크된 항목의 value값을 얻어와서 배열에 넣은다음에
+    name이 비어있지 않을 경우에만 해당 배열의 값을 토대로 반복문을 돌아서
+    검색값 아래에 체크된 항목이 노출되도록 만들었음
+
+    어차피 체크된 항목만 추가하는거니깐 prop함수 사용할때는 무조건 조건 true로 하면됨
+
+    $('#modal_mber').on('keydown', function(e) {
+	  if (e.keyCode === 13) {
+	    e.preventDefault();
+	    fnSearch();
+	  }
+	});
+    위 코드로 엔터키 form전송 방지하고 함수 작동하도록 함
+
+    문제) 이미체크된 항목에 대해서 또 중복해서 나옴'
+    문제2) 체크된 이름의 검색 계속하면 계속 추가되서 나옴
+    체크된 항목 추가하는 코드에서 if문으로 json.mbr_nm이랑 name이랑 같다면 추가작업 안하도록해야할듯
+
+    +문제) 동명이인일때는 어쩌지?
+    -> 어차피 위에서 append 다해주기 때문에 체크된 항목도 문제 없음
+
+    인호님 : php개발은 atom으로 했음 -> 지금은 지원중단 -> vscode로 해보자
+
+    
+    IFEZ보완점검
+    -admin-
+    위험한 형식 파일 업로드
+    if (FuncFile.extCheck(atch_file01.getOriginalFilename(), FileExtEnum.img)==false)
+    위 코드로 파일 확장자 검사하고 있음.
+
+    오류 메시지 정보노출
+    e.printStackTrace()로 정보 노출로 인한 보안약점
+    log4j로 할려고 했으나 해당 메소드가 static이라 사용을 못해서 println으로 함
+
+    부적절한 예외 처리
+    try catch문에서 예외처리를 exception하나만으로 해서 생긴 문제
+    catch 예외 하나더 추가해서 수정함 (jsp파일에 있는 <% 태그안에있는 exception은 무시함)
+
+    건수가 여러개인데 경로를 하나만 보여주면 어쩌자는건지
+
+    -user-
+    상대 경로 조작
+    외부 입력값으로 파일명이 사용될 경우 경로순회 공격이 시도 될 수 있음
+    봤더니 이미 replaceAll로 \r \n \\ & 같은 경로이동에 사용되는 문자열은 모두 없애고있더라
+
+    확장자 검사
+	if (FuncFile.extCheck(atch_file01.getOriginalFilename(), FileExtEnum.data)==false
+	&&	FuncFile.extCheck(atch_file01.getOriginalFilename(), FileExtEnum.img)==false) {
+	이미 하고있음
+    
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    4월03일
+    e.printStackTrace 처리하기
+
+    오후에 ifez 소드코드보안약점진단 상세보고 user 다시 확인 후 수정하고 없으면 git에 올리기
+    저번주에 그룹권한 이름검색 기능 추가한거 확인해야하는데 cms_devel계정 누가 비번 바꾼듯
+    -> 일단 팀장님 계정으로 들어가서 확인한 결과 이상없이 동작함
+
+    홍보메인>발간책자 slidegroups 반응형일때 slidesPerGroup 숫자 바뀌도록 수정함
+    -> 개발서버에 적용할려는데 무한 building 중이라 오후에 과장님오시면 이클립스 껏다켜도 되는지 여쭤보기
+    -> 메이븐이 꼬였나 머가 꼬였나 과장님이 싹 지우고 다시 세팅해서 해결하심..
+    -> 앞으로 새프로젝트 할때마다 플젝별 메이븐 따로 만들어놓기
+
+    -> ifez이클립스 다시 세팅해서그런지 ssl이 없어진상태같음 https로 들어가면 페이지 안됨 (http로 들가야함)
+
+    Indigo
+    qa수정요청 사항 2개
+    1. 모집인원 > 정원이 안찼는데 대기정원 접수된다는 컨펌문구 출력됨, 그리고 이상태에서 신청하기 버튼 누르면 로딩바만 돌아가는 상황임.
+    -> 무한로딩이유 : 제출서류가 없을 경우 getSbmsn_dcmnt_cd_lst코드에서 nullpointerexception 에러가 발생
+    -> if문으로 null유무 검사하여 작동하도록 코드 수정함
+
+    ->(resultVO.bizPbancVO.wait_nope ne '0' and resultVO.bizPbancVO.wait_nope gt resultVO.bizPbancVO.wait_aply_cnt)
+    -> gt를 lt로 바꾸니 해결된 것 같음
+    -> 인줄 알았으나 뒤에 or문에서 true나오면 앞에서 나온 false가 다 의미없음. 따라서 코드 수정함
+    -> ${resultVO.bizPbancVO.rcpt_se eq 'order' and resultVO.bizPbancVO.rcpt_nope ne '0' and resultVO.bizPbancVO.rcpt_nope le resultVO.bizPbancVO.aply_cnt  and resultVO.bizPbancVO.wait_nope ne '0' and resultVO.bizPbancVO.wait_nope gt resultVO.bizPbancVO.wait_aply_cnt}
+    -> wait_nope ne '0' 이면 대기접수 무한이라는 뜻인데 어차피 0으로 신청화면 들어가면 대기신청하겠냐는 버튼뜨므로 괜찮
+
+    2. 분야 셀렉트 박스, 교육/과제 공통된 항목 출력안되도록 수정 요청 ex)기타 
+    -> 기타 2개 같은항목아님 이름을 달리 해야할 것 같음 (과제, 교육)
+    -> 일단 임시로 바꿔논거 조대리님에게 여쭤보기
+    -> 하나로 보이면서 과제,교육값이 둘 다 넘어가야함
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    4월7일
+    
+    인디고 qa
+    1. 메일 스킨 발송 및 스킨 적용? (뭔말인지모르겠음)
+    2. 사용여부 N이라면 통계에 포함 X시켜주기
+    -> 쿼리에 use_yn 추가 및 controller에 검색조건 추가 (사용자 및 관리자 통계에서 use_yn="N"인 항목은 포함안되도록 수정)
+    -> 사용자 가족회사현황 목록 페이지에도 use_yn조건 추가
+    3. 가족현황 업종 드랍다운 수정 (아직 사용업종 리스트 못받아서 보류)
+    4. 과제관리 사업기간/신청기간 반대로 출력 및 삭제 버튼 추가 (목록)
+    -> 사업기간/신청기간 반대로 바꿈 (교육도 마찬가지)
+    -> 과제 및 교육 삭제기능 추가 (근데 삭제하고나서 사용자들은 어떻게 처리해야하는지? 상태에 대해서)
+    5. "보완요청 시 지원자의 수가 줄어드는 부분 기존 모집 정원보다 작게 설정하면 대기 접수로 넘어가는 부분 -> 보완 요청 시, 모집정원에 속하도록"
+    -> 1) view화면에서 aply_cnt + 보완_cnt 로 바꿔야할듯
+    -> 2번에서 해결
+    -> 2) 보완_cnt 라는 변수는 따로없어서 만들어야할듯
+    -> 만들필요없이 쿼리에서 in 함수안에 supply 추가해주면됨
+    -> 3) 정원 숫자보고 대기로할지, 신청못할지, 할지 판단하는 로직 수정 필요
+    -> appy_cnt로 알아서 판단해서 위에서 수정하면 알아서 해결됨
+    6. 과제신청현황 > 제출서류 선택 시 개별로 첨부파일이 다운로드, 전체 다운로드 시, 제출서류의 서류 Zip 파일로 전체 다운로드
+    -> 첨부파일 모두 담아서 zip 형태로 다운받아야하는듯한데 어케해야하
+    -> funcfile에 압축해서 다운해주는 기능있으니 쓰면될듯
+    -> 첨부파일 list로 만들어서 보내면될듯
+    -> ajax로 처리할려고 개고생했는데 걍 a태그 href에 쓰면잘되는걸 빢치게
+    7. 팝업창 오늘 하루 열지 않음 기능 필요 / 닫기 버튼 눌러도 닫히지 않음
+    -> 팝업 등록/수정창에서 쿠키를 0으로 해서 적용안하면 닫기버튼이 동작안하는걸로 보이는데
+    -> 오늘하루안보기 같은 기능도 쿠키를 1이상으로하면 적용되고 닫기도 적용되는데 머 수정해야함??
+    -> 일단 쿠키0 일때도 닫기 동작하도록 수정함 (산학/링크 둘다 적용함)
+    8. 배너위치 필드 삭제 요청
+    -> 배너필드 삭제함
+    9. 산학협력단 > 연구처관리 > 정관 및 규정 목록화면 카테고리구분 항목 추가 검색필터 카테고리 추가
+    -> list에 항목 더 추가하고, 검색 select 추가함 
+    10. 사용자가 비밀글 등록 후 답변하면 비밀글이 풀리는 상황 발생 > 답변일 입력하지 않아도 현재날짜로 자동입력??
+    -> 해봤더니 이상없던데?? 보류 
+    11. 연구비신고센터 > 등록/수정 문제있음
+    -> 뭐가 문제인지 모르겠음 
++ 마이페이지>신청내역 페이징스크립트 없어서 추가함
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅁ
+
+    4월10일
+    인디고 qa
+    1. 메일스킨 여부 
+    -> 저번에 검수할때는 안됬었는데 되더라, 따라서 메일주소만 변경함 kingkong@penta.com -> indigo@머시기.kr
+    -> 메일에 이미지가 안뜨는이율 -> 이미지 경로에 아직임시로 #도메인#/indigo...라고 해놔서 그럼http://192.168.1.53:8082/archive/bundle/2200004522
+    -> 개발서버가 ssl인증을 못받았기때문에 개발서버경로로 변경하고 보내도 뜨지않음. 따라서 ssl인증 받아서 https가 되었을때 가능할 듯
+
+    -> http문제가맞음 따라서 적용함 -> 근데 스킨적용할때 /lib/mail이런식인데 적용하면 http로 나와서 오류생김
+    -> ERROR:RTm
+    -> 임시비번 발급도 똑같은 오류로 http로 나와서 오류나옴
+    
+    @@@@@@@@@@@@@@@@@@@@@@@@SSL넣는방법@@@@@@@@@@@@@@@@@@@@@@@
+    ssl 파일 위치
+    Z:\펜타코드\#연계_SSL인증서_e.pentachord.com\tomcat
+    -> 여기서 e_pentachord_com.jks 복사해서 해당 개발서버가 있는 컴터로 원격접속하여 E드라이브에 넣어주면됨
+    tomcat server.xml
+    <Connector SSLEnabled="true" maxThreads="150" port="58084" protocol="org.apache.coyote.http11.Http11NioProtocol">
+	<SSLHostConfig>
+		<Certificate certificateKeystoreFile="E:\e_pentachord_com.jks" certificateKeystorePassword="vpsxkzhem" type="RSA"/>
+	</SSLHostConfig>
+    </Connector>
+    certificateKeystoreFile 경로랑 certificateKeystorePassword 비밀번호 잘 확인해서 수정하면됨
+    만약에 박팀장님이 재갱신하시면 그때는 파일만 옮겨 넣으면됨 (비밀번호 변경없을 경우) 
+    위에 처럼 수정한다음에 해당 server 톰캣 우클릭한다음 publish 누른다음 재시작하면 적용됨
+    -> ifez에 적용해보았는데 안되는데???
+    -> port에 http1.1로 포트해놔야하는데 안되있어서그런가? -? 되어있는데??
+
+    해답> ifez에 적용하였는데 적용이 안됨
+    기존에 http로 사용했던 포트번호는 사용하면 안되나? ssl적용한것들 보니 모두 https/1.1 포트가 2개 이상인것을 확인
+    따라서 server.xml의  <Connector SSLEnabled="true" maxThreads="150" port="58105" protocol="org.apache.coyote.http11.Http11NioProtocol">
+    PORT 부분을 다른 프로젝트와 겹치지지 않게 임의로 만들어서 publish했더니 톰캣에 서버번호가 추가됨
+    -> 이러니깐 잘됨 (기존에 사용하던 포트는 설정 후에는 안들어가지더라)
+
+    2. 정보서비스 -> QnA
+    -> 답변해도 비밀글 안풀림
+    -> 답변일 미선택시 일자가 null로나옴 (사용자화면에서)
+    -> insert할때 날짜가 잘못들어간듯 쿼리 확인 필요
+    -> 날짜 등록하면 제대로 들어감, 등록안하면 일수 부분에 null
+    -> controller에서 10보다 아래인 일수 혹은 월에대해 0을 붙이는 작업에서 else가 빠져있어서 생긴문제 해결힘
+
+    연구과제공모 접수일이 지난것도 올라오는데
+    나중에 말 나오면 접수종료일이 현재보다 전 이라면 ntisList에 추가안하도록 if문 처리하면 될것같기도?
+    -> 바로 말 나옴 -> 종료일보다 지났다면 아예 화면에 출력안하도록 -> 를 했는데 6개씩 불러오는 방식이라 없애면 아예 빈칸이됨
+    -> 그냥 종료일 지난간 마감으로 바꾸도록 해야할듯하다. -> 완료 
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    4월11일
+    1. 인디고 기본경로가 아직도 http임
+    -> 또 잘되네?? 이미지 경로만 바꿔주면 될듯
+    -> 그 도메인 변수 mav해서 가져온거 사용하면될듯한데 머였지 -> ${siteDomain}인데 html파일이라 사용못함
+    -> #DOMAIN#은 HTML 코드 내에서 사용되는 플레이스홀더(placeholder)로, 대체될 실제 값이나 변수를 나타내는 용어입니다.
+    content = content.replace("#CONTENT_NM#", mbrVO.getMbr_nm_encpt());
+    content = content.replace("#CONTENT_PW#", mbr_pw);
+    content = content.replace("#DOMAIN#", FuncHttp.getSiteDomain());
+    -> controller에서 변경해줘서 보내주고 있었음
+    -> 즉, 변경 할 필요 없음
+    -> 직접 메일보내는건 잘되는데 갑자기 임시비밀번호 메일이 안보내짐
+    -> 그냥 많이보내니깐 네이버메일에서 차단했나? 회사메일로 보내니깐 보내짐
+
+    2. IOS에서 산학메인 연구공모과제 데이터 받아오는 중에 다른페이지로 이동하면 alert가 자꾸 발생한다.
+    -> 다른 환경에서는 문제없으나, IOS에서만 문제발생.
+    -> 캐쉬 사용안하고, header수정하고. xhr요청 취소도 해보고했는데 안되서 그냥 alert를 삭제하거나 console.log로 바꾸도록함
+
+    인디고 가족회사 업종 확정되면 드랍다운 처리해주기(아직 확정 안난듯)
+
+    만화규장각
+    소장자료연구 해야함
+    1. 집필진,발행일,목차 컬럼 추가 요청 드림
+    2. 추가된다면 insert, update 쿼리에 추가된 컬럼들 추가하고 jsp에도 input에 각각 id랑 name에 추가해주기 + VO에도추가
+    -> BBSVO에 컬럼3개 추가해둠
+    -> select, insert, update에 추가하여야하는데 회사cms랑 다르게 if문판독으로 추가할 수 없을것같은데 어떡할까 -> 아니네 그냥 if문으로 != "" 이렇게 해버리리네
+    3. 집필진은 일단 따옴표로 구분하여 들어가면됨
+    -> replaceAll 정규식으로 따옴표 제거함
+    4. 발행일은 그냥 string인가?
+    -> 그냥 String 타입으로 하는듯
+    5. editor가 개발서버에서도 안되는데 왜지
+    6. 성공적으로 db에 컬럼이 모두 들어갔다면 list 집필진 부분에 controlle에서 첫번째 집필진 값만 추려내서 view에 뿌려주고 데이터 넣기
+    일단 관리자는 에디터부분 제외하고는 대충 된듯하다.
+
+    사용자부분 확인하려면 소장품 메뉴만들어야할것같은데..
+    -> 시스템관리 > 관리자료 > 시스템 메뉴 안에서 만들면됨..
+    -> list 목록 및 view까지 나오는거 확인하였으며, 출력내용 바꾸면 될듯
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    4월12일
+    만화규장각
+    소장자료 연구 사용자화면
+    List
+    1. 작성자가 아니라 집필자 맨 앞 대표 1명이 나오도록
+    2. 작성일이 아니라 발행일이 나오도록
+    3. 퍼블 적용
+    
+    View
+    1. 작성자가 아니라 집필진이 나오도록 
+    -> 처음 상태엔 맨 앞 한 명만 나오도록 하고, 1명이라면 +버튼 안나오도록
+    -> 2명 이상이라면 +버튼이 추가되고, 누르면 밑에 나머지 집필자 모두 나오도록
+    2. 첨부파일이 존재하면 무조건 뷰어로보기 버튼이 생겨야함
+
+    view남은거 
+    -> 에디터 출력 확인
+    -> 에디터는 kmas도메인으로 되어있어서 개발서버도 안됨.
+    -> localhost로 해놓으면 된다고하더라
+    -> http://localhost:8082/mgnt/manfrm/mgntManfrmAction.do 이렇게 앞에 localhost붙이면 잘됨
+
+    -> 문서뷰어 작동 확인
+    
+    퍼블이랑 merge했는데 파일3개 conflict 남
+    -> 어디를 수정해야하나
+
+    인디고
+    1. 이메일 -, _, . 기호들 가능하게해달라
+    -> 지금도 가능하긴한데 끝에 붙는건 안된다고 답함
+    2. 링크 메인 맞춤 키워드에서 과제랑 교육 분야가 겹치는 부분은 검색이 안된다.
+    -> 확인해보니 겹치는 값은 과제,교육 코드 두개 모두 파라미터로 넘겨줘야 검색이 가능하다
+    -> 일단 하드코딩은 아닌데.. 겹치는부분은 url 파라미터 하나더 추가해서 보냄
+
+나모에디터 2개 적용한 예제
+https://e.pentachord.com:58105/ifezsm/main/tour/tour_fclt/modify.do?tour_fclt_sn=4658&search=UzFYSmFJUlMrUjM3WmExWWs1WkdkdVJRWGlqZjNCRXA0VWZNWVFKOGRlQk12QUE1SXV6bklWa1NJT1prdU0rMlJ6enJqdEYwLzdtREg4eU1peVdScnc9PQ==
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    4월13일
+    나모 에디터 여러개 적용방법
+    var OnInitCompleted = function() {
+	setTimeout(function(){
+		CrossEditor.SetBodyValue(document.getElementById('nttCn').value);
+		CrossEditor_ttl.SetBodyValue(document.getElementById('ttlLst').value);
+		
+	}, 1000)
+    }
+    위에 처럼 시간각격을 두고 해주면 둘 다 db내용이 에디터 안으로 내용이 적용됨
+
+    문서뷰어 적용 방법
+    C:\Users\PPC070\Documents\synap문서뷰어 파일
+    1. 보통은 Controller부분에 D:/SynapDocViewer/sn3hcv/" 처럼 변수에 경로를 저장했을텐데
+    위에 예처럼 D드라이브라면 D드라이브에 synap 파일을 넣어준다.
+    
+    2. 보통은 properties.xml파일에 파일업로드 경로가 기입되어있는데,
+    해당 경로 안에 docViewer라는 폴더를 넣어준다.
+    -> 해당 폴더안에는 result랑 skin이라는 폴더가 존재하는데, result는 문서뷰어 전환 작업이 끝난 파일이 들어가는 폴더이며,
+    -> 만약에 문서뷰어 처리가 안되었다면 해당 폴더에 존재하지 않고 사용자화면에서도 동작하지 않는다.
+    -> skin은 문서뷰어를 커스텀하는 그런것들이 들어있다. 
+
+    3. 우리회사CMS에는 server에 문서뷰어 경로를 따로 지정하지 않아도 동작하였는데,
+    만화규장각 프로젝트 할 때는 톰캣서버에 docViewer 위치를 추가하여 진행하였다. 
+    -> (Web Modules에 /viewer  ,  D:\archive\docViewer  이렇게 추가함)
+
+    Git에서 Merge안하고 브랜치에서 특정 부분의 commit(변경사항)을 가져오는 방법
+    체리 픽이라는 기능을 지원한다. 원하는 변경사항에 오른쪽 클릭을 하고 체리 픽을 하면 해당 변경사항만 가져올 수 있다
+    merge를 안하므로 그 이후의 수정사항은 현재의 브랜치에 적용되지 않는다.
+
+    참고로 commit을 branch에서 다른 branch로 옮기는 건 아니고, 전체 history를 따지면 새로운 commit이 늘어나는 것이다.
+    [팀으로 협업할 때]
+    만일 팀이랑 사이드 프로젝트를 진행하고 있다고 하자.
+    본인는 백엔드다. 현재 내가 맡은 기능이 프론트까지 더해졌을 때 어떻게 돌아가는지 확인하고 싶은데 프론트엔드를 맡은 동료가 지금 한창 작업 중이라고 한다. 근데 아까 CSS 파일을 완성해서 commit해 뒀다고 한다.
+    그럼 cherry-pick을 통해 그 commit 하나만 찾아서 내 branch에 가져오면 된다. 
+    CSS만 입혀볼 수 있게 되는 것이다.
+    
+    [버그 수정]
+    본인은 며칠 전 A 기능을 완성한 개발자다.
+    A가 끝나고 B 기능을 개발하는 중이었는데, 알고 보니 A 기능에 버그가 있다고 한다.
+    더 많은 유저들이 이 버그로 인한 현상을 겪기 전에 빠르게 버그 패치를 해서 내 branch에 commit한다.
+    방금 commit한 이 패치는 git cherry-pick을 통해 main branch에 바로 반영되었다.
+    
+    [반영되지 않은 pr]
+    실수로 pull request를 merge하기 전에 닫아버렸다.
+    당황하지 않고 git cherry-pick을 통해 해당 commit을 가져옴으로써 살릴 수 있게 됐다.
+
+    [Char Gpt 왈]
+    git cherry-pick 명령어는 다른 브랜치의 특정 커밋에서의 변경 사항을 현재 브랜치로 가져오는 명령어입니다.
+    하지만, git cherry-pick으로 브랜치를 병합하는 것은 권장하지 않습니다. 이유는 git cherry-pick은 커밋 단위로 변경 사항을 가져오는 것이므로, 이전에 cherry-pick 한 커밋과 충돌이 발생할 수 있기 때문입니다.
+    그리고, git cherry-pick을 사용해 병합하면, 이전 브랜치의 모든 커밋을 가져와서 새로운 브랜치를 만들게 됩니다. 이 경우, 이전 브랜치의 커밋 히스토리가 모두 새로운 브랜치로 가져와지게 되므로, 커밋 히스토리가 복잡해지는 단점이 있습니다.
+    따라서, 브랜치를 병합하는 경우에는 git merge를 사용하는 것이 바람직합니다. git merge는 두 브랜치를 병합하는 것이므로, 브랜치 간의 차이를 비교하여 변경 사항을 병합하고, 커밋 히스토리도 간결하게 유지할 수 있습니다.
+
+
+
